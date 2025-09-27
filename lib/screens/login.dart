@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/owner_Login_Page.dart';
 
 void main() {
   runApp(const ZoozyGirisUygulamasi());
@@ -243,7 +244,14 @@ class _ZoozyGirisEkraniState extends State<ZoozyGirisEkrani> {
                 metin: 'Evcil Hayvan Sahibi',
                 renk: Colors.deepPurple,
                 metinRengi: Colors.white,
-                tiklamaFonksiyonu: () {},
+                tiklamaFonksiyonu: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OwnerLoginPage(),
+                    ),
+                  );
+                },
               ),
               _butonOlustur(
                 metin: 'Bakıcı & Hizmetler',
