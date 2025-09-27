@@ -242,7 +242,7 @@ class _ZoozyGirisEkraniState extends State<ZoozyGirisEkrani> {
               // Butonlar
               _butonOlustur(
                 metin: 'Evcil Hayvan Sahibi',
-                renk: Colors.deepPurple,
+                renk: const Color(0xFF7A4FAD), // mor
                 metinRengi: Colors.white,
                 tiklamaFonksiyonu: () {
                   Navigator.push(
@@ -255,17 +255,18 @@ class _ZoozyGirisEkraniState extends State<ZoozyGirisEkrani> {
               ),
               _butonOlustur(
                 metin: 'Bakıcı & Hizmetler',
-                renk: Colors.orangeAccent,
+                renk: const Color(0xFFFFA726), // turuncu
                 metinRengi: Colors.white,
                 tiklamaFonksiyonu: () {},
               ),
               _butonOlustur(
                 metin: 'Keşfet',
-                renk: const Color.fromARGB(0, 240, 237, 237),
-                metinRengi: Colors.deepPurple,
+                renk: const Color(0xFFB2A4FF), // açık mor
+                metinRengi: Colors.white,
                 tiklamaFonksiyonu: () {},
                 cizgili: true,
               ),
+
               const SizedBox(height: 20),
             ],
           ),
