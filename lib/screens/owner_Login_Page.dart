@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/forgot_password.dart';
+import 'package:zoozy/screens/register.dart';
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -267,7 +268,12 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Kayıt sayfasına yönlendirme
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterPage(),
+                          ),
+                        );
                       },
                       child: const Text(
                         "Kayıt Ol",

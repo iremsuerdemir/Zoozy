@@ -125,7 +125,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 200),
+                    const SizedBox(height: 300),
                     const Text(
                       'Şifre Sıfırlama',
                       textAlign: TextAlign.center,
