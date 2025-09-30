@@ -155,14 +155,15 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: const Icon(Icons.arrow_back,
+                            color: Colors.white, size: 28),
                         onPressed: () {
                           Navigator.pop(context);
                         },
                       ),
-                      const SizedBox(width: 5),
                       const Text(
                         'Kayıt Ol',
                         style: TextStyle(
@@ -171,6 +172,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(width: 48),
                     ],
                   ),
                   const SizedBox(height: 20),

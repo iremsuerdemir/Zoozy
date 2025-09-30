@@ -21,17 +21,58 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  void _login() {
+  void _login() async {
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
 
-      // Başarılı giriş için örnek
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Giriş başarılı! Sayfaya yönlendiriliyorsunuz"),
-          backgroundColor: Colors.green,
-        ),
-      );
+      try {
+        // Firebase ile gerçek kimlik doğrulama işlemi
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        // Başarılı giriş
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Giriş başarılı! Sayfaya yönlendiriliyorsunuz..."),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // 4 saniye bekletme ve yönlendirme
+        await Future.delayed(const Duration(seconds: 4));
+
+        if (mounted) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        }
+      } on FirebaseAuthException catch (e) {
+        // Kimlik doğrulama hatalarını yakala ve kullanıcıya göster
+        String message;
+        if (e.code == 'user-not-found') {
+          message = 'Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.';
+        } else if (e.code == 'wrong-password') {
+          message = 'Yanlış şifre. Lütfen tekrar deneyin.';
+        } else {
+          message = 'Giriş hatası';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } catch (e) {
+        // Diğer bilinmeyen hatalar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Bilinmeyen bir hata oluştu: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

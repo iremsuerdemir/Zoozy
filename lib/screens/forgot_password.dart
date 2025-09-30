@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-// Renk sabitleri
+// --- Sabit Renkler ---
 const Color kAnaMor = Color(0xFF8C60A8);
 const Color kAcikMor = Color(0xFFF0EAF5);
 const Color kKoyuYazi = Color(0xFF4C4C4C);
 
+// --- ForgotPassword Widget (Kullanıcının sağladığı kod) ---
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
 
@@ -16,6 +19,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
 
+  // Yükleme durumunu yönetmek için
+  bool _isLoading = false;
+
+  // Hata ve başarı mesajlarını göstermek için yardımcı fonksiyon
+  void _gosterMesaj(String metin, Color renk) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: renk,
+          content: Text(
+            metin,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+  }
+
   // Tekrar kullanılabilir buton oluşturma fonksiyonu
   Widget _butonOlustur({
     required String metin,
@@ -23,16 +44,21 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     required Color metinRengi,
     required VoidCallback tiklamaFonksiyonu,
     bool cizgili = false,
+    bool disabled = false, // Buton devre dışı mı?
   }) {
+    // Buton devre dışıysa rengi biraz gri yapıyoruz
+    final buttonColor = disabled ? Colors.grey : renk;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: SizedBox(
         width: double.infinity,
         height: 55,
         child: ElevatedButton(
-          onPressed: tiklamaFonksiyonu,
+          // Yükleniyorsa veya disabled true ise boş bir fonksiyon atıyoruz
+          onPressed: disabled ? null : tiklamaFonksiyonu,
           style: ElevatedButton.styleFrom(
-            backgroundColor: renk,
+            backgroundColor: buttonColor,
             foregroundColor: metinRengi,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0),
@@ -42,32 +68,88 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             ),
             elevation: 5,
           ),
-          child: Text(
-            metin,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          child: _isLoading && metin == 'SIFRILAMA LİNKİ GÖNDER'
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+              : Text(
+                  metin,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
         ),
       ),
     );
   }
 
-  // Şifre sıfırlama butonuna tıklandığında çalışacak fonksiyon
-  void _sifirlamaLinkiniGonder() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Color.fromARGB(
-            255,
-            19,
-            187,
-            89,
-          ),
-          content: Text(
-            'Şifre sıfırlama linki gönderildi!',
-          ),
-        ),
-      );
+  // Şifre sıfırlama butonuna tıklandığında çalışacak ASENKRON fonksiyon
+  void _sifirlamaLinkiniGonder() async {
+    // Form doğrulamasını kontrol et
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
+
+    // Yükleme durumunu başlat
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 1. Firebase Auth metodu çağrılıyor
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text.trim(),
+      );
+
+      // 2. Başarılı olduysa kullanıcıya bilgi ver
+      _gosterMesaj(
+          'Şifre sıfırlama linki e-postanıza gönderildi! Lütfen gelen kutunuzu kontrol edin.',
+          const Color(0xFF388E3C)); // Yeşil renk
+
+      // 3. Başarılı işlemden sonra önceki sayfaya dön
+      // Eğer widget hala mevcutsa (mounted) Navigator.pop yap
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } on FirebaseAuthException catch (e) {
+      // Hata yakalama ve kullanıcıya özel mesaj gösterme
+      String hataMesaji;
+
+      switch (e.code) {
+        case 'user-not-found':
+          hataMesaji = 'Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.';
+          break;
+        case 'invalid-email':
+          hataMesaji = 'Lütfen geçerli bir e-posta adresi girin.';
+          break;
+        case 'firebase_auth/network-request-failed':
+        case 'network-request-failed':
+          hataMesaji = 'İnternet bağlantınızı kontrol edin.';
+          break;
+        default:
+          hataMesaji = 'Bir hata oluştu: ${e.message ?? 'Bilinmeyen Hata'}';
+          break;
+      }
+
+      _gosterMesaj(hataMesaji, Colors.red); // Hata mesajını kırmızı göster
+    } finally {
+      // İşlem bittiğinde yükleme durumunu kapat
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 
   @override
@@ -102,25 +184,30 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // Geri ok butonu
                               IconButton(
                                 icon: const Icon(Icons.arrow_back,
                                     color: Colors.white, size: 28),
                                 onPressed: () => Navigator.pop(context),
                               ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.pets,
-                                  color: Colors.white, size: 30),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Zoozy',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.pets,
+                                      color: Colors.white, size: 30),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Zoozy',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
+                              const SizedBox(width: 48),
                             ],
                           ),
                         ),
@@ -207,8 +294,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       metin: 'SIFRILAMA LİNKİ GÖNDER',
                                       renk: kAnaMor,
                                       metinRengi: Colors.white,
+                                      // Yükleniyorsa fonksiyonu devre dışı bırak
                                       tiklamaFonksiyonu:
                                           _sifirlamaLinkiniGonder,
+                                      disabled: _isLoading,
                                     ),
                                     const SizedBox(height: 15),
                                     _butonOlustur(
@@ -218,6 +307,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       tiklamaFonksiyonu: () =>
                                           Navigator.pop(context),
                                       cizgili: true,
+                                      disabled:
+                                          _isLoading, // Geri butonu da yüklenirken devre dışı kalsın
                                     ),
                                   ],
                                 ),
@@ -225,7 +316,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             ),
                           ),
                         ),
-                        // Esnek boşluk bırakarak kartın dikey ortalanmasına yardımcı olur
+
                         const SizedBox(height: 40),
                       ],
                     ),

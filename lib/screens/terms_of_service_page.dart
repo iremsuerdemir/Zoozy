@@ -58,31 +58,30 @@ Kullanıcı bilgileri, Gizlilik Politikası çerçevesinde korunur ve üçüncü
           SafeArea(
             child: Column(
               children: [
-                // Üst başlık
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 8.0,
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 28,
-                        ),
+                        icon: const Icon(Icons.arrow_back,
+                            color: Colors.white, size: 28),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                      const SizedBox(width: 8),
                       const Text(
-                        "Hizmet Şartları",
+                        'Hizmet Şartları',
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(width: 48),
                     ],
                   ),
                 ),
@@ -144,9 +143,9 @@ Kullanıcı bilgileri, Gizlilik Politikası çerçevesinde korunur ve üçüncü
                                     duration: const Duration(milliseconds: 300),
                                     transitionBuilder: (child, animation) =>
                                         ScaleTransition(
-                                          scale: animation,
-                                          child: child,
-                                        ),
+                                      scale: animation,
+                                      child: child,
+                                    ),
                                     child: Checkbox(
                                       key: ValueKey<bool>(isChecked),
                                       value: isChecked,

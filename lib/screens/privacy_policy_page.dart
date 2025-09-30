@@ -72,24 +72,24 @@ Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasın
                     vertical: 8.0,
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 28,
-                        ),
+                        icon: const Icon(Icons.arrow_back,
+                            color: Colors.white, size: 28),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                      const SizedBox(width: 8),
                       const Text(
-                        "Gizlilik Politikası",
+                        'Gizlilik Politikası',
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(width: 48),
                     ],
                   ),
                 ),
@@ -149,9 +149,9 @@ Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasın
                                     duration: const Duration(milliseconds: 300),
                                     transitionBuilder: (child, animation) =>
                                         ScaleTransition(
-                                          scale: animation,
-                                          child: child,
-                                        ),
+                                      scale: animation,
+                                      child: child,
+                                    ),
                                     child: Checkbox(
                                       key: ValueKey<bool>(isChecked),
                                       value: isChecked,
@@ -189,7 +189,6 @@ Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasın
                                         );
                                       }
                                     : null,
-
                                 child: Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
