@@ -1,9 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/forgot_password.dart';
+import 'package:zoozy/screens/home_screen.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
 import 'package:zoozy/screens/register_page.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -24,9 +27,52 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
 
       // Başarılı giriş için örnek
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Giriş başarılı! Sayfaya yönlendiriliyorsunuz"),
           backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  // 🔹 Google Sign-In İşlemi
+  Future<void> _signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        // Kullanıcı girişten vazgeçti
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
+      );
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Google ile giriş başarılı! Hoşgeldiniz ${userCredential.user?.displayName ?? ""}",
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => HomeScreen()));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Google ile giriş başarısız: $e"),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -85,7 +131,6 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 30),
-
                 // Email
                 TextFormField(
                   controller: _emailController,
@@ -110,7 +155,6 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   },
                 ),
                 const SizedBox(height: 15),
-
                 // Password
                 TextFormField(
                   controller: _passwordController,
@@ -147,7 +191,6 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-
                 // Login Button
                 SizedBox(
                   width: double.infinity,
@@ -166,9 +209,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
                 // Forgot Password
                 Align(
                   alignment: Alignment.centerRight,
@@ -190,7 +231,6 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
                 const Center(
                   child: Text(
@@ -199,13 +239,12 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   ),
                 ),
                 const SizedBox(height: 15),
-
-                // Facebook & Google Buttons
+                // 🔹 Facebook & Google Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: () {},
+                      onTap: () {}, // Facebook
                       child: Container(
                         width: 50,
                         height: 50,
@@ -232,7 +271,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                     const SizedBox(width: 20),
                     InkWell(
-                      onTap: () {},
+                      onTap: _signInWithGoogle, // 🔹 Google Sign-In
                       child: Container(
                         width: 50,
                         height: 50,
@@ -259,9 +298,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -290,9 +327,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 25),
-
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -307,7 +342,6 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                       ),
                     ],
                   ),
-
                   child: Text.rich(
                     TextSpan(
                       text: "Kayıt Ol veya Giriş Yap’a tıklayarak, ",

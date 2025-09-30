@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
+import 'package:zoozy/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,6 +42,61 @@ class _RegisterPageState extends State<RegisterPage> {
   String? passwordError;
   String? rePasswordError;
 
+  // Google Sign-In instance
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'profile',
+    ],
+  );
+// Web'de (Chrome, vb.) sorunsuz çalışması için güncellenmiş metot
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      // 1. GoogleSignIn paketini kullanmak yerine doğrudan Firebase'in
+      //    GoogleAuthProvider'ını kullanın.
+      GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
+      // Web'de pop-up ile giriş yapılmasını sağlayan metot.
+      // Bu, Firebase'in kimlik bilgilerini doğru şekilde yakalamasını sağlar.
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithPopup(googleProvider);
+
+      // Başarılı giriş sonrası yönlendirme
+      if (!mounted) return;
+
+      // Kullanıcının kayıt olma ekranından sonra gitmesi gereken yer HomeScreen()
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Firebase özel hatalarını yakala (Örn: Hesap zaten var, vs.)
+      print('Firebase Google Sign-In Hatası: ${e.code} - ${e.message}');
+      if (!mounted) return;
+
+      String errorMessage = 'Google ile giriş başarısız: ${e.message}';
+      if (e.code == 'popup-closed-by-user') {
+        errorMessage = 'Giriş penceresi kullanıcı tarafından kapatıldı.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      // Diğer genel hataları yakala
+      print('Genel Google Sign-In Hatası: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Google ile giriş sırasında beklenmeyen bir hata oluştu!')),
+      );
+    }
+  }
+
+// Artık GoogleSignIn objesine ihtiyacınız kalmadı.
+// final GoogleSignIn _googleSignIn = GoogleSignIn(...); satırını silebilirsiniz.
   bool isFormValid() {
     return emailError == null &&
         usernameError == null &&
@@ -96,7 +154,6 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  // Geri butonu + Kayıt başlığı
                   Row(
                     children: [
                       IconButton(
@@ -117,24 +174,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Email
                   _buildTextField(
                     controller: emailController,
                     hintText: 'Email',
                     errorText: emailError,
                   ),
                   const SizedBox(height: 15),
-
-                  // Kullanıcı Adı
                   _buildTextField(
                     controller: usernameController,
                     hintText: 'Kullanıcı Adı',
                     errorText: usernameError,
                   ),
                   const SizedBox(height: 15),
-
-                  // Şifre
                   _buildTextField(
                     controller: passwordController,
                     hintText: 'Şifre',
@@ -154,8 +205,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 15),
-
-                  // Şifre Tekrar
                   _buildTextField(
                     controller: rePasswordController,
                     hintText: 'Şifreyi Tekrar Gir',
@@ -175,8 +224,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 15),
-
-                  // Davet Kodu
                   _buildTextField(
                     controller: referralController,
                     hintText: 'Davet Kodu (Opsiyonel)',
@@ -186,8 +233,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 25),
-
-                  // Kayıt Ol Butonu
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -222,20 +267,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
                   const Text(
                     'Ya da şunlarla devam et',
                     style: TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 15),
-
-                  // Sosyal Giriş Butonları (Facebook + Google)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          // Facebook eklemesi istenirse buraya
+                        },
                         child: Container(
                           width: 50,
                           height: 50,
@@ -262,7 +306,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       const SizedBox(width: 20),
                       InkWell(
-                        onTap: () {},
+                        onTap: _signInWithGoogle, // Google Sign-In bağlandı
                         child: Container(
                           width: 50,
                           height: 50,
@@ -290,8 +334,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Zaten hesabınız var mı? Giriş Yap
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -318,7 +360,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
                 ],
               ),
@@ -345,7 +386,7 @@ class _RegisterPageState extends State<RegisterPage> {
           obscureText: obscureText,
           onChanged: (value) {
             setState(() {
-              validateForm(); // Her değişiklikte form geçerliliğini kontrol et
+              validateForm();
             });
           },
           decoration: InputDecoration(

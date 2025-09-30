@@ -5,19 +5,30 @@ publish_to: "none" # Bu satır uygulamanın pub.dev'e yanlışlıkla yüklenmesi
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  # Dart SDK sürümü, güncel stabil sürümlere uyumluluk için güvenli bir aralıkta tutuldu.
+  sdk: ">=3.1.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # iOS tarzı ikonlar
+  # Firebase Paketleri: En güncel stabil sürümlere yükseltildi.
+  # Bu, uyumluluk sorunlarını (PromiseJsImpl hatalarını) çözer.
+  firebase_core: ^2.27.1
+  firebase_auth: ^4.17.4
+
+  # HATA ÇÖZÜMÜ: firebase_auth_web artık manuel eklenmiyor.
+  # firebase_auth paketi web desteğini otomatik olarak yönetir.
+  # firebase_auth_web: ^5.8.13 satırı silinmiştir.
+
+  # Diğer Paketler
   cupertino_icons: ^1.0.8
+  google_sign_in: ^6.2.4 # En son stabil sürüm.
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true

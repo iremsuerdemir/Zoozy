@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "301880499217",
+    "project_id": "zoozy-proje",
+    "storage_bucket": "zoozy-proje.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301880499217:android:60b52ae08c66be6743a5b0",
+        "android_client_info": {
+          "package_name": "com.example.zoozy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301880499217-a6gerqbfavf5fi1evl7978t4pnd1aold.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zoozy",
+            "certificate_hash": "80eb229e82816d94bbb5f33d4b85897a14117d5c"
+          }
+        },
+        {
+          "client_id": "301880499217-ke43kqtvdpue274f5d4lmjnbbt0enorg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOCglcXGh817vDsKjZ2-qLzLHYbkmBTpo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301880499217-ke43kqtvdpue274f5d4lmjnbbt0enorg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
