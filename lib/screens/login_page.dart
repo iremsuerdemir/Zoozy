@@ -1,31 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:zoozy/screens/owner_Login_Page.dart';
+import 'package:zoozy/screens/owner_login_page.dart';
 
 void main() {
-  runApp(const ZoozyGirisUygulamasi());
+  runApp(const LoginPage());
 }
 
-class ZoozyGirisUygulamasi extends StatelessWidget {
-  const ZoozyGirisUygulamasi({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ZoozyGirisEkrani(),
-    );
-  }
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class ZoozyGirisEkrani extends StatefulWidget {
-  const ZoozyGirisEkrani({super.key});
-
-  @override
-  State<ZoozyGirisEkrani> createState() => _ZoozyGirisEkraniState();
-}
-
-class _ZoozyGirisEkraniState extends State<ZoozyGirisEkrani> {
+class _LoginPageState extends State<LoginPage> {
   final PageController _sayfaKontrol = PageController(viewportFraction: 0.8);
   int _aktifSayfa = 0;
   Timer? _timer;
@@ -257,7 +245,14 @@ class _ZoozyGirisEkraniState extends State<ZoozyGirisEkrani> {
                 metin: 'Bakıcı & Hizmetler',
                 renk: const Color(0xFFFFA726), // turuncu
                 metinRengi: Colors.white,
-                tiklamaFonksiyonu: () {},
+                tiklamaFonksiyonu: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OwnerLoginPage(),
+                    ),
+                  );
+                },
               ),
               _butonOlustur(
                 metin: 'Keşfet',

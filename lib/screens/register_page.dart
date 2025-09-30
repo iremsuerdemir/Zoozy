@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zoozy/screens/owner_Login_Page.dart';
+import 'package:zoozy/screens/owner_login_page.dart';
 
 void main() {
   runApp(const MyApp());

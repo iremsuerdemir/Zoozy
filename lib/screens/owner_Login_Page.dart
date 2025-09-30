@@ -1,6 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/forgot_password.dart';
-import 'package:zoozy/screens/register.dart';
+import 'package:zoozy/screens/privacy_policy_page.dart';
+import 'package:zoozy/screens/register_page.dart';
+import 'package:zoozy/screens/terms_of_service_page.dart';
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -304,31 +307,52 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                       ),
                     ],
                   ),
+
                   child: Text.rich(
                     TextSpan(
                       text: "Kayıt Ol veya Giriş Yap’a tıklayarak, ",
                       style: const TextStyle(color: Colors.black87),
-                      children: const [
+                      children: [
                         TextSpan(
                           text: "Hizmet Şartları",
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFF7A4FAD),
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                             decorationColor: Color(0xFF7A4FAD),
                           ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const TermsOfServicePage(),
+                                ),
+                              );
+                            },
                         ),
-                        TextSpan(text: " ve "),
+                        const TextSpan(text: " ve "),
                         TextSpan(
                           text: "Gizlilik Politikası’nı",
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFF7A4FAD),
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                             decorationColor: Color(0xFF7A4FAD),
                           ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PrivacyPolicyPage(),
+                                ),
+                              );
+                            },
                         ),
-                        TextSpan(text: " kabul etmiş oluyorum."),
+                        const TextSpan(text: " kabul etmiş oluyorum."),
                       ],
                     ),
                     textAlign: TextAlign.center,
