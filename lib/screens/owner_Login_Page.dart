@@ -7,6 +7,7 @@ import 'package:zoozy/screens/register_page.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -76,7 +77,75 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
     }
   }
 
-  // 🔹 Google Sign-In İşlemi
+  // Facebook Sign In
+  Future<void> _signInWithFacebook() async {
+    try {
+      // 1. Facebook ile giriş yap
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'], // İstenen izinler
+      );
+
+      if (result.status == LoginStatus.success) {
+        // Facebook'tan alınan kimlik bilgilerini al
+        final AccessToken accessToken = result.accessToken!;
+
+        // 2. Firebase kimlik bilgisi oluştur
+        final credential = FacebookAuthProvider.credential(accessToken.token);
+
+        // 3. Firebase ile giriş yap
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+
+        // Başarılı giriş bildirimi
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Facebook ile giriş başarılı! Hoşgeldiniz ${userCredential.user?.displayName ?? ""}",
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Ana sayfaya yönlendirme
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        }
+      } else if (result.status == LoginStatus.cancelled) {
+        // Kullanıcı girişi iptal etti
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Facebook ile giriş iptal edildi."),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      } else {
+        // Giriş başarısız
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Facebook ile giriş başarısız: ${result.message}"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Bilinmeyen hata
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Facebook ile giriş sırasında hata oluştu: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Google Sign-In İşlemi
   Future<void> _signInWithGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -280,12 +349,12 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                // 🔹 Facebook & Google Buttons
+                //  Facebook & Google Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: () {}, // Facebook
+                      onTap: _signInWithFacebook, // Facebook
                       child: Container(
                         width: 50,
                         height: 50,

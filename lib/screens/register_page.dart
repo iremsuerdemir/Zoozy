@@ -3,6 +3,7 @@ import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,15 +42,6 @@ class _RegisterPageState extends State<RegisterPage> {
   String? usernameError;
   String? passwordError;
   String? rePasswordError;
-
-  // Google Sign-In instance
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [
-      'email',
-      'profile',
-    ],
-  );
-// Web'de (Chrome, vb.) sorunsuz çalışması için güncellenmiş metot
 
   Future<void> _signInWithGoogle() async {
     try {
@@ -95,8 +87,66 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-// Artık GoogleSignIn objesine ihtiyacınız kalmadı.
-// final GoogleSignIn _googleSignIn = GoogleSignIn(...); satırını silebilirsiniz.
+  // FACEBOOK İLE GİRİŞ (Google yapısına uygun olarak eklendi)
+  Future<void> _signInWithFacebook() async {
+    try {
+      // flutter_facebook_auth paketi, web ve mobil akışını otomatik yönetir.
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status == LoginStatus.success) {
+        // 1. Facebook'tan alınan jetonu al
+        final AccessToken accessToken = result.accessToken!;
+
+        // 2. Jetonu kullanarak Firebase Kimlik Bilgisi oluştur
+        final credential = FacebookAuthProvider.credential(accessToken.token);
+
+        // 3. Firebase ile giriş yap (signInWithCredential hem mobil hem web'de çalışır)
+        final UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+
+        // Başarılı giriş sonrası yönlendirme
+        if (!mounted) return;
+
+        // Kullanıcının kayıt olma ekranından sonra gitmesi gereken yer HomeScreen()
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else if (result.status == LoginStatus.cancelled) {
+        // Kullanıcı pencereyi kapattı (Hata yerine uyarı gösterilir)
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Facebook ile giriş iptal edildi.')),
+        );
+      } else {
+        // Facebook'tan dönen diğer hatalar
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Facebook giriş başarısız: ${result.message}')),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      // Firebase özel hataları (Örn: Hesap zaten var)
+      print('Firebase Facebook Sign-In Hatası: ${e.code} - ${e.message}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Firebase Facebook Hatası: ${e.message}')),
+      );
+    } catch (e) {
+      // Diğer genel hatalar
+      print('Genel Facebook Sign-In Hatası: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Facebook ile giriş sırasında beklenmeyen bir hata oluştu!')),
+      );
+    }
+  }
+
   bool isFormValid() {
     return emailError == null &&
         usernameError == null &&
@@ -279,22 +329,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () {
-                          // Facebook eklemesi istenirse buraya
-                        },
+                        onTap: _signInWithFacebook,
                         child: Container(
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
                           child: Center(
                             child: Image.network(

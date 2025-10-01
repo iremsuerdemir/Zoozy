@@ -15,6 +15,7 @@ dependencies:
   # Firebase Paketleri: En güncel stabil sürümlere yükseltildi.
   # Bu, uyumluluk sorunlarını (PromiseJsImpl hatalarını) çözer.
   firebase_core: ^2.27.1
+  flutter_facebook_auth: ^6.1.1
   firebase_auth: ^4.17.4
 
   # HATA ÇÖZÜMÜ: firebase_auth_web artık manuel eklenmiyor.
