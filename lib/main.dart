@@ -29,7 +29,7 @@ Future<void> main() async {
   // 🔹 Web için Facebook SDK başlat
   if (kIsWeb) {
     await FacebookAuth.i.webAndDesktopInitialize(
-      appId: "1199373132023022",
+      appId: "2324446061343469",
       cookie: true,
       xfbml: true,
       version: "v15.0",
