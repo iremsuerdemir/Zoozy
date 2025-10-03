@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
+import 'package:zoozy/screens/edit_profile.dart';
 
 import '../components/bottom_navigation_bar.dart'
     show CustomBottomNavBar; // kendi yolunu kullandım
@@ -144,17 +145,28 @@ class ProfileScreen extends StatelessWidget {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
+                            children: [
+                              const Text(
                                 'Berk Şahin',
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Profilini düzenlemek için tıkla',
-                                style:
-                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              const SizedBox(height: 4),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const EditProfileScreen(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  'Profilini düzenlemek için tıkla',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey),
+                                ),
                               ),
                             ],
                           ),

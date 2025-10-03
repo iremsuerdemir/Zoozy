@@ -375,7 +375,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const EditProfileScreen(),
+                                      const TermsOfServicePage(),
                                 ),
                               );
                             },

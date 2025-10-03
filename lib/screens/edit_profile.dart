@@ -77,7 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     bool isEmailValid =
         RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
             .hasMatch(email);
-    bool isPhoneValid = RegExp(r"^\+?\d{10,15}$").hasMatch(phone);
+    bool isPhoneValid = RegExp(r"^0\d{10}$").hasMatch(phone);
 
     setState(() {
       _emailFieldColor = isEmailValid ? Colors.grey[100]! : Colors.red[100]!;
