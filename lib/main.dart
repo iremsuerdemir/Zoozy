@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:zoozy/screens/login_page.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart'; // <-- Bunu ekledik
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:zoozy/screens/profile_screen.dart'; // <-- Bunu ekledik
 
 // Web için GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginPage(),
+      home: ProfileScreen(),
     );
   }
 }
