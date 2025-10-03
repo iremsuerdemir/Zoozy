@@ -11,6 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  qr_flutter: ^4.1.0
 
   # Firebase Paketleri
   firebase_core: ^2.27.1

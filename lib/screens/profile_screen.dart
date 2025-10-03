@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/edit_profile.dart';
+import 'package:zoozy/screens/qr_code_screen.dart';
 
 import '../components/bottom_navigation_bar.dart'
     show CustomBottomNavBar; // kendi yolunu kullandım
@@ -171,11 +172,23 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        CircleAvatar(
-                          radius: 18,
-                          backgroundColor:
-                              const Color.fromARGB(206, 238, 231, 231),
-                          child: Icon(Icons.qr_code, color: Colors.purple),
+                        GestureDetector(
+                          onTap: () {
+                            // QR Code ekranına geçiş
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const QrCodeScreen(
+                                  qrData: 'https://example.com/pet/booking',
+                                ),
+                              ),
+                            );
+                          },
+                          child: const CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Color.fromARGB(206, 238, 231, 231),
+                            child: Icon(Icons.qr_code, color: Colors.purple),
+                          ),
                         ),
                       ],
                     ),
