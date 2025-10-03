@@ -323,9 +323,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: const Text(
                         'Kaydet',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ),
                   ),
@@ -348,11 +348,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       controller.text = initialValue;
     }
 
+    // Tüm input alanları için aynı container stili
     Color bgColor = Colors.white.withOpacity(0.9);
-    if (labelText == 'E-posta') bgColor = _emailFieldColor.withOpacity(0.3);
-    if (labelText == 'Telefon') bgColor = _phoneFieldColor.withOpacity(0.3);
+    if (labelText == 'E-posta') bgColor = _emailFieldColor.withOpacity(1.0);
+    if (labelText == 'Telefon') bgColor = _phoneFieldColor.withOpacity(1.0);
 
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6), // biraz boşluk
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
@@ -384,7 +386,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildListTile({required String title, required VoidCallback onTap}) {
+    // input alanlarıyla aynı container stili
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
         borderRadius: BorderRadius.circular(12),

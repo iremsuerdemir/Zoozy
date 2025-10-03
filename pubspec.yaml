@@ -12,19 +12,19 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Firebase Paketleri: En güncel stabil sürümlere yükseltildi.
-  # Bu, uyumluluk sorunlarını (PromiseJsImpl hatalarını) çözer.
+  # Firebase Paketleri
   firebase_core: ^2.27.1
   flutter_facebook_auth: ^6.1.1
   firebase_auth: ^4.17.4
 
-  # HATA ÇÖZÜMÜ: firebase_auth_web artık manuel eklenmiyor.
-  # firebase_auth paketi web desteğini otomatik olarak yönetir.
-  # firebase_auth_web: ^5.8.13 satırı silinmiştir.
-
   # Diğer Paketler
   cupertino_icons: ^1.0.8
-  google_sign_in: ^6.2.4 # En son stabil sürüm.
+  google_sign_in: ^6.2.4
+
+  image_picker: ^1.1.2 # Resim seçmek için
+  shared_preferences: ^2.2.2 # Veri kaydetmek için
+  path_provider: ^2.1.2 # Resim yolunu kaydetmek için
+  path: ^1.9.0 # Yol birleştirme işlemleri için
 
 dev_dependencies:
   flutter_test:
@@ -34,7 +34,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Assets ekleme
   assets:
     - assets/images/login_1.png
     - assets/images/login_2.png

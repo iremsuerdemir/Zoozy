@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb; // <-- Bunu ekledik
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:zoozy/screens/edit_profile.dart';
 import 'package:zoozy/screens/login_page.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:zoozy/screens/profile_screen.dart'; // <-- Bunu ekledik
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginPage(),
+      home: EditProfileScreen(),
     );
   }
 }
