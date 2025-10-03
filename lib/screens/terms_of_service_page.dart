@@ -14,29 +14,6 @@ class TermsOfServicePage extends StatefulWidget {
 class _TermsOfServicePageState extends State<TermsOfServicePage> {
   bool isChecked = false;
 
-  final String termsText = """
-PetBacker hizmetlerini kullanarak aşağıdaki şartları kabul etmiş sayılırsınız. 
-Lütfen bu şartları dikkatlice okuyun. Bu metin, kullanıcı ile PetBacker arasında bir sözleşme niteliğindedir.
-
-1. Hizmetin Tanımı  
-PetBacker, evcil hayvan sahiplerini ve hizmet sağlayıcıları bir araya getiren bir platformdur. 
-Sağlanan hizmetler, PetBacker tarafından doğrudan verilmez, üçüncü taraf sağlayıcılar tarafından sunulur.
-
-2. Kullanıcı Yükümlülükleri  
-Kullanıcılar, sağladıkları bilgilerin doğru ve güncel olduğunu beyan eder. 
-Platformun kötüye kullanılması durumunda, hesap kalıcı olarak askıya alınabilir.
-
-3. Ödeme ve İptal  
-Ödemeler, PetBacker tarafından güvenli bir şekilde işlenir. 
-İptal politikaları, ilgili hizmet sağlayıcının belirlediği kurallara göre uygulanır.
-
-4. Sorumluluk Reddi  
-PetBacker, hizmet sağlayıcıların eylemlerinden veya sunulan hizmetlerin kalitesinden sorumlu değildir.
-
-5. Gizlilik  
-Kullanıcı bilgileri, Gizlilik Politikası çerçevesinde korunur ve üçüncü taraflarla yalnızca gerekli durumlarda paylaşılır.
-""";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,14 +99,75 @@ Kullanıcı bilgileri, Gizlilik Politikası çerçevesinde korunur ve üçüncü
                               Expanded(
                                 child: SingleChildScrollView(
                                   physics: const BouncingScrollPhysics(),
-                                  child: SelectableText(
-                                    termsText,
+                                  child: RichText(
                                     textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                      fontSize: fontSize,
-                                      color: Colors.black87,
-                                      height: 1.6,
-                                      letterSpacing: 0.2,
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: fontSize,
+                                        color: Colors.black87,
+                                        height: 1.6,
+                                        letterSpacing: 0.2,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "1. Hizmetin Tanımı\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "PetBacker, evcil hayvan sahiplerini ve hizmet sağlayıcıları bir araya getiren bir platformdur. "
+                                              "Sağlanan hizmetler, PetBacker tarafından doğrudan verilmez, üçüncü taraf sağlayıcılar tarafından sunulur.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text: "2. Kullanıcı Yükümlülükleri\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Kullanıcılar, sağladıkları bilgilerin doğru ve güncel olduğunu beyan eder. "
+                                              "Platformun kötüye kullanılması durumunda, hesap kalıcı olarak askıya alınabilir.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text: "3. Ödeme ve İptal\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Ödemeler, PetBacker tarafından güvenli bir şekilde işlenir. "
+                                              "İptal politikaları, ilgili hizmet sağlayıcının belirlediği kurallara göre uygulanır.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text: "4. Sorumluluk Reddi\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "PetBacker, hizmet sağlayıcıların eylemlerinden veya sunulan hizmetlerin kalitesinden sorumlu değildir.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text: "5. Gizlilik\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Kullanıcı bilgileri, Gizlilik Politikası çerçevesinde korunur ve üçüncü taraflarla yalnızca gerekli durumlarda paylaşılır.\n",
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

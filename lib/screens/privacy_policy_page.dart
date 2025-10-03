@@ -13,51 +13,20 @@ class PrivacyPolicyPage extends StatefulWidget {
 class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   bool isChecked = false;
 
-  final String privacyPolicyText = """
-PetBacker.com (“PetBacker”) gizliliğinize değer verir. Bu Gizlilik Politikası, 
-web sitemizi, iletişim sistemimizi veya mobil uygulamamızı (“Platform”) ziyaret ettiğinizde 
-ve Platform'da sunulan hizmetleri kullandığınızda hangi bilgileri topladığımızı, 
-bu bilgileri nasıl kullandığımızı ve ifşa ettiğimizi açıklar.
-
-1. Kişisel Bilgilerin Toplanması
-PetBacker, kullanıcılarından hesap oluşturma, rezervasyon yapma veya hizmet sunma gibi 
-etkileşimler sırasında kişisel bilgiler toplar. Bu bilgiler ad, e-posta adresi, telefon numarası, 
-konum bilgisi gibi verileri içerebilir.
-
-2. Çerezler ve Takip Teknolojileri
-PetBacker, platform kullanımınızı analiz etmek ve size özel içerik sunmak için çerezler ve diğer 
-takip teknolojilerini kullanabilir. Tarayıcı ayarlarından çerezleri reddedebilirsiniz, ancak bu 
-durum bazı özelliklerin çalışmasını engelleyebilir.
-
-3. Bilgilerin Kullanımı
-Toplanan bilgiler, hizmetlerin iyileştirilmesi, rezervasyon süreçlerinin yönetimi ve kullanıcı 
-deneyiminin kişiselleştirilmesi için kullanılır.
-
-4. Üçüncü Taraf Paylaşımları
-Kişisel bilgileriniz yalnızca yasal gereklilikler doğrultusunda veya hizmetin sağlanabilmesi için 
-gerekli olduğunda üçüncü taraflarla paylaşılabilir.
-
-5. Güvenlik
-Kişisel bilgilerinizin güvenliği için endüstri standartlarında önlemler alınmaktadır. 
-Ancak internet üzerinden yapılan hiçbir veri aktarımının %100 güvenliği garanti edilemez.
-
-Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasını inceleyin.
-""";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient arka plan (giriş ekranındaki gibi mor -> pembe)
+          // Gradient arka plan (mor -> pembe)
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFFB39DDB), // Açık mor (üst sol)
-                  Color(0xFFF48FB1), // Açık pembe (alt sağ)
+                  Color(0xFFB39DDB), // Açık mor
+                  Color(0xFFF48FB1), // Açık pembe
                 ],
               ),
             ),
@@ -65,7 +34,7 @@ Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasın
           SafeArea(
             child: Column(
               children: [
-                // Üstte AppBar benzeri başlık
+                // Üst başlık
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -94,7 +63,7 @@ Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasın
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Burada LayoutBuilder ile genişlik kontrolü yapıyoruz
+                // İçerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -125,18 +94,96 @@ Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasın
                           ),
                           child: Column(
                             children: [
-                              // Scrollable metin
                               Expanded(
                                 child: SingleChildScrollView(
                                   physics: const BouncingScrollPhysics(),
-                                  child: SelectableText(
-                                    privacyPolicyText,
+                                  child: RichText(
                                     textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                      fontSize: fontSize,
-                                      color: Colors.black87,
-                                      height: 1.6,
-                                      letterSpacing: 0.2,
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: fontSize,
+                                        color: Colors.black87,
+                                        height: 1.6,
+                                        letterSpacing: 0.2,
+                                      ),
+                                      children: [
+                                        const TextSpan(
+                                          text:
+                                              "PetBacker.com (“PetBacker”) gizliliğinize değer verir. Bu Gizlilik Politikası, "
+                                              "web sitemizi, iletişim sistemimizi veya mobil uygulamamızı (“Platform”) ziyaret ettiğinizde "
+                                              "ve Platform'da sunulan hizmetleri kullandığınızda hangi bilgileri topladığımızı, "
+                                              "bu bilgileri nasıl kullandığımızı ve ifşa ettiğimizi açıklar.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              "1. Kişisel Bilgilerin Toplanması\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "PetBacker, kullanıcılarından hesap oluşturma, rezervasyon yapma veya hizmet sunma gibi "
+                                              "etkileşimler sırasında kişisel bilgiler toplar. Bu bilgiler ad, e-posta adresi, telefon numarası, "
+                                              "konum bilgisi gibi verileri içerebilir.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              "2. Çerezler ve Takip Teknolojileri\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "PetBacker, platform kullanımınızı analiz etmek ve size özel içerik sunmak için çerezler ve diğer "
+                                              "takip teknolojilerini kullanabilir. Tarayıcı ayarlarından çerezleri reddedebilirsiniz, ancak bu "
+                                              "durum bazı özelliklerin çalışmasını engelleyebilir.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text: "3. Bilgilerin Kullanımı\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Toplanan bilgiler, hizmetlerin iyileştirilmesi, rezervasyon süreçlerinin yönetimi ve kullanıcı "
+                                              "deneyiminin kişiselleştirilmesi için kullanılır.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              "4. Üçüncü Taraf Paylaşımları\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Kişisel bilgileriniz yalnızca yasal gereklilikler doğrultusunda veya hizmetin sağlanabilmesi için "
+                                              "gerekli olduğunda üçüncü taraflarla paylaşılabilir.\n\n",
+                                        ),
+                                        TextSpan(
+                                          text: "5. Güvenlik\n",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Kişisel bilgilerinizin güvenliği için endüstri standartlarında önlemler alınmaktadır. "
+                                              "Ancak internet üzerinden yapılan hiçbir veri aktarımının %100 güvenliği garanti edilemez.\n\n",
+                                        ),
+                                        const TextSpan(
+                                          text:
+                                              "Detaylı bilgi için lütfen PetBacker web sitesindeki tam gizlilik politikasını inceleyin.\n",
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
