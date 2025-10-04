@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/edit_profile.dart';
+import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 
 import '../components/bottom_navigation_bar.dart'
@@ -246,18 +247,35 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Listings Başlığı
-                  const Row(
+                  Row(
                     children: [
-                      Text('İlanlar',
-                          style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF7A4FAD))),
-                      SizedBox(width: 360),
-                      Icon(Icons.help_outline,
-                          color: Color(0xFF7A4FAD), size: 25),
+                      const Text(
+                        'İlanlar',
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF7A4FAD)),
+                      ),
+                      const SizedBox(width: 340),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.help_outline,
+                          color: Color(0xFF7A4FAD),
+                          size: 25,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ListingProcessScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
+
                   const SizedBox(height: 16),
 
                   // Add Pet Service Kartı
