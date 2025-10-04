@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/services.dart';
 
 // Madde işaretleri için özel widget
 class BulletTextItem extends StatelessWidget {
@@ -79,7 +80,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Text(
-                        'Hizmet Koşulları',
+                        'Anlaşmalar',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -277,11 +278,18 @@ class _AgreementScreenState extends State<AgreementScreen> {
                               const SizedBox(height: 12),
 
                               // Devam Et butonu
+                              // Devam Et butonu
                               GestureDetector(
                                 onTap: isChecked
                                     ? () {
-                                        // İlerleme işlemi buraya eklenecek
-                                        print("Koşullar onaylandı");
+                                        // Koşullar onaylandı, ServicesScreen'e yönlendir
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Services(),
+                                          ),
+                                        );
                                       }
                                     : null,
                                 child: Container(
