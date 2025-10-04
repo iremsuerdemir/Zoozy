@@ -201,7 +201,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient arka plan
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -219,7 +218,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // AppBar benzeri üst kısım
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -242,8 +240,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Profil resmi
                   GestureDetector(
                     onTap: () => _showImageSourceActionSheet(context),
                     child: Column(
@@ -272,8 +268,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Input alanları
                   _buildInputField(
                     controller: _usernameController,
                     labelText: 'Kullanıcı Adı',
@@ -292,8 +286,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     keyboardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 24),
-
-                  // Alt alanlar
                   _buildListTile(title: 'Hakkımda', onTap: () {}),
                   const SizedBox(height: 8),
                   _buildListTile(title: 'Rozetlerim', onTap: () {}),
@@ -302,10 +294,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title: 'Hizmet Konumu ve Fotoğraflar', onTap: () {}),
                   const SizedBox(height: 8),
                   _buildListTile(title: 'İletişim Uygulamaları', onTap: () {}),
-
                   const SizedBox(height: 40),
-
-                  // Kaydet butonu
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -348,13 +337,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       controller.text = initialValue;
     }
 
-    // Tüm input alanları için aynı container stili
     Color bgColor = Colors.white.withOpacity(0.9);
     if (labelText == 'E-posta') bgColor = _emailFieldColor.withOpacity(1.0);
     if (labelText == 'Telefon') bgColor = _phoneFieldColor.withOpacity(1.0);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6), // biraz boşluk
+      margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
@@ -386,7 +374,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildListTile({required String title, required VoidCallback onTap}) {
-    // input alanlarıyla aynı container stili
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(

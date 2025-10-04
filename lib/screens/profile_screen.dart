@@ -1,16 +1,53 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/edit_profile.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 
-import '../components/bottom_navigation_bar.dart'
-    show CustomBottomNavBar; // kendi yolunu kullandım
-
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  // Menü butonu (arka planla aynı renk ama gölgeli kutu içinde)
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String username = 'İrem Su Erdemir';
+  String email = '7692003@gmail.com';
+  ImageProvider? _profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? 'İrem Su Erdemir';
+      email = prefs.getString('email') ?? '7692003@gmail.com';
+
+      // Profil resmini yükle
+      final imageString = prefs.getString('profileImagePath');
+      if (imageString != null && imageString.isNotEmpty) {
+        try {
+          final bytes = base64Decode(imageString);
+          _profileImage = MemoryImage(bytes);
+        } catch (e) {
+          print('Profil resmi yüklenirken hata: $e');
+          _profileImage = null;
+        }
+      } else {
+        _profileImage = null;
+      }
+    });
+  }
+
+  // Menü butonu
   Widget buildMenuButton(IconData icon, String title) {
     return Container(
       decoration: BoxDecoration(
@@ -69,7 +106,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Gradient arka plan
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -137,32 +173,36 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 40,
                           backgroundColor: Colors.grey,
-                          child:
-                              Icon(Icons.person, color: Colors.white, size: 50),
+                          backgroundImage: _profileImage,
+                          child: _profileImage == null
+                              ? const Icon(Icons.person,
+                                  color: Colors.white, size: 50)
+                              : null,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'İrem Su Erdemir',
-                                style: TextStyle(
+                              Text(
+                                username,
+                                style: const TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 4),
                               GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
+                                onTap: () async {
+                                  await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           const EditProfileScreen(),
                                     ),
                                   );
+                                  _loadProfileData();
                                 },
                                 child: const Text(
                                   'Profilini düzenlemek için tıkla',
@@ -170,12 +210,17 @@ class ProfileScreen extends StatelessWidget {
                                       fontSize: 14, color: Colors.grey),
                                 ),
                               ),
+                              const SizedBox(height: 4),
+                              Text(
+                                email,
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54),
+                              ),
                             ],
                           ),
                         ),
                         GestureDetector(
                           onTap: () {
-                            // QR Code ekranına geçiş
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -221,7 +266,6 @@ class ProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [], // gölge kaldırıldı
                     ),
                     child: GridView.count(
                       crossAxisCount: 4,
@@ -299,7 +343,7 @@ class ProfileScreen extends StatelessWidget {
                           CircleAvatar(
                             backgroundColor: Color.fromARGB(255, 205, 196, 216),
                             radius: 28,
-                            child: const Icon(
+                            child: Icon(
                               Icons.add,
                               color: Color(0xFF7A4FAD),
                               size: 40,
@@ -342,7 +386,7 @@ class ProfileScreen extends StatelessWidget {
             Navigator.pushNamed(context, '/moments');
           } else if (index == 3) {
             Navigator.pushNamed(context, '/jobs');
-          } else if (index == 4) {}
+          }
         },
         selectedColor: const Color(0xFF7A4FAD),
         unselectedColor: Colors.grey,

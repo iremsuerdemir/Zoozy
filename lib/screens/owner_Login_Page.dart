@@ -7,6 +7,7 @@ import 'package:zoozy/screens/register_page.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // 🔹 ekledik
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -21,6 +22,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  // 🔹 E-posta ile giriş
   void _login() async {
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text.trim();
@@ -32,6 +34,11 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
           email: email,
           password: password,
         );
+
+        // 🔹 SharedPreferences kaydı
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', 'İrem Su Erdemir'); // varsayılan ad
+        await prefs.setString('email', email);
 
         // Başarılı giriş
         ScaffoldMessenger.of(context).showSnackBar(
@@ -76,7 +83,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
     }
   }
 
-  // Google Sign-In İşlemi
+  // 🔹 Google Sign-In İşlemi
   Future<void> _signInWithGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -98,6 +105,12 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
+      // 🔹 SharedPreferences kaydı
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          'username', userCredential.user?.displayName ?? 'İrem Su Erdemir');
+      await prefs.setString('email', userCredential.user?.email ?? '');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -108,7 +121,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
       );
 
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => HomeScreen()));
+          context, MaterialPageRoute(builder: (_) => const HomeScreen()));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
