@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/jobs_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -25,10 +26,16 @@ class CustomBottomNavBar extends StatelessWidget {
       showUnselectedLabels: true,
       onTap: (index) {
         if (index == 4) {
-          // Profil butonuna basıldığında profile_screen.dart sayfasına git
+          // Profil butonuna basıldığında ProfileScreen sayfasına git
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          );
+        } else if (index == 3) {
+          // Jobs butonuna basıldığında JobsScreen sayfasına git
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const JobsScreen()),
           );
         } else {
           // Diğer indexler için senin verdiğin onTap çalışsın
