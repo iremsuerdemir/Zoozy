@@ -4,22 +4,7 @@ import 'package:zoozy/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: RegisterPage(),
-    );
-  }
-}
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -43,41 +28,45 @@ class _RegisterPageState extends State<RegisterPage> {
   String? passwordError;
   String? rePasswordError;
 
+  // GOOGLE SIGN-IN (Web)
   Future<void> _signInWithGoogle() async {
     try {
-      // 1. GoogleSignIn paketini kullanmak yerine doğrudan Firebase'in
-      //    GoogleAuthProvider'ını kullanın.
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
-      // Web'de pop-up ile giriş yapılmasını sağlayan metot.
-      // Bu, Firebase'in kimlik bilgilerini doğru şekilde yakalamasını sağlar.
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInWithPopup(googleProvider);
 
-      // Başarılı giriş sonrası yönlendirme
+      // SharedPreferences kaydı
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          'username', userCredential.user?.displayName ?? 'Kullanıcı');
+      await prefs.setString(
+          'email', (userCredential.user?.email ?? '').toLowerCase());
+
       if (!mounted) return;
 
-      // Kullanıcının kayıt olma ekranından sonra gitmesi gereken yer HomeScreen()
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text("Hoş geldiniz ${userCredential.user?.displayName ?? ""}!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
-      // Firebase özel hatalarını yakala (Örn: Hesap zaten var, vs.)
-      print('Firebase Google Sign-In Hatası: ${e.code} - ${e.message}');
       if (!mounted) return;
-
       String errorMessage = 'Google ile giriş başarısız: ${e.message}';
       if (e.code == 'popup-closed-by-user') {
         errorMessage = 'Giriş penceresi kullanıcı tarafından kapatıldı.';
       }
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
     } catch (e) {
-      // Diğer genel hataları yakala
-      print('Genel Google Sign-In Hatası: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -87,41 +76,45 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  // FACEBOOK İLE GİRİŞ (Google yapısına uygun olarak eklendi)
+  // FACEBOOK SIGN-IN (Web)
   Future<void> _signInWithFacebook() async {
     try {
-      // flutter_facebook_auth paketi, web ve mobil akışını otomatik yönetir.
       final LoginResult result = await FacebookAuth.instance.login(
         permissions: ['email', 'public_profile'],
       );
 
       if (result.status == LoginStatus.success) {
-        // 1. Facebook'tan alınan jetonu al
         final AccessToken accessToken = result.accessToken!;
-
-        // 2. Jetonu kullanarak Firebase Kimlik Bilgisi oluştur
         final credential = FacebookAuthProvider.credential(accessToken.token);
 
-        // 3. Firebase ile giriş yap (signInWithCredential hem mobil hem web'de çalışır)
         final UserCredential userCredential =
             await FirebaseAuth.instance.signInWithCredential(credential);
 
-        // Başarılı giriş sonrası yönlendirme
-        if (!mounted) return;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+            'username', userCredential.user?.displayName ?? 'Kullanıcı');
+        await prefs.setString(
+            'email', (userCredential.user?.email ?? '').toLowerCase());
 
-        // Kullanıcının kayıt olma ekranından sonra gitmesi gereken yer HomeScreen()
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text("Hoş geldiniz ${userCredential.user?.displayName ?? ""}!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (result.status == LoginStatus.cancelled) {
-        // Kullanıcı pencereyi kapattı (Hata yerine uyarı gösterilir)
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Facebook ile giriş iptal edildi.')),
         );
       } else {
-        // Facebook'tan dönen diğer hatalar
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -129,15 +122,11 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Firebase özel hataları (Örn: Hesap zaten var)
-      print('Firebase Facebook Sign-In Hatası: ${e.code} - ${e.message}');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Firebase Facebook Hatası: ${e.message}')),
       );
     } catch (e) {
-      // Diğer genel hatalar
-      print('Genel Facebook Sign-In Hatası: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -145,17 +134,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 'Facebook ile giriş sırasında beklenmeyen bir hata oluştu!')),
       );
     }
-  }
-
-  bool isFormValid() {
-    return emailError == null &&
-        usernameError == null &&
-        passwordError == null &&
-        rePasswordError == null &&
-        emailController.text.isNotEmpty &&
-        usernameController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty &&
-        rePasswordController.text.isNotEmpty;
   }
 
   void validateForm() {
@@ -185,6 +163,17 @@ class _RegisterPageState extends State<RegisterPage> {
     } else if (rePasswordController.text != passwordController.text) {
       rePasswordError = "Şifreler eşleşmiyor";
     }
+  }
+
+  bool isFormValid() {
+    return emailError == null &&
+        usernameError == null &&
+        passwordError == null &&
+        rePasswordError == null &&
+        emailController.text.isNotEmpty &&
+        usernameController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        rePasswordController.text.isNotEmpty;
   }
 
   @override
@@ -227,16 +216,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    errorText: emailError,
-                  ),
+                      controller: emailController,
+                      hintText: 'Email',
+                      errorText: emailError),
                   const SizedBox(height: 15),
                   _buildTextField(
-                    controller: usernameController,
-                    hintText: 'Kullanıcı Adı',
-                    errorText: usernameError,
-                  ),
+                      controller: usernameController,
+                      hintText: 'Kullanıcı Adı',
+                      errorText: usernameError),
                   const SizedBox(height: 15),
                   _buildTextField(
                     controller: passwordController,
@@ -244,11 +231,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: obscurePassword,
                     errorText: passwordError,
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
+                      icon: Icon(obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
                       onPressed: () {
                         setState(() {
                           obscurePassword = !obscurePassword;
@@ -263,11 +248,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: obscureRePassword,
                     errorText: rePasswordError,
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        obscureRePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
+                      icon: Icon(obscureRePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
                       onPressed: () {
                         setState(() {
                           obscureRePassword = !obscureRePassword;
@@ -289,12 +272,67 @@ class _RegisterPageState extends State<RegisterPage> {
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
                           validateForm();
                         });
                         if (isFormValid()) {
-                          // Home Page veya diğer ekran yönlendirme işlemi
+                          try {
+                            // Firebase email/password ile kayıt
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .createUserWithEmailAndPassword(
+                              email: emailController.text.trim(),
+                              password: passwordController.text.trim(),
+                            );
+
+                            // Kullanıcı adını ekle
+                            await userCredential.user
+                                ?.updateDisplayName(usernameController.text);
+
+                            // SharedPreferences kaydı
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString(
+                                'username', usernameController.text);
+                            await prefs.setString('email',
+                                emailController.text.trim().toLowerCase());
+                            await prefs.setString(
+                                'password', passwordController.text.trim());
+
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text(
+                                  "Kayıt başarılı! Giriş ekranına yönlendiriliyorsunuz..."),
+                              backgroundColor: Colors.green,
+                            ));
+
+                            await Future.delayed(const Duration(seconds: 2));
+                            if (mounted) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const OwnerLoginPage()),
+                              );
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            String errorMessage;
+                            if (e.code == 'weak-password') {
+                              errorMessage = 'Şifre çok zayıf.';
+                            } else if (e.code == 'email-already-in-use') {
+                              errorMessage =
+                                  'Bu e-posta adresi zaten kullanılıyor.';
+                            } else {
+                              errorMessage = 'Kayıt başarısız: ${e.message}';
+                            }
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errorMessage),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -349,7 +387,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       const SizedBox(width: 20),
                       InkWell(
-                        onTap: _signInWithGoogle, // Google Sign-In bağlandı
+                        onTap: _signInWithGoogle,
                         child: Container(
                           width: 50,
                           height: 50,
@@ -427,25 +465,18 @@ class _RegisterPageState extends State<RegisterPage> {
         TextField(
           controller: controller,
           obscureText: obscureText,
-          onChanged: (value) {
-            setState(() {
-              validateForm();
-            });
-          },
+          onChanged: (_) => setState(() => validateForm()),
           decoration: InputDecoration(
             hintText: hintText,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 18,
-            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
           ),
         ),
         if (errorText != null)

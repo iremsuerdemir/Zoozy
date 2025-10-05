@@ -7,7 +7,7 @@ import 'package:zoozy/screens/register_page.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 🔹 ekledik
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -22,57 +22,61 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  // 🔹 E-posta ile giriş
+  /// E-posta ve şifre ile giriş işlemini gerçekleştirir.
   void _login() async {
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
 
       try {
-        // Firebase ile gerçek kimlik doğrulama işlemi
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        // 🔹 SharedPreferences kaydı
+        // SharedPreferences'a kullanıcı adını ve e-postayı kaydet
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('username', 'İrem Su Erdemir'); // varsayılan ad
-        await prefs.setString('email', email);
+        await prefs.setString(
+            'username', userCredential.user?.displayName ?? 'Kullanıcı');
+        await prefs.setString('email', email.toLowerCase());
 
-        // Başarılı giriş
+        // Başarılı giriş bildirimi ve 4 saniye bekletme
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Giriş başarılı! Sayfaya yönlendiriliyorsunuz..."),
+          SnackBar(
+            content: Text(
+                "Giriş başarılı! Hoş geldiniz ${userCredential.user?.displayName ?? ""}. Sayfaya yönlendiriliyorsunuz..."),
             backgroundColor: Colors.green,
           ),
         );
 
-        // 4 saniye bekletme ve yönlendirme
+        // İstenen 4 saniyelik bekletme
         await Future.delayed(const Duration(seconds: 4));
 
         if (mounted) {
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
         }
       } on FirebaseAuthException catch (e) {
-        // Kimlik doğrulama hatalarını yakala ve kullanıcıya göster
-        String message;
+        String errorMessage;
         if (e.code == 'user-not-found') {
-          message = 'Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.';
+          errorMessage = 'Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.';
         } else if (e.code == 'wrong-password') {
-          message = 'Yanlış şifre. Lütfen tekrar deneyin.';
+          errorMessage = 'Yanlış şifre. Lütfen tekrar deneyin.';
         } else {
-          message = 'Giriş hatası';
+          // Diğer Firebase hataları için genel mesaj
+          errorMessage = 'Giriş başarısız: ${e.message}';
         }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message),
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
           ),
         );
       } catch (e) {
-        // Diğer bilinmeyen hatalar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Bilinmeyen bir hata oluştu: $e'),
@@ -83,45 +87,47 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
     }
   }
 
-  // 🔹 Google Sign-In İşlemi
+  /// Google ile giriş işlemini gerçekleştirir.
   Future<void> _signInWithGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        // Kullanıcı girişten vazgeçti
-        return;
-      }
+      GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return; // Kullanıcı vazgeçti
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // 🔹 SharedPreferences kaydı
+      // SharedPreferences'a kullanıcı adını ve e-postayı kaydet
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
-          'username', userCredential.user?.displayName ?? 'İrem Su Erdemir');
-      await prefs.setString('email', userCredential.user?.email ?? '');
+          'username', userCredential.user?.displayName ?? 'Kullanıcı');
+      await prefs.setString(
+          'email', (userCredential.user?.email ?? '').toLowerCase());
 
+      // Başarılı giriş bildirimi
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "Google ile giriş başarılı! Hoşgeldiniz ${userCredential.user?.displayName ?? ""}",
-          ),
+              "Google ile giriş başarılı! Hoşgeldiniz ${userCredential.user?.displayName ?? ""}"),
           backgroundColor: Colors.green,
         ),
       );
 
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+      if (mounted) {
+        // Doğrudan yönlendirme (e-posta girişindeki 4 saniye burada uygulanmadı)
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -185,31 +191,37 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 30),
-                // Email
+                // E-posta alanı
                 TextFormField(
                   controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: "E-posta",
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide:
+                          const BorderSide(color: Color(0xFF7A4FAD), width: 2),
                     ),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Lütfen e-posta adresinizi girin.';
                     }
-                    if (!RegExp(
-                      r'^[\w-.]+@([\w-]+\.)+[\w]{2,4}$',
-                    ).hasMatch(value)) {
+                    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Geçerli bir e-posta adresi girin.';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 15),
-                // Password
+                // Şifre alanı
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -219,6 +231,12 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide:
+                          const BorderSide(color: Color(0xFF7A4FAD), width: 2),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -245,7 +263,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                // Login Button
+                // Giriş Yap butonu
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -255,16 +273,20 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
+                      elevation: 4,
                     ),
                     onPressed: _login,
                     child: const Text(
                       "E-posta ile Giriş Yap",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
                 const SizedBox(height: 15),
-                // Forgot Password
+                // Şifremi unuttum butonu
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -280,7 +302,9 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                       "Şifrenizi mi unuttunuz?",
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white,
                       ),
                     ),
                   ),
@@ -289,16 +313,16 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                 const Center(
                   child: Text(
                     "veya ile devam et",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
                 ),
                 const SizedBox(height: 15),
-                //  Google Buttons
+                // Google Girişi butonu
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: _signInWithGoogle, // 🔹 Google Sign-In
+                      onTap: _signInWithGoogle,
                       child: Container(
                         width: 50,
                         height: 50,
@@ -316,8 +340,8 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                         child: Center(
                           child: Image.network(
                             "https://cdn-icons-png.flaticon.com/512/300/300221.png",
-                            width: 45,
-                            height: 45,
+                            width: 30,
+                            height: 30,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -326,12 +350,13 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Kayıt ol linki
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       "Hesabınız yok mu? ",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -349,21 +374,23 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                           decorationColor: Color(0xFF7A4FAD),
+                          fontSize: 14,
                         ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 25),
+                // Yasal metinler
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 6,
                         offset: const Offset(0, 3),
                       ),
@@ -372,7 +399,8 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   child: Text.rich(
                     TextSpan(
                       text: "Kayıt Ol veya Giriş Yap’a tıklayarak, ",
-                      style: const TextStyle(color: Colors.black87),
+                      style:
+                          const TextStyle(color: Colors.black87, fontSize: 12),
                       children: [
                         TextSpan(
                           text: "Hizmet Şartları",
