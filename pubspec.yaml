@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   qr_flutter: ^4.1.0
+  font_awesome_flutter: ^10.9.1
 
   # Firebase Paketleri
   firebase_core: ^2.27.1

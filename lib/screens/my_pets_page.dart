@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'my_cities_page.dart'; // MyCitiesPage dosyanızın doğru yolunu yazın
 
 class MyPetsPage extends StatelessWidget {
   final List<Map<String, dynamic>> pets = [
@@ -95,42 +96,53 @@ class MyPetsPage extends StatelessWidget {
             childAspectRatio: 0.9,
           ),
           itemBuilder: (context, index) {
-            return Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 4,
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: pets[index]["color"],
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(16),
+            return InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyCitiesPage(),
+                  ),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: pets[index]["color"],
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            pets[index]["icon"],
+                            style: TextStyle(fontSize: 50),
+                          ),
                         ),
                       ),
+                    ),
+                    Expanded(
                       child: Center(
                         child: Text(
-                          pets[index]["icon"],
-                          style: TextStyle(fontSize: 50),
+                          pets[index]["name"],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        pets[index]["name"],
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
