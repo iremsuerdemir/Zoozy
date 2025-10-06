@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -26,6 +28,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Color _emailFieldColor = Colors.grey[100]!;
   Color _phoneFieldColor = Colors.grey[100]!;
+
+  final maskFormatter = MaskTextInputFormatter(
+      mask: '(###) ### ## ##', filter: {"#": RegExp(r'[0-9]')});
 
   @override
   void initState() {
@@ -77,7 +82,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     bool isEmailValid =
         RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
             .hasMatch(email);
-    bool isPhoneValid = RegExp(r"^0\d{10}$").hasMatch(phone);
+    bool isPhoneValid =
+        RegExp(r"^\d{10}$").hasMatch(maskFormatter.getUnmaskedText());
 
     setState(() {
       _emailFieldColor = isEmailValid ? Colors.grey[100]! : Colors.red[100]!;
@@ -98,7 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', _usernameController.text);
     await prefs.setString('email', email);
-    await prefs.setString('phone', phone);
+    await prefs.setString('phone', maskFormatter.getUnmaskedText());
 
     Uint8List? imageBytes;
 
@@ -280,12 +286,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     initialValue: '7692003@gmail.com',
                   ),
                   const SizedBox(height: 16),
-                  _buildInputField(
+                  IntlPhoneField(
                     controller: _phoneController,
-                    labelText: 'Telefon',
+                    initialCountryCode: 'TR',
                     keyboardType: TextInputType.phone,
+                    inputFormatters: [maskFormatter],
+                    decoration: InputDecoration(
+                      labelText: 'Telefon',
+                      filled: true,
+                      fillColor: _phoneFieldColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                    ),
+                    onChanged: (phone) {
+                      setState(() {}); // karakter sayacını güncelle
+                    },
+                    onCountryChanged: (country) {
+                      print(
+                          'Seçilen ülke: ${country.name}, kod: ${country.dialCode}');
+                    },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   _buildListTile(title: 'Hakkımda', onTap: () {}),
                   const SizedBox(height: 8),
                   _buildListTile(title: 'Rozetlerim', onTap: () {}),

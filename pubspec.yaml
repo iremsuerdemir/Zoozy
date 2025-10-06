@@ -1,18 +1,21 @@
 name: zoozy
 description: "A new Flutter project."
-publish_to: "none" # Bu satır uygulamanın pub.dev'e yanlışlıkla yüklenmesini engeller
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  # Dart SDK sürümü, güncel stabil sürümlere uyumluluk için güvenli bir aralıkta tutuldu.
   sdk: ">=3.1.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
+  # Paketler
   qr_flutter: ^4.1.0
   font_awesome_flutter: ^10.9.1
+  intl_phone_field: ^3.1.0
+  mask_text_input_formatter: ^2.4.0
 
   # Firebase Paketleri
   firebase_core: ^2.27.1
@@ -22,11 +25,10 @@ dependencies:
   # Diğer Paketler
   cupertino_icons: ^1.0.8
   google_sign_in: ^6.2.4
-
-  image_picker: ^1.1.2 # Resim seçmek için
-  shared_preferences: ^2.2.2 # Veri kaydetmek için
-  path_provider: ^2.1.2 # Resim yolunu kaydetmek için
-  path: ^1.9.0 # Yol birleştirme işlemleri için
+  image_picker: ^1.1.2
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.2
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

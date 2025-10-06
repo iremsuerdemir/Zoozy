@@ -9,6 +9,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:zoozy/screens/my_cities_page.dart';
 import 'package:zoozy/screens/my_pets_page.dart';
 import 'package:zoozy/screens/pet_gender_page.dart';
+import 'package:zoozy/screens/pet_pickup_page.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/promotions_coupons_Screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MyCitiesPage(),
+      home: PetPickupPage(),
     );
   }
 }
