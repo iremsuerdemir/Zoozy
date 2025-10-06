@@ -6,7 +6,8 @@ import 'package:zoozy/screens/edit_profile.dart';
 import 'package:zoozy/screens/jobs_screen.dart';
 import 'package:zoozy/screens/login_page.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:zoozy/screens/profile_screen.dart'; // <-- Bunu ekledik
+import 'package:zoozy/screens/profile_screen.dart';
+import 'package:zoozy/screens/reguests_screen.dart'; // <-- Bunu ekledik
 
 // Web için GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: JobsScreen(),
+      home: RequestsScreen(),
     );
   }
 }
