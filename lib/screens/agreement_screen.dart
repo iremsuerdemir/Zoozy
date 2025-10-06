@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/jobs_screen.dart';
 import 'package:zoozy/screens/services.dart';
 
 // Madde işaretleri için özel widget
@@ -77,7 +78,10 @@ class _AgreementScreenState extends State<AgreementScreen> {
                           color: Colors.white,
                           size: 28,
                         ),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => JobsScreen())),
                       ),
                       const Text(
                         'Anlaşmalar',

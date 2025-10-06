@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/agreement_screen.dart';
 
 // Services ekranı
 class Services extends StatelessWidget {
@@ -65,21 +66,53 @@ class Services extends StatelessWidget {
               // Başlık
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: const [
-                    Icon(Icons.pets, color: Colors.white, size: 30),
-                    SizedBox(width: 8),
-                    Text(
-                      'Hizmetler',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Ortadaki Hizmetler + Pet ikonu
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text(
+                          'Hizmetler',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.pets,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ],
+                    ),
+
+                    // Sol üstte geri ikonu
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AgreementScreen()));
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+
               // Services listesi
               Expanded(
                 child: Scrollbar(

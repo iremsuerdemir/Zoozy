@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/profile_screen.dart';
 
 class PromotionsCouponsScreen extends StatelessWidget {
   const PromotionsCouponsScreen({super.key});
@@ -55,7 +56,10 @@ class PromotionsCouponsScreen extends StatelessWidget {
                           Icons.arrow_back_ios_new,
                           color: Colors.white,
                         ),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfileScreen())),
                       ),
                     ),
                     // Ortadaki ikon ve yazı

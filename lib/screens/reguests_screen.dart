@@ -3,10 +3,18 @@ import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 
-class RequestsScreen extends StatelessWidget {
+class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
 
-  // 🎨 Renk paleti
+  @override
+  State<RequestsScreen> createState() => _RequestsScreenState();
+}
+
+class _RequestsScreenState extends State<RequestsScreen> {
+  // Seçilen ikon index'i
+  int selectedIndex = 0;
+
+  //  Renk paleti
   static const Color primaryPurple = Color.fromARGB(255, 111, 79, 172);
   static const Color softPink = Color(0xFFF48FB1);
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
@@ -14,40 +22,63 @@ class RequestsScreen extends StatelessWidget {
   // İkonlu kart oluşturma metodu
   Widget _buildIconTextCard(IconData icon, String text,
       {bool isSelected = false}) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: isSelected ? primaryPurple : cardIconBgColor,
-            borderRadius: BorderRadius.circular(10.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex =
+              _getIndexFromText(text); // Tıklanan ikon seçili olacak
+        });
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: isSelected ? primaryPurple : cardIconBgColor,
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.white : primaryPurple,
+              size: 28,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isSelected ? Colors.white : primaryPurple,
-            size: 28,
+          const SizedBox(height: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? Colors.black87 : Colors.black54,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            color: isSelected ? Colors.black87 : Colors.black54,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  int _getIndexFromText(String text) {
+    switch (text) {
+      case "İstekler":
+        return 0;
+      case "Hizmet Al":
+        return 1;
+      case "Köpek Gezdir":
+        return 2;
+      case "Yardım":
+        return 3;
+      default:
+        return 0;
+    }
   }
 
   // Yeni eklenecek hizmet seçimi modalı için kart
@@ -56,11 +87,7 @@ class RequestsScreen extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          // Servis seçildiğinde yapılacak işlem (örneğin yeni bir ekrana yönlendirme)
-          // Bu örnekte sadece bottom sheet'i kapatıyoruz
           Navigator.pop(context);
-          // Burada seçilen servis ile ilgili yeni bir sayfaya yönlendirme yapılabilir.
-          // print('$text hizmeti seçildi');
         },
         child: Column(
           children: [
@@ -68,7 +95,6 @@ class RequestsScreen extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                // Renk ve gölge görseldeki gibi değil ama işlevsellik için yeterli
                 color: primaryPurple.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(15.0),
               ),
@@ -97,7 +123,7 @@ class RequestsScreen extends StatelessWidget {
   void _showBroadcastRequestModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // İçeriğin kaydırılabilir olması için
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
       ),
@@ -105,11 +131,9 @@ class RequestsScreen extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min, // İçeriği kadar yer kaplamasını sağlar
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Başlık
               const Text(
                 "İlan Yayını",
                 style: TextStyle(
@@ -118,9 +142,7 @@ class RequestsScreen extends StatelessWidget {
                   color: Colors.black87,
                 ),
               ),
-              // push etmek için eklendi
               const SizedBox(height: 8),
-              // Açıklama
               const Text(
                 "Yakınınızdaki destekçilere evcil hayvanlarınızla ilgili yardıma ihtiyacınız olduğunu bildirmek için ilan yayınlayın.",
                 style: TextStyle(
@@ -129,7 +151,6 @@ class RequestsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              // Hizmet kartları 1. satır (4 adet)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -144,7 +165,6 @@ class RequestsScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              // Hizmet kartları 2. satır (3 adet)
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
@@ -154,7 +174,6 @@ class RequestsScreen extends StatelessWidget {
                       context, Icons.cut_outlined, "Bakım"),
                   _buildServiceSelectionCard(
                       context, Icons.school_outlined, "Eğitim"),
-                  // 4. sütunun boş kalması için bir Expanded widget'ı
                   const Expanded(child: SizedBox.shrink()),
                 ],
               ),
@@ -223,7 +242,6 @@ class RequestsScreen extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                // Üst arka plan gradyanı
                 Container(
                   height: 200,
                   width: double.infinity,
@@ -235,8 +253,6 @@ class RequestsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Orta görsel
                 Positioned(
                   left: screenWidth / 2 - 80,
                   top: 20,
@@ -252,8 +268,6 @@ class RequestsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Alt kısım: ikonlu kutular
                 Positioned(
                   top: screenHeight * 0.25,
                   left: screenWidth * 0.06,
@@ -276,26 +290,22 @@ class RequestsScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        // 1. Requests -> İSTEKLER (Seçili)
                         _buildIconTextCard(Icons.list_alt, "İstekler",
-                            isSelected: true),
-                        // 2. Get Service -> HİZMET AL
+                            isSelected: selectedIndex == 0),
                         _buildIconTextCard(
-                            Icons.touch_app_outlined, "Hizmet Al"),
-                        // 3. Dog Walk -> KÖPEK GEZDİRME
-                        _buildIconTextCard(Icons.pets, "Köpek Gezdir"),
-                        // 4. Help -> YARDIM
-                        _buildIconTextCard(Icons.help_outline, "Yardım"),
+                            Icons.touch_app_outlined, "Hizmet Al",
+                            isSelected: selectedIndex == 1),
+                        _buildIconTextCard(Icons.pets, "Köpek Gezdir",
+                            isSelected: selectedIndex == 2),
+                        _buildIconTextCard(Icons.help_outline, "Yardım",
+                            isSelected: selectedIndex == 3),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 100),
-
-            // Daire ikon
             Container(
               width: 100,
               height: 100,
@@ -307,10 +317,7 @@ class RequestsScreen extends StatelessWidget {
                 child: Icon(Icons.pets, size: 60, color: primaryPurple),
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Bilgilendirme metni
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
@@ -323,10 +330,7 @@ class RequestsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Hizmet Sun butonu
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -339,20 +343,16 @@ class RequestsScreen extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              // BUTON ACTION BURAYA EKLENDİ!
               onPressed: () => _showBroadcastRequestModal(context),
               child: const Text(
                 "ŞİMDİ HİZMET SUNUN",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
-
             const SizedBox(height: 20),
           ],
         ),
       ),
-
-      // Alt menü çubuğu
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 1,
         selectedColor: primaryPurple,

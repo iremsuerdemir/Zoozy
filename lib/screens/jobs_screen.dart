@@ -3,41 +3,81 @@ import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 
-class JobsScreen extends StatelessWidget {
+class JobsScreen extends StatefulWidget {
   const JobsScreen({super.key});
 
-  // 🎨 Renk paleti
+  @override
+  State<JobsScreen> createState() => _JobsScreenState();
+}
+
+class _JobsScreenState extends State<JobsScreen> {
+  // Seçilen ikon index'i
+  int selectedIndex = 0;
+
+  //   Renk paleti
   static const Color primaryPurple = Color.fromARGB(255, 111, 79, 172);
   static const Color softPink = Color(0xFFF48FB1);
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
 
   Widget _buildIconTextCard(IconData icon, String text) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: cardIconBgColor,
-            borderRadius: BorderRadius.circular(10.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    bool isSelected = _getIndexFromText(text) == selectedIndex;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex = _getIndexFromText(text);
+        });
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: isSelected ? primaryPurple : cardIconBgColor,
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.white : primaryPurple,
+              size: 28,
+            ),
           ),
-          child: Icon(icon, color: primaryPurple, size: 28),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          text,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? Colors.black87 : Colors.black54,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  int _getIndexFromText(String text) {
+    switch (text) {
+      case "İş Listeleri":
+        return 0;
+      case "Takvim":
+        return 1;
+      case "Köpek Gezdir":
+        return 2;
+      case "Yardım":
+        return 3;
+      default:
+        return 0;
+    }
   }
 
   @override
@@ -97,7 +137,7 @@ class JobsScreen extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                //   Üst arka plan gradient
+                // Üst arka plan gradient
                 Container(
                   height: 200,
                   width: double.infinity,
@@ -110,7 +150,7 @@ class JobsScreen extends StatelessWidget {
                   ),
                 ),
 
-                //   Orta görsel
+                // Orta görsel
                 Positioned(
                   left: screenWidth / 2 - 80,
                   top: 20,
@@ -127,9 +167,9 @@ class JobsScreen extends StatelessWidget {
                   ),
                 ),
 
-                //   Alt kısım: ikonlu kutular
+                // Alt kısım: ikonlu kutular
                 Positioned(
-                  top: screenHeight * 0.25, // biraz aşağıda
+                  top: screenHeight * 0.25,
                   left: screenWidth * 0.06,
                   right: screenWidth * 0.06,
                   child: Container(
@@ -160,10 +200,7 @@ class JobsScreen extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 100),
-
-            //   Daire ikon
             Container(
               width: 100,
               height: 100,
@@ -175,10 +212,7 @@ class JobsScreen extends StatelessWidget {
                 child: Icon(Icons.pets, size: 60, color: primaryPurple),
               ),
             ),
-
             const SizedBox(height: 24),
-
-            //   Bilgilendirme metni
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
@@ -191,10 +225,7 @@ class JobsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
-            //   Hizmet Sun butonu
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -219,13 +250,10 @@ class JobsScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
-
             const SizedBox(height: 20),
           ],
         ),
       ),
-
-      //   Alt menü çubuğu
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 3,
         selectedColor: primaryPurple,
