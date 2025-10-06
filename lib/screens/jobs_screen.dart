@@ -6,11 +6,10 @@ import 'package:zoozy/screens/profile_screen.dart';
 class JobsScreen extends StatelessWidget {
   const JobsScreen({super.key});
 
-  // Renk paleti
-  static const Color primaryPurple =
-      Color.fromARGB(255, 111, 79, 172); // Özel mor
-  static const Color softPink = Color(0xFFF48FB1); // Açık pembe
-  static const Color cardIconBgColor = Color(0xFFF3E5F5); // Kart arka planı
+  // 🎨 Renk paleti
+  static const Color primaryPurple = Color.fromARGB(255, 111, 79, 172);
+  static const Color softPink = Color(0xFFF48FB1);
+  static const Color cardIconBgColor = Color(0xFFF3E5F5);
 
   Widget _buildIconTextCard(IconData icon, String text) {
     return Column(
@@ -44,6 +43,7 @@ class JobsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -52,8 +52,8 @@ class JobsScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         toolbarHeight: 50,
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.pets, color: primaryPurple, size: 28),
             SizedBox(width: 8),
             Text(
@@ -85,7 +85,7 @@ class JobsScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(width: 8),
@@ -97,7 +97,7 @@ class JobsScreen extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                // Gradient alan
+                //   Üst arka plan gradient
                 Container(
                   height: 200,
                   width: double.infinity,
@@ -109,39 +109,41 @@ class JobsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                //   Orta görsel
                 Positioned(
                   left: screenWidth / 2 - 80,
-                  right: screenWidth / 2 - 80,
                   top: 20,
                   child: Center(
-                    child: Image.asset(
-                      'assets/images/jobs.png',
-                      height: 160,
-                      width: 160,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                    child: Transform.scale(
+                      scale: 1.3,
+                      child: Image.asset(
+                        'assets/images/jobs.png',
                         height: 160,
                         width: 160,
-                        color: Colors.transparent,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
                 ),
+
+                //   Alt kısım: ikonlu kutular
                 Positioned(
-                  bottom: -55,
-                  left: 20,
-                  right: 20,
+                  top: screenHeight * 0.25, // biraz aşağıda
+                  left: screenWidth * 0.06,
+                  right: screenWidth * 0.06,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          spreadRadius: 2,
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
+                          color: Colors.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
@@ -158,7 +160,10 @@ class JobsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 95),
+
+            const SizedBox(height: 100),
+
+            //   Daire ikon
             Container(
               width: 100,
               height: 100,
@@ -170,7 +175,10 @@ class JobsScreen extends StatelessWidget {
                 child: Icon(Icons.pets, size: 60, color: primaryPurple),
               ),
             ),
+
             const SizedBox(height: 24),
+
+            //   Bilgilendirme metni
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
@@ -183,7 +191,10 @@ class JobsScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 24),
+
+            //   Hizmet Sun butonu
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -199,7 +210,8 @@ class JobsScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AgreementScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const AgreementScreen()),
                 );
               },
               child: const Text(
@@ -207,10 +219,13 @@ class JobsScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
+
             const SizedBox(height: 20),
           ],
         ),
       ),
+
+      //   Alt menü çubuğu
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 3,
         selectedColor: primaryPurple,
