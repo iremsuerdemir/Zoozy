@@ -1,4 +1,3 @@
-// settings_screen.dart
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +6,10 @@ import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/edit_profile.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
+
+// Şifre değiştirme sayfası için bir geçici import ekliyorum.
+// Gerçek uygulamanızda bu sayfayı oluşturmanız gerekecektir.
+// import 'package:zoozy/screens/change_password_page.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -20,7 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const Color zoozyGradientStart = Color(0xFFB39DDB);
   static const Color zoozyGradientEnd = Color(0xFFF48FB1);
 
-  // Oturumu kapatma dialogu
+  // 🔹 Oturumu kapatma
   Future<void> _showLogoutDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
@@ -51,20 +54,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: GestureDetector(
                 onTap: () async {
+                  // Dialog'u kapat
                   Navigator.of(dialogContext).pop();
-                  await FirebaseAuth.instance.signOut();
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.clear();
-                  if (mounted) {
+
+                  print("LOGOUT: Oturum kapatma işlemi başlatılıyor...");
+                  try {
+                    // Firebase ve SharedPreferences temizle
+                    await FirebaseAuth.instance.signOut();
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    print(
+                      "LOGOUT: Firebase oturumu kapatıldı ve SharedPreferences temizlendi.",
+                    );
+
+                    if (!context.mounted) return;
+
+                    // Başarı mesajını göster
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Başarıyla çıkış yapıldı."),
+                        backgroundColor: Colors.blueGrey,
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.all(16),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
+                    print("LOGOUT: OwnerLoginPage'e yönlendiriliyor.");
+                    // Güvenilir yönlendirme
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const OwnerLoginPage()),
                       (route) => false,
+                    );
+                  } catch (e) {
+                    print(
+                      "LOGOUT ERROR: Çıkış yapılırken bir hata oluştu: ${e.toString()}",
+                    );
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Çıkış hatası: ${e.toString()}"),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.all(16),
+                      ),
                     );
                   }
                 },
@@ -96,38 +132,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Hesabı silme fonksiyonu
+  // 🔹 Hesabı silme fonksiyonu (Güncellenmiş)
   Future<void> _showDeleteAccountDialog(BuildContext context) async {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Hesabı Sil"),
         content: const Text(
-          "Hesabınızı kalıcı olarak silmek istediğinize emin misiniz?",
+          "Hesabınızı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text("İptal"),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              // Önce onay diyalogunu kapat
+              Navigator.pop(dialogContext);
 
               final user = FirebaseAuth.instance.currentUser;
-              if (user == null) return;
+              if (user == null) {
+                print("DELETE ERROR: Kullanıcı oturumu bulunamadı.");
+                return;
+              }
+              print(
+                "DELETE: Kullanıcı UID: ${user.uid} - Hesap silme işlemi başlatılıyor.",
+              );
 
               try {
-                // Google kullanıcıları için şifre doğrulama gerekmez
+                // 🔸 Google hesabı, diğer sosyal medya veya anonim ise (tekrar şifre istemeye gerek yok)
                 if (user.providerData.any(
-                  (info) => info.providerId == 'google.com',
+                  (info) =>
+                      info.providerId == 'google.com' ||
+                      info.providerId == 'facebook.com' ||
+                      info.providerId == 'twitter.com' ||
+                      info.providerId == 'apple.com' ||
+                      info.providerId == 'anonymous',
                 )) {
+                  print(
+                    "DELETE: Google/Sosyal Medya/Anonim hesap. Direkt silme deneniyor.",
+                  );
                   await user.delete();
                 } else {
-                  // Şifreyi onayla
+                  // 🔸 Email/şifre ile giriş yapan kullanıcılar için şifre doğrulama
+                  print(
+                    "DELETE: Email/Şifre hesabı. Şifre doğrulaması isteniyor.",
+                  );
                   String? enteredPassword = await showDialog<String>(
                     context: context,
-                    builder: (_) {
+                    builder: (passwordDialogContext) {
                       final TextEditingController passwordController =
                           TextEditingController();
                       return AlertDialog(
@@ -141,12 +195,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context, null),
+                            onPressed: () =>
+                                Navigator.pop(passwordDialogContext, null),
                             child: const Text("İptal"),
                           ),
                           TextButton(
-                            onPressed: () =>
-                                Navigator.pop(context, passwordController.text),
+                            onPressed: () => Navigator.pop(
+                              passwordDialogContext,
+                              passwordController.text,
+                            ),
                             child: const Text("Onayla"),
                           ),
                         ],
@@ -154,47 +211,115 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   );
 
-                  if (enteredPassword == null || enteredPassword.isEmpty)
+                  if (enteredPassword == null || enteredPassword.isEmpty) {
+                    print(
+                      "DELETE: Şifre doğrulama iptal edildi veya boş bırakıldı.",
+                    );
                     return;
+                  }
 
+                  if (user.email == null) {
+                    print(
+                      "DELETE ERROR: Email/Şifre kullanıcısının e-posta adresi bulunamadı.",
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Hesap silinemedi. Lütfen tekrar giriş yapın.",
+                          ),
+                          backgroundColor: Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.all(16),
+                        ),
+                      );
+                    }
+                    return;
+                  }
+
+                  // Kimlik bilgileriyle yeniden oturum açma
                   final cred = EmailAuthProvider.credential(
                     email: user.email!,
                     password: enteredPassword,
                   );
+
+                  print("DELETE: Kullanıcı yeniden kimliklendiriliyor...");
                   await user.reauthenticateWithCredential(cred);
+                  print(
+                    "DELETE: Yeniden kimliklendirme başarılı, hesap siliniyor...",
+                  );
                   await user.delete();
                 }
 
+                // Hesap silme başarılı
+                print("DELETE SUCCESS: Hesap başarıyla silindi.");
+
+                // Hesap silindikten sonra SharedPreferences temizle
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.clear();
+                print("DELETE: SharedPreferences temizlendi.");
+
+                if (!context.mounted) return;
+
+                // 🔹 SnackBar'ı göster
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "Hesabınız başarıyla silindi. Giriş sayfasına yönlendiriliyorsunuz.",
+                    ),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.all(16),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+
+                // 🔹 Yönlendirmeyi yap
+                print("DELETE: OwnerLoginPage'e yönlendiriliyor.");
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const OwnerLoginPage()),
+                  (route) => false,
+                );
+              } on FirebaseAuthException catch (e) {
+                String errorMessage = "";
+                print(
+                  "DELETE ERROR: FirebaseAuthException - Code: ${e.code}, Message: ${e.message}",
+                ); // ⬅️ DEBUG LOG
+
+                if (e.code == 'wrong-password' ||
+                    e.code == 'invalid-credential') {
+                  errorMessage =
+                      "Girdiğiniz şifre yanlış. Lütfen tekrar deneyin.";
+                } else if (e.code == 'requires-recent-login') {
+                  errorMessage =
+                      "Hesabınızı silebilmek için yeniden giriş yapmanız gerekiyor (Çok kısa süre önce giriş yapmalısınız).";
+                } else if (e.code == 'user-not-found') {
+                  errorMessage =
+                      "Kullanıcı bulunamadı. Lütfen tekrar giriş yapın.";
+                } else {
+                  errorMessage = "Hesap silinemedi: ${e.message}";
+                }
 
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Hesabınız başarıyla silindi."),
-                      backgroundColor: Colors.green,
+                    SnackBar(
+                      content: Text(errorMessage),
+                      backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,
-                      margin: EdgeInsets.all(16),
-                      duration: Duration(seconds: 3),
+                      margin: const EdgeInsets.all(16),
                     ),
                   );
-
-                  await Future.delayed(const Duration(seconds: 3));
-                  if (context.mounted) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const OwnerLoginPage()),
-                      (route) => false,
-                    );
-                  }
                 }
-              } on FirebaseAuthException catch (e) {
-                String errorMessage = e.code == 'requires-recent-login'
-                    ? "Hesabınızı silebilmek için yeniden giriş yapmanız gerekiyor."
-                    : "Hesap silinemedi: ${e.message}";
-
+              } catch (e) {
+                print(
+                  "DELETE ERROR: Beklenmedik bir hata oluştu: ${e.toString()}",
+                ); // ⬅️ DEBUG LOG
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(errorMessage),
+                    content: Text(
+                      "Beklenmedik bir hata oluştu: ${e.toString()}",
+                    ),
                     backgroundColor: Colors.red,
                     behavior: SnackBarBehavior.floating,
                     margin: const EdgeInsets.all(16),
@@ -212,6 +337,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // 🔹 Ayar satırını oluşturan widget
   Widget _buildSettingRow(String title, {VoidCallback? onTap}) {
     return Column(
       children: [
@@ -342,8 +468,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     );
                                   },
                                 ),
-                                _buildSettingRow("Şifreyi Değiştir"),
+                                // Şifreyi Değiştir için onTap eklendi
+                                _buildSettingRow(
+                                  "Şifreyi Değiştir",
+                                  onTap: () {
+                                    // TODO: Bu kısma şifre değiştirme ekranına yönlendirme logic'i eklenmelidir.
+                                    // SnackBar mesajı artık sadece bilgilendirme amaçlı.
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Şifre değiştirme ekranı henüz tamamlanmadı. (TODO)",
+                                        ),
+                                        backgroundColor: Colors.blue,
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: EdgeInsets.all(16),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                  },
+                                ),
                                 const SizedBox(height: 20),
+                                const Text(
+                                  " HUKUKİ",
+                                  style: TextStyle(
+                                    color: zoozyPurple,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
                                 _buildSettingRow(
                                   "Hizmet Şartları",
                                   onTap: () {
@@ -369,6 +522,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 20),
+                                // Oturumu Kapat butonu
                                 Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
@@ -386,6 +540,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                       minimumSize: const Size.fromHeight(50),
+                                      padding:
+                                          EdgeInsets.zero, // Padding'i kaldırır
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
                                     child: const Text(
                                       "Oturumu Kapat",
@@ -397,14 +556,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 12),
+                                // Hesabı Sil butonu
                                 Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color(0xFF9C27B0),
-                                        Color(0xFF7B1FA2),
+                                        Color.fromARGB(
+                                          255,
+                                          239,
+                                          83,
+                                          80,
+                                        ), // Kırmızımsı başlangıç
+                                        Color.fromARGB(
+                                          255,
+                                          211,
+                                          47,
+                                          47,
+                                        ), // Kırmızımsı bitiş
                                       ],
                                     ),
                                   ),
@@ -415,6 +585,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                       minimumSize: const Size.fromHeight(50),
+                                      padding: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
                                     child: const Text(
                                       "Hesabı Sil",
@@ -425,6 +599,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ),
                                 ),
+                                const SizedBox(height: 20),
                               ],
                             ),
                           ),
