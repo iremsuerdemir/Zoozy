@@ -5,7 +5,11 @@ import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
 
 class TermsOfServicePage extends StatefulWidget {
-  const TermsOfServicePage({super.key});
+  /// Sayfa bir onay akışının parçası mı? (örneğin kayıt sürecinde)
+  /// Varsayılan olarak `true`.
+  final bool isForApproval;
+
+  const TermsOfServicePage({super.key, this.isForApproval = true});
 
   @override
   State<TermsOfServicePage> createState() => _TermsOfServicePageState();
@@ -16,6 +20,8 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showApprovalWidgets = widget.isForApproval;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -44,8 +50,11 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -172,97 +181,99 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 20),
 
-                              // Checkbox satırı
-                              Row(
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 300),
-                                    transitionBuilder: (child, animation) =>
-                                        ScaleTransition(
-                                      scale: animation,
-                                      child: child,
-                                    ),
-                                    child: Checkbox(
-                                      key: ValueKey<bool>(isChecked),
-                                      value: isChecked,
-                                      activeColor: Colors.purple,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isChecked = value ?? false;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  const Expanded(
-                                    child: Text(
-                                      "Okudum, onayladım",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                              // Sadece onay akışı aktifse göster
+                              if (showApprovalWidgets) ...[
+                                const SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    AnimatedSwitcher(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      transitionBuilder: (child, animation) =>
+                                          ScaleTransition(
+                                            scale: animation,
+                                            child: child,
+                                          ),
+                                      child: Checkbox(
+                                        key: ValueKey<bool>(isChecked),
+                                        value: isChecked,
+                                        activeColor: Colors.purple,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            isChecked = value ?? false;
+                                          });
+                                        },
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Devam Et butonu
-                              GestureDetector(
-                                onTap: isChecked
-                                    ? () {
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const PrivacyPolicyPage(),
-                                          ),
-                                          (route) => false,
-                                        );
-                                      }
-                                    : null,
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: isChecked
-                                          ? [
-                                              Colors.purple,
-                                              Colors.deepPurpleAccent,
-                                            ]
-                                          : [
-                                              Colors.grey.shade400,
-                                              Colors.grey.shade300,
-                                            ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(14),
-                                    boxShadow: [
-                                      if (isChecked)
-                                        const BoxShadow(
-                                          color: Colors.purpleAccent,
-                                          blurRadius: 8,
-                                          offset: Offset(0, 4),
+                                    const Expanded(
+                                      child: Text(
+                                        "Okudum, onayladım",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
                                         ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "Devam Et",
-                                      style: TextStyle(
-                                        color: isChecked
-                                            ? Colors.white
-                                            : Colors.black54,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                GestureDetector(
+                                  onTap: isChecked
+                                      ? () {
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const PrivacyPolicyPage(),
+                                            ),
+                                            (route) => false,
+                                          );
+                                        }
+                                      : null,
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: isChecked
+                                            ? [
+                                                Colors.purple,
+                                                Colors.deepPurpleAccent,
+                                              ]
+                                            : [
+                                                Colors.grey.shade400,
+                                                Colors.grey.shade300,
+                                              ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(14),
+                                      boxShadow: [
+                                        if (isChecked)
+                                          const BoxShadow(
+                                            color: Colors.purpleAccent,
+                                            blurRadius: 8,
+                                            offset: Offset(0, 4),
+                                          ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Devam Et",
+                                        style: TextStyle(
+                                          color: isChecked
+                                              ? Colors.white
+                                              : Colors.black54,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ),

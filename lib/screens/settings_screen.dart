@@ -504,7 +504,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) =>
-                                            const TermsOfServicePage(),
+                                            const TermsOfServicePage(
+                                              isForApproval: false,
+                                            ),
                                       ),
                                     );
                                   },
@@ -515,8 +517,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            const PrivacyPolicyPage(),
+                                        builder: (_) => const PrivacyPolicyPage(
+                                          isModal: false,
+                                        ),
                                       ),
                                     );
                                   },
