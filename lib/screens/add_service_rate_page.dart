@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AddServiceRatePageFromPrefs extends StatefulWidget {
   const AddServiceRatePageFromPrefs({super.key});
@@ -16,6 +15,7 @@ class _AddServiceRatePageFromPrefsState
   final TextEditingController _aciklamaController = TextEditingController();
   String _serviceName = '';
   bool _isFilled = false;
+  bool _isEditing = false; // ₺ otomatik ekleme kontrolü
 
   void _kontrolButonDurumu() {
     setState(() {
@@ -25,19 +25,21 @@ class _AddServiceRatePageFromPrefsState
     });
   }
 
-  Future<void> _loadServiceName() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _serviceName = prefs.getString('service_name') ?? '';
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    _loadServiceName();
     _fiyatController.addListener(_kontrolButonDurumu);
     _aciklamaController.addListener(_kontrolButonDurumu);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 🔹 Named route'tan gelen argümanı burada alıyoruz
+    final args = ModalRoute.of(context)!.settings.arguments as Map?;
+    setState(() {
+      _serviceName = args?['serviceName'] ?? 'Servis Adı Belirtilmemiş';
+    });
   }
 
   @override
@@ -55,6 +57,7 @@ class _AddServiceRatePageFromPrefsState
     return Scaffold(
       body: Stack(
         children: [
+          // 🔹 Arka Plan
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -67,6 +70,7 @@ class _AddServiceRatePageFromPrefsState
           SafeArea(
             child: Column(
               children: [
+                // 🔹 Üst Bar
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -96,6 +100,8 @@ class _AddServiceRatePageFromPrefsState
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // 🔹 İçerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -153,6 +159,7 @@ class _AddServiceRatePageFromPrefsState
                                 ),
                               ),
                               const SizedBox(height: 20),
+                              // 🔹 Kaydet Butonu
                               GestureDetector(
                                 onTap: _isFilled
                                     ? () =>
@@ -216,6 +223,7 @@ class _AddServiceRatePageFromPrefsState
     );
   }
 
+  // 🔹 Okunabilir TextField (Servis Adı)
   Widget _buildReadOnlyTextField(String serviceName) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -239,6 +247,8 @@ class _AddServiceRatePageFromPrefsState
     );
   }
 
+  // 🔹 Fiyat Alanı (₺ Otomatik Eklemeli)
+  // 🔹 Fiyat Alanı (₺ her zaman başta sabit)
   Widget _buildPriceInputField(
     String labelText,
     TextEditingController controller,
@@ -256,8 +266,19 @@ class _AddServiceRatePageFromPrefsState
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
+        onChanged: (value) {
+          // Sadece sayı girilmesine izin verelim
+          final cleaned = value.replaceAll(RegExp(r'[^0-9]'), '');
+          if (value != cleaned) {
+            controller.text = cleaned;
+            controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: cleaned.length),
+            );
+          }
+        },
         decoration: InputDecoration(
           border: InputBorder.none,
+          prefixText: '₺ ', // 💰 TL simgesi sabit
           hintText: labelText,
           isDense: true,
         ),
@@ -266,6 +287,7 @@ class _AddServiceRatePageFromPrefsState
     );
   }
 
+  // 🔹 Açıklama Alanı
   Widget _buildDescriptionInputField(
     String labelText,
     TextEditingController controller,

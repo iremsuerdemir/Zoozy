@@ -36,11 +36,10 @@ class _ServiceNamePageState extends State<ServiceNamePage> {
     await prefs.setString('service_name', serviceName);
 
     // AddServiceRatePage'e yönlendir
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddServiceRatePageFromPrefs(),
-      ),
+      '/addServiceRate',
+      arguments: {'serviceName': serviceName},
     );
   }
 

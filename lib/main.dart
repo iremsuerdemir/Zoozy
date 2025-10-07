@@ -4,7 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:zoozy/screens/about_me_page.dart';
-import 'package:zoozy/screens/add_service_rate_page.dart';
+import 'package:zoozy/screens/add_service_rate_page.dart'
+    show AddServiceRatePageFromPrefs;
 import 'package:zoozy/screens/describe_services_page.dart';
 import 'package:zoozy/screens/groomer_note.dart';
 import 'package:zoozy/screens/grooming_service_page.dart';
@@ -66,7 +67,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: ServiceNamePage(),
+      home: const ServiceNamePage(),
+      routes: {
+        '/describeServices': (context) => const DescribeServicesPage(),
+        '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
+      },
     );
   }
 }
