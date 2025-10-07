@@ -5,26 +5,33 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.1.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
   flutter:
+    sdk: flutter
+  provider: ^6.0.5
+
+  # Localization paketi
+  flutter_localizations:
     sdk: flutter
 
   # Paketler
   qr_flutter: ^4.1.0
   font_awesome_flutter: ^10.9.1
   intl_phone_field: ^3.1.0
+  flutter_local_notifications: ^19.4.2
   mask_text_input_formatter: ^2.4.0
+  audioplayers: 6.5.1
 
   # Firebase Paketleri
-  firebase_core: ^2.27.1
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
   flutter_facebook_auth: ^6.1.1
-  firebase_auth: ^4.17.4
 
   # Diğer Paketler
   cupertino_icons: ^1.0.8
-  google_sign_in: ^6.2.4
+  google_sign_in: ^6.2.1
   image_picker: ^1.1.2
   shared_preferences: ^2.2.2
   path_provider: ^2.1.2
@@ -45,3 +52,5 @@ flutter:
     - assets/images/login_4.png
     - assets/images/forgot_password.png
     - assets/images/jobs.png
+    - assets/sounds/havhav.ogg
+    - assets/sounds/miyav.ogg

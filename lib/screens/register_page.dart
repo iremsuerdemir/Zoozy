@@ -3,7 +3,6 @@ import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -72,66 +71,6 @@ class _RegisterPageState extends State<RegisterPage> {
         const SnackBar(
             content: Text(
                 'Google ile giriş sırasında beklenmeyen bir hata oluştu!')),
-      );
-    }
-  }
-
-  // FACEBOOK SIGN-IN (Web)
-  Future<void> _signInWithFacebook() async {
-    try {
-      final LoginResult result = await FacebookAuth.instance.login(
-        permissions: ['email', 'public_profile'],
-      );
-
-      if (result.status == LoginStatus.success) {
-        final AccessToken accessToken = result.accessToken!;
-        final credential = FacebookAuthProvider.credential(accessToken.token);
-
-        final UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(
-            'username', userCredential.user?.displayName ?? 'Kullanıcı');
-        await prefs.setString(
-            'email', (userCredential.user?.email ?? '').toLowerCase());
-
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text("Hoş geldiniz ${userCredential.user?.displayName ?? ""}!"),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else if (result.status == LoginStatus.cancelled) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Facebook ile giriş iptal edildi.')),
-        );
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Facebook giriş başarısız: ${result.message}')),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Firebase Facebook Hatası: ${e.message}')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Facebook ile giriş sırasında beklenmeyen bir hata oluştu!')),
       );
     }
   }
@@ -363,56 +302,31 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                        onTap: _signInWithFacebook,
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
+                  InkWell(
+                    onTap: _signInWithGoogle,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
-                          child: Center(
-                            child: Image.network(
-                              "https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png",
-                              width: 45,
-                              height: 45,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Image.network(
+                          "https://cdn-icons-png.flaticon.com/512/300/300221.png",
+                          width: 45,
+                          height: 45,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(width: 20),
-                      InkWell(
-                        onTap: _signInWithGoogle,
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Image.network(
-                              "https://cdn-icons-png.flaticon.com/512/300/300221.png",
-                              width: 45,
-                              height: 45,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(

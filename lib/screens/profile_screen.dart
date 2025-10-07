@@ -3,9 +3,12 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
+import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/edit_profile.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
+import 'package:zoozy/screens/agreement_screen.dart';
+import 'package:zoozy/screens/settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       username = prefs.getString('username') ?? 'İrem Su Erdemir';
       email = prefs.getString('email') ?? '7692003@gmail.com';
 
-      // Profil resmini yükle
       final imageString = prefs.getString('profileImagePath');
       if (imageString != null && imageString.isNotEmpty) {
         try {
@@ -47,7 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  // Menü butonu
   Widget buildMenuButton(IconData icon, String title) {
     return Container(
       decoration: BoxDecoration(
@@ -76,7 +77,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Bakiye/Kredi/İnceleme alanları
   Widget buildStatColumn(String label, String value, {String? subLabel}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -144,7 +144,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           IconButton(
                             icon:
                                 const Icon(Icons.settings, color: Colors.white),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SettingsScreen()));
+                            },
                           ),
                           IconButton(
                             icon: const Icon(Icons.chat_bubble_outline,
@@ -300,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF7A4FAD)),
                       ),
-                      const SizedBox(width: 340),
+                      const Spacer(),
                       IconButton(
                         icon: const Icon(
                           Icons.help_outline,
@@ -324,7 +329,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   // Add Pet Service Kartı
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AgreementScreen()),
+                      );
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -354,12 +365,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Evcil Hayvan Hizmeti Ekle',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                Text('Bakıcı / Evcil Hayvan Oteli Ol',
-                                    style: TextStyle(color: Colors.grey)),
+                                Text(
+                                  'Evcil Hayvan Hizmeti Ekle',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Bakıcı / Evcil Hayvan Oteli Ol',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
                               ],
                             ),
                           ),
