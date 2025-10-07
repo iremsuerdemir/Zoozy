@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/services_rate.dart';
 
 class AddServiceRatePageFromPrefs extends StatefulWidget {
   const AddServiceRatePageFromPrefs({super.key});
@@ -162,8 +163,13 @@ class _AddServiceRatePageFromPrefsState
                               // 🔹 Kaydet Butonu
                               GestureDetector(
                                 onTap: _isFilled
-                                    ? () =>
-                                          debugPrint('Servis oranı kaydedildi')
+                                    ? () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ServiceRatesPage(),
+                                        ),
+                                      )
                                     : null,
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),

@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zoozy/screens/add_service_rate_page.dart';
+import 'package:zoozy/screens/describe_services_page.dart';
 
 class ServiceNamePage extends StatefulWidget {
   const ServiceNamePage({super.key});
@@ -17,7 +16,7 @@ class _ServiceNamePageState extends State<ServiceNamePage> {
   void initState() {
     super.initState();
     _serviceNameController.addListener(() {
-      setState(() {}); // Her yazımda build yenilenir
+      setState(() {});
     });
   }
 
@@ -28,18 +27,12 @@ class _ServiceNamePageState extends State<ServiceNamePage> {
   }
 
   Future<void> _kaydetVeDevamEt() async {
-    final String serviceName = _serviceNameController.text.trim();
-    if (serviceName.isEmpty) return;
+    if (_serviceNameController.text.trim().isEmpty) return;
 
-    // SharedPreferences ile kaydet
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('service_name', serviceName);
-
-    // AddServiceRatePage'e yönlendir
-    Navigator.pushNamed(
+    // Artık serviceName göndermeye gerek yok
+    Navigator.push(
       context,
-      '/addServiceRate',
-      arguments: {'serviceName': serviceName},
+      MaterialPageRoute(builder: (context) => const DescribeServicesPage()),
     );
   }
 

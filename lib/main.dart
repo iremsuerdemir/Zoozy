@@ -11,6 +11,7 @@ import 'package:zoozy/screens/groomer_note.dart';
 import 'package:zoozy/screens/grooming_service_page.dart';
 import 'package:zoozy/screens/login_page.dart';
 import 'package:zoozy/screens/service_name_page.dart';
+import 'package:zoozy/screens/services_rate.dart';
 import 'package:zoozy/screens/session_count_page.dart';
 import 'package:zoozy/screens/settings_screen.dart';
 import 'package:zoozy/screens/visit_type_page.dart';
@@ -67,9 +68,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ServiceNamePage(),
+      home: const ServiceRatesPage(),
       routes: {
-        '/describeServices': (context) => const DescribeServicesPage(),
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
       },
     );
