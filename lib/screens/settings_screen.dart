@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/edit_profile.dart';
+import 'package:zoozy/screens/password_reset.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
 
@@ -472,21 +473,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 _buildSettingRow(
                                   "Şifreyi Değiştir",
                                   onTap: () {
-                                    // TODO: Bu kısma şifre değiştirme ekranına yönlendirme logic'i eklenmelidir.
-                                    // SnackBar mesajı artık sadece bilgilendirme amaçlı.
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Şifre değiştirme ekranı henüz tamamlanmadı. (TODO)",
-                                        ),
-                                        backgroundColor: Colors.blue,
-                                        behavior: SnackBarBehavior.floating,
-                                        margin: EdgeInsets.all(16),
-                                        duration: Duration(seconds: 2),
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const PasswordReset(),
                                       ),
                                     );
                                   },
                                 ),
+
                                 const SizedBox(height: 20),
                                 const Text(
                                   " HUKUKİ",
