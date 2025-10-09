@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+// Harita bileşeni için gerekli paket
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 
 class AddLocation extends StatefulWidget {
@@ -10,19 +11,35 @@ class AddLocation extends StatefulWidget {
 }
 
 class _AddLocationState extends State<AddLocation> {
-  final TextEditingController searchController = TextEditingController();
-  final TextEditingController aptController = TextEditingController();
-  final TextEditingController streetController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController stateController = TextEditingController();
-  final TextEditingController postalController = TextEditingController();
-  final TextEditingController countryController = TextEditingController();
+  // Metin giriş alanları için kontrolcüler (Controllers)
+  final TextEditingController aramaKontrolcusu = TextEditingController();
+  final TextEditingController daireKontrolcusu = TextEditingController();
+  final TextEditingController caddeKontrolcusu = TextEditingController();
+  final TextEditingController sehirKontrolcusu = TextEditingController();
+  final TextEditingController eyaletKontrolcusu = TextEditingController();
+  final TextEditingController postaKoduKontrolcusu = TextEditingController();
+  final TextEditingController ulkeKontrolcusu = TextEditingController();
 
+  // Giriş alanları için kenarlık stili
   final OutlineInputBorder _inputBorder = const OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(8.0)),
     borderSide: BorderSide(color: Color(0xFFD3D3D3)),
   );
+  // Google API Anahtarı
   static const String googleApiKey = "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4";
+
+  @override
+  void dispose() {
+    // Controller'ları temizle
+    aramaKontrolcusu.dispose();
+    daireKontrolcusu.dispose();
+    caddeKontrolcusu.dispose();
+    sehirKontrolcusu.dispose();
+    eyaletKontrolcusu.dispose();
+    postaKoduKontrolcusu.dispose();
+    ulkeKontrolcusu.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +47,7 @@ class _AddLocationState extends State<AddLocation> {
       body: Stack(
         children: [
           Container(
+            // Gradient arka plan
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFFB39DDB), Color(0xFFF48FB1)],
@@ -41,6 +59,7 @@ class _AddLocationState extends State<AddLocation> {
           SafeArea(
             child: Column(
               children: [
+                // Üst Çubuk
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -70,6 +89,8 @@ class _AddLocationState extends State<AddLocation> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // İçerik Alanı
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -124,26 +145,27 @@ class _AddLocationState extends State<AddLocation> {
                                       ),
                                       const SizedBox(height: 25),
 
-                                      // Google Places Autocomplete (show ile)
+                                      // Google Places Otomatik Tamamlama
                                       _buildInputField(
-                                        hint: 'Aramak için yazın',
-                                        controller: searchController,
-                                        readOnly: false,
+                                        ipucu: 'Aramak için yazın',
+                                        kontrolcu: aramaKontrolcusu,
+                                        saltOkunur:
+                                            true, // Kullanıcının tıklayarak açması için
                                         onTap: () async {
-                                          final p =
+                                          final secilenYer =
                                               await PlacesAutocomplete.show(
                                                 context: context,
                                                 apiKey: googleApiKey,
                                                 mode: Mode.overlay,
-                                                types: [],
+                                                types: const [],
                                                 strictbounds: false,
                                                 onError: (err) => print(err),
                                               );
 
-                                          if (p != null) {
+                                          if (secilenYer != null) {
                                             setState(() {
-                                              searchController.text =
-                                                  p.description ?? '';
+                                              aramaKontrolcusu.text =
+                                                  secilenYer.description ?? '';
                                             });
                                           }
                                         },
@@ -151,48 +173,52 @@ class _AddLocationState extends State<AddLocation> {
 
                                       const SizedBox(height: 20),
                                       _buildInputField(
-                                        hint: 'Daire, kat, vs.',
-                                        controller: aptController,
+                                        ipucu: 'Daire, kat, vs.',
+                                        kontrolcu: daireKontrolcusu,
                                       ),
                                       const SizedBox(height: 15),
                                       _buildInputField(
-                                        hint: 'Sokak',
-                                        controller: streetController,
+                                        ipucu: 'Sokak',
+                                        kontrolcu: caddeKontrolcusu,
                                       ),
                                       const SizedBox(height: 15),
                                       _buildInputField(
-                                        hint: 'Şehir',
-                                        controller: cityController,
+                                        ipucu: 'Şehir',
+                                        kontrolcu: sehirKontrolcusu,
                                       ),
                                       const SizedBox(height: 15),
                                       _buildInputField(
-                                        hint: 'Eyalet',
-                                        controller: stateController,
+                                        ipucu: 'Eyalet / İlçe',
+                                        kontrolcu: eyaletKontrolcusu,
                                       ),
                                       const SizedBox(height: 15),
                                       _buildInputField(
-                                        hint: 'Posta Kodu',
-                                        controller: postalController,
+                                        ipucu: 'Posta Kodu',
+                                        kontrolcu: postaKoduKontrolcusu,
                                       ),
                                       const SizedBox(height: 15),
                                       _buildInputField(
-                                        hint: 'Ülke',
-                                        controller: countryController,
+                                        ipucu: 'Ülke',
+                                        kontrolcu: ulkeKontrolcusu,
                                       ),
                                       const SizedBox(height: 20),
                                     ],
                                   ),
                                 ),
                               ),
+
+                              // İLERİ Butonu
                               GestureDetector(
                                 onTap: () {
-                                  if (searchController.text.isEmpty ||
-                                      aptController.text.isEmpty ||
-                                      streetController.text.isEmpty ||
-                                      cityController.text.isEmpty ||
-                                      stateController.text.isEmpty ||
-                                      postalController.text.isEmpty ||
-                                      countryController.text.isEmpty) {
+                                  // Kontrol et: Tüm alanlar boş mu?
+                                  if (aramaKontrolcusu.text.isEmpty ||
+                                      daireKontrolcusu.text.isEmpty ||
+                                      caddeKontrolcusu.text.isEmpty ||
+                                      sehirKontrolcusu.text.isEmpty ||
+                                      eyaletKontrolcusu.text.isEmpty ||
+                                      postaKoduKontrolcusu.text.isEmpty ||
+                                      ulkeKontrolcusu.text.isEmpty) {
+                                    // Hata Mesajı Göster
                                     showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
@@ -207,7 +233,7 @@ class _AddLocationState extends State<AddLocation> {
                                           size: 50,
                                         ),
                                         content: const Text(
-                                          'Please provide a more accurate address of your service to proceed.',
+                                          'Devam etmek için lütfen hizmetinizin daha doğru bir adresini girin.',
                                           style: TextStyle(fontSize: 16),
                                         ),
                                         actions: [
@@ -220,11 +246,14 @@ class _AddLocationState extends State<AddLocation> {
                                               ),
                                               foregroundColor: Colors.white,
                                             ),
-                                            child: const Text('OK'),
+                                            child: const Text('Tamam'),
                                           ),
                                         ],
                                       ),
                                     );
+                                  } else {
+                                    // Tüm alanlar doluysa sonraki sayfaya veya işleme geç
+                                    // Örnek: Navigator.push(context, MaterialPageRoute(builder: (context) => NextScreen()));
                                   }
                                 },
                                 child: Container(
@@ -276,18 +305,19 @@ class _AddLocationState extends State<AddLocation> {
     );
   }
 
+  // Giriş Alanı Yapıcı Fonksiyon
   Widget _buildInputField({
-    required String hint,
-    TextEditingController? controller,
-    bool readOnly = false,
+    required String ipucu, // hint -> ipucu
+    TextEditingController? kontrolcu, // controller -> kontrolcu
+    bool saltOkunur = false, // readOnly -> saltOkunur
     VoidCallback? onTap,
   }) {
     return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
+      controller: kontrolcu,
+      readOnly: saltOkunur,
       onTap: onTap,
       decoration: InputDecoration(
-        hintText: hint,
+        hintText: ipucu,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 16),
         fillColor: Colors.white,
         filled: true,

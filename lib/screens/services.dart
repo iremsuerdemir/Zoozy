@@ -1,12 +1,21 @@
 // services.dart
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/about_me_page.dart'; // İlk durak
 import 'package:zoozy/screens/add_service_rate_page.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
-import 'package:zoozy/screens/service_name_page.dart';
+// import 'package:zoozy/screens/service_name_page.dart'; // Bu dosyayı akışta kullanabilirsiniz.
+import 'package:zoozy/screens/services_rate.dart'; // ServiceRatesPage'i import etmeyi unutmayın
 
 // Services ekranı
-class Services extends StatelessWidget {
+class Services extends StatefulWidget {
   const Services({super.key});
+
+  @override
+  State<Services> createState() => _ServicesState();
+}
+
+class _ServicesState extends State<Services> {
+  final ScrollController _scrollController = ScrollController();
 
   final List<Map<String, String>> Service = const [
     {
@@ -49,6 +58,12 @@ class Services extends StatelessWidget {
   ];
 
   final String resimYolu = 'assets/images/login_3.png';
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +123,9 @@ class Services extends StatelessWidget {
               ),
               Expanded(
                 child: Scrollbar(
+                  controller: _scrollController,
                   child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: Service.length,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -121,13 +138,15 @@ class Services extends StatelessWidget {
                           aciklama: Service[index]['description']!,
                           resimYolu: resimYolu,
                           onTap: () {
-                            // 🔹 Burada tıklanan servisi AddServiceRatePageFromPrefs'a gönderiyoruz
+                            //  AboutMePage'e yönlendir
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ServiceNamePage(),
+                                builder: (context) =>
+                                    const AboutMePage(), // AboutMePage'i çağırdık
                                 settings: RouteSettings(
                                   arguments: {
+                                    // serviceName'i AboutMePage'e iletiyoruz
                                     'serviceName': Service[index]['title']!,
                                   },
                                 ),
@@ -148,7 +167,7 @@ class Services extends StatelessWidget {
   }
 }
 
-// Hizmet Kart Widget
+// Hizmet Kart Widget (Değişmedi)
 class HizmetKart extends StatelessWidget {
   final String baslik;
   final String aciklama;

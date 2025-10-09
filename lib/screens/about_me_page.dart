@@ -15,6 +15,9 @@ class _AboutMePageState extends State<AboutMePage> {
   final TextEditingController _deneyimController = TextEditingController();
   final TextEditingController _ozelController = TextEditingController();
 
+  // 1. ADIM: Yakalanan hizmet adını tutacak değişken
+  String _hizmetAdi = '';
+
   final List<String> _yetenekler = [
     'Eğitim deneyimi',
     'Davranış eğitimi becerisi',
@@ -30,6 +33,18 @@ class _AboutMePageState extends State<AboutMePage> {
       _deneyimController.text.isNotEmpty &&
       _ozelController.text.isNotEmpty &&
       _secilenYetenek != null;
+
+  // 2. ADIM: Gelen argümanı yakala
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args.containsKey('serviceName')) {
+      // serviceName'i al ve state'e kaydet
+      _hizmetAdi = args['serviceName'] as String;
+    }
+  }
 
   @override
   void dispose() {
@@ -190,7 +205,6 @@ class _AboutMePageState extends State<AboutMePage> {
                                 child: ElevatedButton(
                                   onPressed: _formDolu
                                       ? () {
-                                          // 1️⃣ SnackBar göster
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
@@ -202,12 +216,18 @@ class _AboutMePageState extends State<AboutMePage> {
                                             ),
                                           );
 
-                                          // 2️⃣ DescribeServicesPage'e yönlendir
+                                          // 3. ADIM: DescribeServicesPage'e yönlendir ve hizmet adını ilet
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   const DescribeServicesPage(),
+                                              settings: RouteSettings(
+                                                arguments: {
+                                                  // Service adını bir sonraki sayfaya aktarıyoruz!
+                                                  'serviceName': _hizmetAdi,
+                                                },
+                                              ),
                                             ),
                                           );
                                         }
@@ -246,6 +266,8 @@ class _AboutMePageState extends State<AboutMePage> {
       ),
     );
   }
+
+  // ... (Diğer _yetenekDropdown ve _OzellesmisTextField kodları aynı kalır)
 
   Widget _yetenekDropdown(Color anaRenk) {
     return Column(

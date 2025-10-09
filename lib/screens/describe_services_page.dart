@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart';
-import 'package:zoozy/screens/services_rate.dart';
+import 'package:zoozy/screens/services_rate.dart'; // Bu import'un ServiceRatesPage'i içerdiğini varsayıyoruz
 
 class DescribeServicesPage extends StatefulWidget {
   const DescribeServicesPage({super.key});
@@ -11,6 +11,10 @@ class DescribeServicesPage extends StatefulWidget {
 }
 
 class _DescribeServicesPageState extends State<DescribeServicesPage> {
+  // 1. ADIM: Yakalanan hizmet adını tutacak değişken
+  String _hizmetAdi = '';
+
+  // Diğer tüm listeler ve değişkenler...
   final List<String> cinsler = [
     'Köpek',
     'Kedi',
@@ -58,6 +62,23 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
   String? secilenEvDisiKonum;
   String? secilenSonDakika;
   bool butonAktifMi = false;
+
+  // 2. ADIM: Gelen argümanı yakala
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args.containsKey('serviceName')) {
+      // serviceName'i al ve state'e kaydet
+      _hizmetAdi = args['serviceName'] as String;
+    }
+    // Kontrol: Eğer hizmet adı hala boşsa, AboutMePage'den doğru gelmemiş demektir.
+    if (_hizmetAdi.isEmpty) {
+      // Hata ayıklama veya varsayılan değer ataması
+      _hizmetAdi = 'Seçilen Hizmet';
+    }
+  }
 
   void _kontrolButonDurumu() {
     setState(() {
@@ -116,7 +137,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                   ),
                 )
                 .toList(),
-            onChanged: onChanged,
+            onChanged: (val) {
+              onChanged(val);
+              _kontrolButonDurumu();
+            },
           ),
         ],
       ),
@@ -231,10 +255,13 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                 _olusturMetinAlani(
                                   baslik: 'İlan Özeti',
                                   altYazi:
-                                      'Sunduğunuz hizmetlere dair genel bir bakış sunun...',
-                                  ipucu: '',
+                                      'Sunduğunuz hizmetlere dair genel bir bakış sunun. (Hizmet Adı: $_hizmetAdi)',
+                                  ipucu: 'Buraya ilan özetinizi girin...',
                                   maxSatir: 6,
                                 ),
+
+                                // Dropdown'lar
+                                // Evcil Hayvan Sayısı
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Aynı anda evinizde kaç evcil hayvana bakabilirsiniz?',
@@ -243,10 +270,11 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenEvcilHayvanSayisi = val;
-                                      _kontrolButonDurumu();
+                                      // _kontrolButonDurumu() zaten _olusturDropdown içinde çağrılıyor
                                     });
                                   },
                                 ),
+                                // Cins
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Hangi evcil hayvanları kabul ediyorsunuz?',
@@ -255,10 +283,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenCins = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Boyut
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Kabul ettiğiniz evcil hayvanların boyutu nedir?',
@@ -267,10 +295,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenBoyut = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Denetim
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Ne düzeyde yetişkin gözetimi sağlayacaksınız?',
@@ -279,10 +307,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenDenetim = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Ev Dışı Konum
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Evinizde gözetimsiz bırakılırlarsa evcil hayvanlar nerede olacaklar?',
@@ -291,10 +319,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenEvDisiKonum = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Ev Tipi
                                 _olusturDropdown<String>(
                                   baslik: 'Yaşadığınız evi en iyi ne tanımlar?',
                                   elemanlar: evTipleri,
@@ -302,10 +330,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenEvTipi = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Dış Alan Boyutu
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Dış alanınızın (bahçe vb.) boyutu nedir?',
@@ -314,10 +342,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenDisAlanBoyutu = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Acil Durum Aracı
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Acil durumlar için aracınız (ulaşımınız) var mı?',
@@ -326,10 +354,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenAcilDurumAraci = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Uyku Alanı
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Evcil hayvanlar gece nerede uyuyacaklar?',
@@ -338,10 +366,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenUykuAlani = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Mola Sayısı
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Günde kaç tuvalet molası sağlayabilirsiniz?',
@@ -350,10 +378,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenMolaSayisi = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Yürüyüş Sayısı
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Günde kaç yürüyüş sağlayabilirsiniz?',
@@ -362,10 +390,10 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenYuruyusSayisi = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+                                // Son Dakika
                                 _olusturDropdown<String>(
                                   baslik:
                                       'Son dakika rezervasyonlarına izin veriyor musunuz?',
@@ -374,10 +402,11 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   onChanged: (val) {
                                     setState(() {
                                       secilenSonDakika = val;
-                                      _kontrolButonDurumu();
                                     });
                                   },
                                 ),
+
+                                // Tercih Edilen Arama Konumu
                                 _olusturMetinAlani(
                                   baslik:
                                       'Tercih Edilen Arama Konumu (İsteğe Bağlı)',
@@ -402,11 +431,13 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                   child: ElevatedButton(
                     onPressed: butonAktifMi
                         ? () {
+                            // 3. ADIM: ServiceRatesPage'e yönlendir ve HİZMET ADINI İLET
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const ServiceRatesPage(
-                                  initialServiceName: 'deneme',
+                                builder: (_) => ServiceRatesPage(
+                                  initialServiceName:
+                                      _hizmetAdi, // Hizmet adını doğru şekilde iletiyoruz
                                 ),
                               ),
                             );

@@ -11,13 +11,19 @@ class AddServiceRatePageFromPrefs extends StatefulWidget {
 
 class _AddServiceRatePageFromPrefsState
     extends State<AddServiceRatePageFromPrefs> {
+  // NOT: Bu sayfaya artık Açıklama Başlığı (title) için yeni controller eklemedik.
+  // Geri gönderilen title, yine widget'tan gelen _serviceName olacak.
+  // Ancak görseldeki 'Seçilen Hizmet' hatasını gidermek için read-only field'ı ekliyoruz.
   final TextEditingController _fiyatController = TextEditingController();
   final TextEditingController _aciklamaController = TextEditingController();
+
+  // Hizmet adını tutar
   String _serviceName = '';
   bool _isFilled = false;
 
   void _kontrolButonDurumu() {
     setState(() {
+      // Fiyat ve açıklama alanlarının dolu olup olmadığını kontrol et
       _isFilled =
           _fiyatController.text.isNotEmpty &&
           _aciklamaController.text.isNotEmpty;
@@ -34,8 +40,10 @@ class _AddServiceRatePageFromPrefsState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // ModalRoute'dan gelen serviceName argümanını alın
     final args = ModalRoute.of(context)!.settings.arguments as Map?;
     setState(() {
+      // Gelen serviceName'i yakalıyoruz.
       _serviceName = args?['serviceName'] ?? 'Servis Adı Belirtilmemiş';
     });
   }
@@ -67,6 +75,7 @@ class _AddServiceRatePageFromPrefsState
           SafeArea(
             child: Column(
               children: [
+                // Başlık Alanı
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -83,8 +92,9 @@ class _AddServiceRatePageFromPrefsState
                         ),
                         onPressed: () => Navigator.pop(context),
                       ),
+                      // Dinamik Başlık
                       const Text(
-                        'Servis Oranı Ekle',
+                        'Servis Oranı Ekle', // Resimdeki başlık
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22,
@@ -96,6 +106,8 @@ class _AddServiceRatePageFromPrefsState
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // İçerik Alanı
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -127,21 +139,28 @@ class _AddServiceRatePageFromPrefsState
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      // YENİ/DÜZELTİLMİŞ KISIM: Dinamik hizmet adını read-only alanda gösteriyoruz.
                                       _buildReadOnlyTextField(_serviceName),
                                       const SizedBox(height: 20),
+
+                                      // Fiyat Giriş Alanı
                                       _buildPriceInputField(
-                                        'Fiyatınız',
+                                        'Fiyatınız (Gecelik)',
                                         _fiyatController,
                                       ),
                                       const SizedBox(height: 15),
+
+                                      // Açıklama Metni (Metin aynen korundu)
                                       const Text(
-                                        'Evcil hayvan sahipleri, teklifinizde nelerin dahil olduğunu bilmekten daha rahat hissedecekler.',
+                                        'Evcil hayvan sahipleri, teklifinizde hangi hizmetlerin dahil olduğunu bilmekten daha rahat hissedecekler. (Örn: Mama, günlük yürüyüş, ilaç takibi vb.)',
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.black54,
                                         ),
                                       ),
                                       const SizedBox(height: 15),
+
+                                      // Açıklama Giriş Alanı
                                       _buildDescriptionInputField(
                                         'Açıklama',
                                         _aciklamaController,
@@ -151,11 +170,15 @@ class _AddServiceRatePageFromPrefsState
                                 ),
                               ),
                               const SizedBox(height: 20),
+
+                              // Kaydet Butonu
                               GestureDetector(
                                 onTap: _isFilled
                                     ? () {
+                                        // Geri dönerken kartın BAŞLIĞI olarak hizmet adını (serviceName) gönderin.
                                         Navigator.pop(context, {
-                                          'title': _serviceName,
+                                          'title':
+                                              _serviceName, // Hizmet adı geri gönderiliyor
                                           'subtitle':
                                               '₺${_fiyatController.text}/gece\n${_aciklamaController.text}',
                                         });
@@ -211,9 +234,10 @@ class _AddServiceRatePageFromPrefsState
     );
   }
 
+  // YENİ EKLEME: Read-only metin alanı
   Widget _buildReadOnlyTextField(String serviceName) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),
@@ -229,13 +253,13 @@ class _AddServiceRatePageFromPrefsState
           border: InputBorder.none,
           isDense: true,
         ),
-        style: const TextStyle(fontSize: 16),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     );
   }
 
   Widget _buildPriceInputField(
-    String labelText,
+    String hintText,
     TextEditingController controller,
   ) {
     return Container(
@@ -263,7 +287,7 @@ class _AddServiceRatePageFromPrefsState
         decoration: InputDecoration(
           border: InputBorder.none,
           prefixText: '₺ ',
-          hintText: labelText,
+          hintText: hintText,
           isDense: true,
         ),
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),

@@ -1,30 +1,62 @@
+import 'dart:developer';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/add_location.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart';
 
 class ServiceRatesPage extends StatefulWidget {
-  const ServiceRatesPage({super.key, required String initialServiceName});
+  final String initialServiceName;
+
+  const ServiceRatesPage({super.key, required this.initialServiceName});
 
   @override
   State<ServiceRatesPage> createState() => _ServiceRatesPageState();
 }
 
 class _ServiceRatesPageState extends State<ServiceRatesPage> {
-  // Mevcut ve eklenen servis fiyatlarını tutacak liste
-  List<Map<String, String>> _rateCards = [
-    {'title': 'Evcil Hayvan Bakımı', 'subtitle': 'TRY225/gece\nEe'},
-  ];
+  // ScrollController tanımla (Scrollbar hatası çözümü için)
+  final ScrollController _scrollController = ScrollController();
+  List<Map<String, String>> _rateCards = [];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // Yeni bir servis oranı eklemek için kullanılan fonksiyon
+  Future<void> _navigateToAddServiceRate(String currentServiceName) async {
+    final newRate = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddServiceRatePageFromPrefs(),
+        settings: RouteSettings(arguments: {'serviceName': currentServiceName}),
+      ),
+    );
+
+    if (newRate != null && mounted) {
+      setState(() {
+        _rateCards.add({
+          'title': newRate['title'],
+          'subtitle': newRate['subtitle'],
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     const Color buttonColor1 = Color(0xFFB39DDB);
     const Color buttonColor2 = Color(0xFFF48FB1);
 
+    // HATA DÜZELTİLDİ: serviceTitle, artık doğru kaynaktan (widget.initialServiceName) alınıyor.
+    final String serviceTitle = widget.initialServiceName.isEmpty
+        ? 'Seçilen Hizmet'
+        : widget.initialServiceName;
+
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient arka plan
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -56,9 +88,9 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
                           Navigator.pop(context);
                         },
                       ),
-                      const Text(
-                        'Hizmet Fiyatları',
-                        style: TextStyle(
+                      Text(
+                        '${serviceTitle} Fiyatları', // Dinamik başlık
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -101,84 +133,52 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
                           child: Column(
                             children: [
                               Expanded(
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Dinamik olarak mevcut ve eklenen kartlar
-                                      for (var card in _rateCards)
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 12,
-                                          ),
-                                          child: _rateCard(
-                                            title: card['title']!,
-                                            subtitle: card['subtitle']!,
-                                            fontSize: fontSize,
-                                            onTap: () async {
-                                              final serviceName =
-                                                  card['title'] ??
-                                                  'Yeni Servis';
-                                              final newRate = await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const AddServiceRatePageFromPrefs(),
-                                                  settings: RouteSettings(
-                                                    arguments: {
-                                                      'serviceName':
-                                                          serviceName,
-                                                    },
-                                                  ),
-                                                ),
-                                              );
-
-                                              if (newRate != null && mounted) {
-                                                setState(() {
-                                                  _rateCards.add({
-                                                    'title': newRate['title'],
-                                                    'subtitle':
-                                                        newRate['subtitle'],
-                                                  });
-                                                });
-                                              }
-                                            },
-                                          ),
-                                        ),
-
-                                      // Yeni Fiyat Ekle Kartı
-                                      _rateCard(
-                                        title: 'Hizmet Fiyatı Ekle',
-                                        subtitle:
-                                            'Hizmet fiyatınız evcil hayvan türüne veya boyutuna göre değişiyorsa, bu liste için birden fazla fiyat eklemek için buraya dokunun.',
-                                        fontSize: fontSize,
-                                        onTap: () async {
-                                          final newRate = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const AddServiceRatePageFromPrefs(),
-                                              settings: const RouteSettings(
-                                                arguments: {
-                                                  'serviceName': 'Yeni Servis',
-                                                },
-                                              ),
+                                // Scrollbar ve Controller kullanıldı
+                                child: Scrollbar(
+                                  controller: _scrollController,
+                                  child: SingleChildScrollView(
+                                    controller: _scrollController,
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Dinamik olarak mevcut ve eklenen kartlar
+                                        for (var card in _rateCards)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 12,
                                             ),
-                                          );
+                                            child: _rateCard(
+                                              title: card['title']!,
+                                              subtitle: card['subtitle']!,
+                                              fontSize: fontSize,
+                                              onTap: () async {
+                                                final serviceName =
+                                                    card['title'] ??
+                                                    widget.initialServiceName;
+                                                _navigateToAddServiceRate(
+                                                  serviceName,
+                                                );
+                                              },
+                                            ),
+                                          ),
 
-                                          if (newRate != null && mounted) {
-                                            setState(() {
-                                              _rateCards.add({
-                                                'title': newRate['title'],
-                                                'subtitle': newRate['subtitle'],
-                                              });
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ],
+                                        // Yeni Fiyat Ekle Kartı
+                                        _rateCard(
+                                          title:
+                                              '${serviceTitle} İçin Fiyat Ekle',
+                                          subtitle:
+                                              'Hizmet fiyatınız evcil hayvan türüne veya boyutuna göre değişiyorsa, bu liste için birden fazla fiyat eklemek için buraya dokunun.',
+                                          fontSize: fontSize,
+                                          onTap: () {
+                                            _navigateToAddServiceRate(
+                                              serviceTitle,
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -190,7 +190,7 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AddLocation(),
+                                      builder: (context) => const AddLocation(),
                                     ),
                                   );
                                 },
