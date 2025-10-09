@@ -30,7 +30,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Color _phoneFieldColor = Colors.grey[100]!;
 
   final maskFormatter = MaskTextInputFormatter(
-      mask: '(###) ### ## ##', filter: {"#": RegExp(r'[0-9]')});
+    mask: '(###) ### ## ##',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
 
   @override
   void initState() {
@@ -79,11 +81,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final email = _emailController.text.trim();
     final phone = _phoneController.text.trim();
 
-    bool isEmailValid =
-        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-            .hasMatch(email);
-    bool isPhoneValid =
-        RegExp(r"^\d{10}$").hasMatch(maskFormatter.getUnmaskedText());
+    bool isEmailValid = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    ).hasMatch(email);
+    bool isPhoneValid = RegExp(
+      r"^\d{10}$",
+    ).hasMatch(maskFormatter.getUnmaskedText());
 
     setState(() {
       _emailFieldColor = isEmailValid ? Colors.grey[100]! : Colors.red[100]!;
@@ -138,8 +141,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final pickedFile =
-          await _picker.pickImage(source: source, imageQuality: 80);
+      final pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 80,
+      );
       if (pickedFile != null) {
         if (kIsWeb) {
           _webImage = await pickedFile.readAsBytes();
@@ -178,8 +183,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   },
                 ),
                 ListTile(
-                  leading:
-                      const Icon(Icons.photo_library, color: Colors.purple),
+                  leading: const Icon(
+                    Icons.photo_library,
+                    color: Colors.purple,
+                  ),
                   title: const Text('Galeri'),
                   onTap: () async {
                     Navigator.pop(context);
@@ -210,10 +217,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFFB39DDB),
-                  Color(0xFFF48FB1),
-                ],
+                colors: [Color(0xFFB39DDB), Color(0xFFF48FB1)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -228,8 +232,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -290,7 +297,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: _phoneController,
                     initialCountryCode: 'TR',
                     keyboardType: TextInputType.phone,
-                    inputFormatters: [maskFormatter],
+                    // ⚠️ maskFormatter kaldırıldı (IntlPhoneField kendi formatına sahip)
                     decoration: InputDecoration(
                       labelText: 'Telefon',
                       filled: true,
@@ -300,14 +307,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                     ),
                     onChanged: (phone) {
                       setState(() {}); // karakter sayacını güncelle
                     },
                     onCountryChanged: (country) {
                       print(
-                          'Seçilen ülke: ${country.name}, kod: ${country.dialCode}');
+                        'Seçilen ülke: ${country.name}, kod: ${country.dialCode}',
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -316,7 +326,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   _buildListTile(title: 'Rozetlerim', onTap: () {}),
                   const SizedBox(height: 8),
                   _buildListTile(
-                      title: 'Hizmet Konumu ve Fotoğraflar', onTap: () {}),
+                    title: 'Hizmet Konumu ve Fotoğraflar',
+                    onTap: () {},
+                  ),
                   const SizedBox(height: 8),
                   _buildListTile(title: 'İletişim Uygulamaları', onTap: () {}),
                   const SizedBox(height: 40),
@@ -337,9 +349,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: const Text(
                         'Kaydet',
                         style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -384,8 +397,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: labelText,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
           border: InputBorder.none,
           floatingLabelBehavior: FloatingLabelBehavior.always,
           labelStyle: TextStyle(
@@ -413,12 +428,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ),
       child: ListTile(
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.black87),
+        title: Text(title, style: const TextStyle(color: Colors.black87)),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.grey,
         ),
-        trailing:
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
         onTap: onTap,
       ),
     );

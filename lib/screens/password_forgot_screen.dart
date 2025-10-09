@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:zoozy/screens/settings_screen.dart';
 
-class PasswordReset extends StatefulWidget {
-  const PasswordReset({super.key});
+class PasswordForgotScreen extends StatefulWidget {
+  const PasswordForgotScreen({super.key});
 
   @override
-  State<PasswordReset> createState() => _PasswordResetState();
+  State<PasswordForgotScreen> createState() => _PasswordForgotScreenState();
 }
 
-class _PasswordResetState extends State<PasswordReset> {
+class _PasswordForgotScreenState extends State<PasswordForgotScreen> {
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
 
@@ -34,7 +35,9 @@ class _PasswordResetState extends State<PasswordReset> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text,
+      );
 
       if (!mounted) return;
 
@@ -104,7 +107,12 @@ class _PasswordResetState extends State<PasswordReset> {
                           color: Colors.white,
                           size: 28,
                         ),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(),
+                          ),
+                        ),
                       ),
                       const Text(
                         "Şifreyi Sıfırla",

@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/edit_profile.dart';
-import 'package:zoozy/screens/password_reset.dart';
+import 'package:zoozy/screens/password_forgot_screen.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
 
@@ -476,7 +476,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => const PasswordReset(),
+                                        builder: (_) =>
+                                            const PasswordForgotScreen(),
                                       ),
                                     );
                                   },
