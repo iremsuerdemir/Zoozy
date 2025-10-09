@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 // Harita bileşeni için gerekli paket
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:zoozy/screens/upload_photo_screen.dart';
 
 class AddLocation extends StatefulWidget {
   const AddLocation({super.key});
@@ -253,7 +254,13 @@ class _AddLocationState extends State<AddLocation> {
                                     );
                                   } else {
                                     // Tüm alanlar doluysa sonraki sayfaya veya işleme geç
-                                    // Örnek: Navigator.push(context, MaterialPageRoute(builder: (context) => NextScreen()));
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            UploadPhotoScreen(),
+                                      ),
+                                    );
                                   }
                                 },
                                 child: Container(
