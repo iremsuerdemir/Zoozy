@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart';
+import 'package:zoozy/screens/services_rate.dart';
 
 class DescribeServicesPage extends StatefulWidget {
   const DescribeServicesPage({super.key});
@@ -10,7 +11,6 @@ class DescribeServicesPage extends StatefulWidget {
 }
 
 class _DescribeServicesPageState extends State<DescribeServicesPage> {
-  // Dropdown verileri
   final List<String> cinsler = [
     'Köpek',
     'Kedi',
@@ -45,7 +45,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
   final List<String> evDisiKonumlar = ['Kafes', 'Oyun Alanı', 'Güvenli Oda'];
   final List<String> evetHayir = ['Evet', 'Hayır'];
 
-  // Form değişkenleri
   String? secilenEvcilHayvanSayisi;
   String? secilenCins;
   String? secilenBoyut;
@@ -60,7 +59,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
   String? secilenSonDakika;
   bool butonAktifMi = false;
 
-  // Tüm alanların dolu olup olmadığını kontrol eden fonksiyon
   void _kontrolButonDurumu() {
     setState(() {
       butonAktifMi =
@@ -75,11 +73,9 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
           secilenMolaSayisi != null &&
           secilenYuruyusSayisi != null &&
           secilenEvDisiKonum != null;
-      // Not: Tercih edilen arama konumu opsiyonel olduğu için dahil etmedik
     });
   }
 
-  // Dropdown widget
   Widget _olusturDropdown<T>({
     required String baslik,
     required List<T> elemanlar,
@@ -109,15 +105,17 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
             ),
             icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
             isExpanded: true,
-            items: elemanlar.map((item) {
-              return DropdownMenuItem<T>(
-                value: item,
-                child: Text(
-                  item.toString(),
-                  style: const TextStyle(fontSize: 16),
-                ),
-              );
-            }).toList(),
+            items: elemanlar
+                .map(
+                  (item) => DropdownMenuItem<T>(
+                    value: item,
+                    child: Text(
+                      item.toString(),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                )
+                .toList(),
             onChanged: onChanged,
           ),
         ],
@@ -125,7 +123,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
     );
   }
 
-  // TextField widget
   Widget _olusturMetinAlani({
     required String baslik,
     required String ipucu,
@@ -168,7 +165,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient arka plan
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -181,7 +177,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
           SafeArea(
             child: Column(
               children: [
-                // Üst bar
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -206,8 +201,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                     ],
                   ),
                 ),
-
-                // İçerik alanı
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -238,7 +231,7 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                 _olusturMetinAlani(
                                   baslik: 'İlan Özeti',
                                   altYazi:
-                                      'Sunduğunuz hizmetlere dair genel bir bakış sunun. Tipik bir günün nasıl göründüğünü ve evcil hayvanların yapacağı eğlenceli şeyleri anlatın. 500 kelime ve üzeri açıklamalar görünürlüğünüzü en üst düzeye çıkaracaktır.',
+                                      'Sunduğunuz hizmetlere dair genel bir bakış sunun...',
                                   ipucu: '',
                                   maxSatir: 6,
                                 ),
@@ -389,7 +382,7 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                                   baslik:
                                       'Tercih Edilen Arama Konumu (İsteğe Bağlı)',
                                   altYazi:
-                                      'Hizmetlerinizi arayan kişilerin sizi bulmasını istediğiniz bir dönüm noktası, önemli bir konum veya alan girin. Bu değer sadece bir kez girilebilir. Örn. Manhattan, Paris Şehri, Merkez Londra',
+                                      'Hizmetlerinizi arayan kişilerin sizi bulmasını istediğiniz bir dönüm noktası, önemli bir konum veya alan girin.',
                                   ipucu:
                                       'Bir dönüm noktası, önemli bir konum veya alan girin',
                                 ),
@@ -402,8 +395,6 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                     },
                   ),
                 ),
-
-                // SONRAKİ butonu
                 Container(
                   padding: const EdgeInsets.all(20.0),
                   width: double.infinity,
@@ -414,16 +405,17 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AddServiceRatePageFromPrefs(),
+                                builder: (_) => const ServiceRatesPage(
+                                  initialServiceName: 'deneme',
+                                ),
                               ),
                             );
                           }
-                        : null, // buton pasif olacak
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: butonAktifMi
-                          ? const Color(0xFF8e44ad) // mor
-                          : Colors.grey, // gri
+                          ? const Color(0xFF8e44ad)
+                          : Colors.grey,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(

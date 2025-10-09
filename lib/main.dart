@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +14,7 @@ import 'package:zoozy/screens/groomer_note.dart';
 import 'package:zoozy/screens/grooming_service_page.dart';
 import 'package:zoozy/screens/login_page.dart';
 import 'package:zoozy/screens/service_name_page.dart';
+import 'package:zoozy/screens/services.dart';
 import 'package:zoozy/screens/services_rate.dart';
 import 'package:zoozy/screens/session_count_page.dart';
 import 'package:zoozy/screens/settings_screen.dart';
@@ -69,7 +72,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const AddLocation(),
+      home: const Services(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
       },

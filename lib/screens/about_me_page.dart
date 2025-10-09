@@ -2,14 +2,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/describe_services_page.dart';
 
-class AbouMePage extends StatefulWidget {
-  const AbouMePage({super.key});
+class AboutMePage extends StatefulWidget {
+  const AboutMePage({super.key});
 
   @override
-  State<AbouMePage> createState() => _AbouMePageState();
+  State<AboutMePage> createState() => _AboutMePageState();
 }
 
-class _AbouMePageState extends State<AbouMePage> {
+class _AboutMePageState extends State<AboutMePage> {
   String? _secilenYetenek;
   final TextEditingController _kendiniController = TextEditingController();
   final TextEditingController _deneyimController = TextEditingController();
@@ -45,8 +45,8 @@ class _AbouMePageState extends State<AbouMePage> {
     const Color gradientStart = Color(0xFFB39DDB);
     const Color gradientEnd = Color(0xFFF48FB1);
 
-    return Material(
-      child: Container(
+    return Scaffold(
+      body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [gradientStart, gradientEnd],
@@ -212,7 +212,6 @@ class _AbouMePageState extends State<AbouMePage> {
                                           );
                                         }
                                       : null,
-
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
                                     shadowColor: Colors.transparent,
@@ -222,22 +221,14 @@ class _AbouMePageState extends State<AbouMePage> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  child: !_formDolu
-                                      ? const Text(
-                                          "Kaydet",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : const Text(
-                                          "Kaydet",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                  child: const Text(
+                                    "Kaydet",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 20),

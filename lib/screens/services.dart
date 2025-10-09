@@ -1,11 +1,13 @@
+// services.dart
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/add_service_rate_page.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
+import 'package:zoozy/screens/service_name_page.dart';
 
 // Services ekranı
 class Services extends StatelessWidget {
   const Services({super.key});
 
-  // Tüm Servicesin listesi
   final List<Map<String, String>> Service = const [
     {
       'title': 'Evcil Hayvan Pansiyonu',
@@ -51,7 +53,6 @@ class Services extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Arka plan gradyanı LoginPage temasıyla uyumlu
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -63,13 +64,11 @@ class Services extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              // Başlık
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Ortadaki Hizmetler + Pet ikonu
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: const [
@@ -82,16 +81,9 @@ class Services extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 8),
-                        Icon(
-                          Icons.pets,
-                          color: Colors.white,
-                          size: 30,
-                        ),
+                        Icon(Icons.pets, color: Colors.white, size: 30),
                       ],
                     ),
-
-                    // Sol üstte geri ikonu
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -102,9 +94,11 @@ class Services extends StatelessWidget {
                           ),
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AgreementScreen()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AgreementScreen(),
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -112,8 +106,6 @@ class Services extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Services listesi
               Expanded(
                 child: Scrollbar(
                   child: ListView.builder(
@@ -121,11 +113,27 @@ class Services extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
                         child: HizmetKart(
                           baslik: Service[index]['title']!,
                           aciklama: Service[index]['description']!,
                           resimYolu: resimYolu,
+                          onTap: () {
+                            // 🔹 Burada tıklanan servisi AddServiceRatePageFromPrefs'a gönderiyoruz
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ServiceNamePage(),
+                                settings: RouteSettings(
+                                  arguments: {
+                                    'serviceName': Service[index]['title']!,
+                                  },
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
@@ -140,16 +148,18 @@ class Services extends StatelessWidget {
   }
 }
 
-// Her bir hizmet için özel kart widget'ı
+// Hizmet Kart Widget
 class HizmetKart extends StatelessWidget {
   final String baslik;
   final String aciklama;
   final String resimYolu;
+  final VoidCallback? onTap;
 
   const HizmetKart({
     required this.baslik,
     required this.aciklama,
     required this.resimYolu,
+    this.onTap,
     super.key,
   });
 
@@ -158,16 +168,13 @@ class HizmetKart extends StatelessWidget {
     return Card(
       elevation: 4,
       color: Colors.white.withOpacity(0.9),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
-              // Resim
               ClipOval(
                 child: Image.asset(
                   resimYolu,
@@ -183,7 +190,6 @@ class HizmetKart extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              // Başlık ve açıklama
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,21 +205,14 @@ class HizmetKart extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       aciklama,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 18,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
             ],
           ),
         ),

@@ -1,13 +1,23 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/add_location.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart';
 
-class ServiceRatesPage extends StatelessWidget {
-  const ServiceRatesPage({super.key});
+class ServiceRatesPage extends StatefulWidget {
+  const ServiceRatesPage({super.key, required String initialServiceName});
+
+  @override
+  State<ServiceRatesPage> createState() => _ServiceRatesPageState();
+}
+
+class _ServiceRatesPageState extends State<ServiceRatesPage> {
+  // Mevcut ve eklenen servis fiyatlarını tutacak liste
+  List<Map<String, String>> _rateCards = [
+    {'title': 'Evcil Hayvan Bakımı', 'subtitle': 'TRY225/gece\nEe'},
+  ];
 
   @override
   Widget build(BuildContext context) {
-    // Alt buton gradient renkleri
     const Color buttonColor1 = Color(0xFFB39DDB);
     const Color buttonColor2 = Color(0xFFF48FB1);
 
@@ -27,7 +37,7 @@ class ServiceRatesPage extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
-                // AppBar yerine üst kısım
+                // Üst bar
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -60,7 +70,7 @@ class ServiceRatesPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Responsive içerik alanı
+                // İçerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -97,33 +107,75 @@ class ServiceRatesPage extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // 1. Mevcut Fiyat Kartı
-                                      _rateCard(
-                                        title: 'Evcil Hayvan Bakımı',
-                                        subtitle: 'TRY225/gece\nEe',
-                                        fontSize: fontSize,
-                                        onTap: () {
-                                          print(
-                                            'Mevcut fiyat düzenleme tıklandı.',
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 12),
+                                      // Dinamik olarak mevcut ve eklenen kartlar
+                                      for (var card in _rateCards)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                          ),
+                                          child: _rateCard(
+                                            title: card['title']!,
+                                            subtitle: card['subtitle']!,
+                                            fontSize: fontSize,
+                                            onTap: () async {
+                                              final serviceName =
+                                                  card['title'] ??
+                                                  'Yeni Servis';
+                                              final newRate = await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const AddServiceRatePageFromPrefs(),
+                                                  settings: RouteSettings(
+                                                    arguments: {
+                                                      'serviceName':
+                                                          serviceName,
+                                                    },
+                                                  ),
+                                                ),
+                                              );
 
-                                      // 2. Yeni Fiyat Ekle Kartı
+                                              if (newRate != null && mounted) {
+                                                setState(() {
+                                                  _rateCards.add({
+                                                    'title': newRate['title'],
+                                                    'subtitle':
+                                                        newRate['subtitle'],
+                                                  });
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ),
+
+                                      // Yeni Fiyat Ekle Kartı
                                       _rateCard(
                                         title: 'Hizmet Fiyatı Ekle',
                                         subtitle:
                                             'Hizmet fiyatınız evcil hayvan türüne veya boyutuna göre değişiyorsa, bu liste için birden fazla fiyat eklemek için buraya dokunun.',
                                         fontSize: fontSize,
-                                        onTap: () {
-                                          Navigator.push(
+                                        onTap: () async {
+                                          final newRate = await Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   const AddServiceRatePageFromPrefs(),
+                                              settings: const RouteSettings(
+                                                arguments: {
+                                                  'serviceName': 'Yeni Servis',
+                                                },
+                                              ),
                                             ),
                                           );
+
+                                          if (newRate != null && mounted) {
+                                            setState(() {
+                                              _rateCards.add({
+                                                'title': newRate['title'],
+                                                'subtitle': newRate['subtitle'],
+                                              });
+                                            });
+                                          }
                                         },
                                       ),
                                     ],
@@ -135,7 +187,12 @@ class ServiceRatesPage extends StatelessWidget {
                               // Alt İLERİ butonu
                               GestureDetector(
                                 onTap: () {
-                                  print('İLERİ butonuna tıklandı.');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddLocation(),
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   width: double.infinity,
@@ -198,8 +255,8 @@ class ServiceRatesPage extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: fontSize,
-            fontWeight: FontWeight.w600, // biraz daha kalın
-            color: Colors.black87, // koyu renk
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
           ),
         ),
         subtitle: Text(
