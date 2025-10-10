@@ -12,6 +12,7 @@ import 'package:zoozy/screens/add_service_rate_page.dart'
 import 'package:zoozy/screens/describe_services_page.dart';
 import 'package:zoozy/screens/groomer_note.dart';
 import 'package:zoozy/screens/grooming_service_page.dart';
+import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/login_page.dart';
 import 'package:zoozy/screens/password_forgot_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
@@ -75,7 +76,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const PasswordForgotScreen(),
+      home: const IndexboxMessageScreen(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
       },
