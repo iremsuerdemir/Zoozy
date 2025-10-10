@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
+import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 
 class RequestsScreen extends StatefulWidget {
@@ -20,13 +21,17 @@ class _RequestsScreenState extends State<RequestsScreen> {
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
 
   // İkonlu kart oluşturma metodu
-  Widget _buildIconTextCard(IconData icon, String text,
-      {bool isSelected = false}) {
+  Widget _buildIconTextCard(
+    IconData icon,
+    String text, {
+    bool isSelected = false,
+  }) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedIndex =
-              _getIndexFromText(text); // Tıklanan ikon seçili olacak
+          selectedIndex = _getIndexFromText(
+            text,
+          ); // Tıklanan ikon seçili olacak
         });
       },
       child: Column(
@@ -83,7 +88,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
   // Yeni eklenecek hizmet seçimi modalı için kart
   Widget _buildServiceSelectionCard(
-      BuildContext context, IconData icon, String text) {
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -98,20 +106,13 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 color: primaryPurple.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(15.0),
               ),
-              child: Icon(
-                icon,
-                color: primaryPurple,
-                size: 32,
-              ),
+              child: Icon(icon, color: primaryPurple, size: 32),
             ),
             const SizedBox(height: 8),
             Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 12, color: Colors.black87),
             ),
           ],
         ),
@@ -145,23 +146,32 @@ class _RequestsScreenState extends State<RequestsScreen> {
               const SizedBox(height: 8),
               const Text(
                 "Yakınınızdaki destekçilere evcil hayvanlarınızla ilgili yardıma ihtiyacınız olduğunu bildirmek için ilan yayınlayın.",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   _buildServiceSelectionCard(
-                      context, Icons.house_outlined, "Pansiyon"),
+                    context,
+                    Icons.house_outlined,
+                    "Pansiyon",
+                  ),
                   _buildServiceSelectionCard(
-                      context, Icons.sunny_snowing, "Gündüz Bakımı"),
+                    context,
+                    Icons.sunny_snowing,
+                    "Gündüz Bakımı",
+                  ),
                   _buildServiceSelectionCard(
-                      context, Icons.chair_outlined, "Evde Bakım"),
+                    context,
+                    Icons.chair_outlined,
+                    "Evde Bakım",
+                  ),
                   _buildServiceSelectionCard(
-                      context, Icons.directions_walk, "Gezdirme"),
+                    context,
+                    Icons.directions_walk,
+                    "Gezdirme",
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -169,11 +179,20 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   _buildServiceSelectionCard(
-                      context, Icons.local_taxi_outlined, "Taksi"),
+                    context,
+                    Icons.local_taxi_outlined,
+                    "Taksi",
+                  ),
                   _buildServiceSelectionCard(
-                      context, Icons.cut_outlined, "Bakım"),
+                    context,
+                    Icons.cut_outlined,
+                    "Bakım",
+                  ),
                   _buildServiceSelectionCard(
-                      context, Icons.school_outlined, "Eğitim"),
+                    context,
+                    Icons.school_outlined,
+                    "Eğitim",
+                  ),
                   const Expanded(child: SizedBox.shrink()),
                 ],
               ),
@@ -215,9 +234,19 @@ class _RequestsScreenState extends State<RequestsScreen> {
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.chat_bubble_outline,
-                    color: primaryPurple, size: 24),
-                onPressed: () {},
+                icon: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: primaryPurple,
+                  size: 24,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => IndexboxMessageScreen(),
+                    ),
+                  );
+                },
               ),
               Positioned(
                 right: 8,
@@ -273,8 +302,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   left: screenWidth * 0.06,
                   right: screenWidth * 0.06,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -290,15 +321,26 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildIconTextCard(Icons.list_alt, "İstekler",
-                            isSelected: selectedIndex == 0),
                         _buildIconTextCard(
-                            Icons.touch_app_outlined, "Hizmet Al",
-                            isSelected: selectedIndex == 1),
-                        _buildIconTextCard(Icons.pets, "Köpek Gezdir",
-                            isSelected: selectedIndex == 2),
-                        _buildIconTextCard(Icons.help_outline, "Yardım",
-                            isSelected: selectedIndex == 3),
+                          Icons.list_alt,
+                          "İstekler",
+                          isSelected: selectedIndex == 0,
+                        ),
+                        _buildIconTextCard(
+                          Icons.touch_app_outlined,
+                          "Hizmet Al",
+                          isSelected: selectedIndex == 1,
+                        ),
+                        _buildIconTextCard(
+                          Icons.pets,
+                          "Köpek Gezdir",
+                          isSelected: selectedIndex == 2,
+                        ),
+                        _buildIconTextCard(
+                          Icons.help_outline,
+                          "Yardım",
+                          isSelected: selectedIndex == 3,
+                        ),
                       ],
                     ),
                   ),
@@ -336,8 +378,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 backgroundColor: Colors.white,
                 foregroundColor: primaryPurple,
                 side: const BorderSide(color: primaryPurple, width: 1.5),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

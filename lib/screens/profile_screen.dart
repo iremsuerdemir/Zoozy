@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/edit_profile.dart';
+import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
@@ -142,22 +143,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Row(
                         children: [
                           IconButton(
-                            icon:
-                                const Icon(Icons.settings, color: Colors.white),
+                            icon: const Icon(
+                              Icons.settings,
+                              color: Colors.white,
+                            ),
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SettingsScreen()));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SettingsScreen(),
+                                ),
+                              );
                             },
                           ),
                           IconButton(
-                            icon: const Icon(Icons.chat_bubble_outline,
-                                color: Colors.white),
-                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.chat_bubble_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => IndexboxMessageScreen(),
+                                ),
+                              );
+                            },
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -183,8 +197,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: Colors.grey,
                           backgroundImage: _profileImage,
                           child: _profileImage == null
-                              ? const Icon(Icons.person,
-                                  color: Colors.white, size: 50)
+                              ? const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 50,
+                                )
                               : null,
                         ),
                         const SizedBox(width: 16),
@@ -195,7 +212,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text(
                                 username,
                                 style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               GestureDetector(
@@ -212,14 +231,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: const Text(
                                   'Profilini düzenlemek için tıkla',
                                   style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 email,
                                 style: const TextStyle(
-                                    fontSize: 12, color: Colors.black54),
+                                  fontSize: 12,
+                                  color: Colors.black54,
+                                ),
                               ),
                             ],
                           ),
@@ -280,9 +303,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         buildMenuButton(
-                            Icons.card_giftcard, 'Promosyonlar\nKuponlar'),
+                          Icons.card_giftcard,
+                          'Promosyonlar\nKuponlar',
+                        ),
                         buildMenuButton(
-                            Icons.monetization_on, 'Referans Programı'),
+                          Icons.monetization_on,
+                          'Referans Programı',
+                        ),
                         buildMenuButton(Icons.favorite, 'Favorilerim'),
                         buildMenuButton(Icons.account_balance_wallet, 'Bakiye'),
                         buildMenuButton(Icons.pets, 'Evcil Hayvanlarım'),
@@ -301,9 +328,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const Text(
                         'İlanlar',
                         style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF7A4FAD)),
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF7A4FAD),
+                        ),
                       ),
                       const Spacer(),
                       IconButton(
@@ -333,7 +361,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const AgreementScreen()),
+                          builder: (context) => const AgreementScreen(),
+                        ),
                       );
                     },
                     child: Container(
@@ -379,8 +408,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios,
-                              color: Colors.grey, size: 18),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.grey,
+                            size: 18,
+                          ),
                         ],
                       ),
                     ),
