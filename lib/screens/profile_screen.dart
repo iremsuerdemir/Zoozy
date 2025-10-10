@@ -7,6 +7,7 @@ import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/edit_profile.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
+import 'package:zoozy/screens/my_badgets_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/settings_screen.dart';
@@ -78,8 +79,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget buildStatColumn(String label, String value, {String? subLabel}) {
-    return Column(
+  Widget buildStatColumn(
+    String label,
+    String value, {
+    String? subLabel,
+    VoidCallback? onTap,
+  }) {
+    final content = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
@@ -102,6 +108,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
       ],
     );
+
+    // Eğer onTap tanımlandıysa GestureDetector ile sar
+    return GestureDetector(onTap: onTap, child: content);
   }
 
   @override
@@ -282,7 +291,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         buildStatColumn('Bakiye', '0.00'),
                         buildStatColumn('Kredi', '0'),
                         buildStatColumn('Yorum', '0'),
-                        buildStatColumn('Görev', '1/7'),
+                        buildStatColumn(
+                          'Görev',
+                          '1/7',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const MyBadgetsScreen(), // Yeni ekran ismi
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
