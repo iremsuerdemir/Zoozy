@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
 
 class ConfirmEmailScreen extends StatefulWidget {
@@ -27,15 +26,7 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
   void initState() {
     super.initState();
     _emailController.text = widget.email;
-    _setupDynamicLinks();
-
-    final user = _auth.currentUser;
-    if (user == null) {
-      _message = 'Kullanıcı oturumu alınamadı. Lütfen tekrar giriş yapın.';
-    } else {
-      _message =
-          'E-posta adresinizi doğrulamak için doğrulama mailini kontrol edin.';
-    }
+    _checkEmailVerified();
   }
 
   @override
@@ -56,57 +47,18 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
     });
   }
 
-  void _setupDynamicLinks() async {
-    // Uygulama açıkken
-    FirebaseDynamicLinks.instance.onLink
-        .listen((linkData) async {
-          final Uri deepLink = linkData.link;
-          if (deepLink.queryParameters['mode'] == 'verifyEmail') {
-            final user = _auth.currentUser;
-            if (user != null) {
-              await user.reload();
-              final updatedUser = _auth.currentUser;
-              if (updatedUser != null && updatedUser.emailVerified) {
-                if (!mounted) return;
+  Future<void> _checkEmailVerified() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      setState(() {
+        _message = 'Kullanıcı oturumu alınamadı. Lütfen tekrar giriş yapın.';
+      });
+      return;
+    }
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Doğrulama başarılı! Yönlendiriliyorsunuz...',
-                      ),
-                      backgroundColor: Colors.green,
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                  _navigateToBadgetsScreen();
-                });
-              }
-            }
-          }
-        })
-        .onError((error) {
-          print('Dynamic link error: $error');
-        });
-
-    // Uygulama kapalı veya arka planda iken
-    final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks
-        .instance
-        .getInitialLink();
-    if (initialLink != null) {
-      final Uri deepLink = initialLink.link;
-      if (deepLink.queryParameters['mode'] == 'verifyEmail') {
-        final user = _auth.currentUser;
-        if (user != null) {
-          await user.reload();
-          final updatedUser = _auth.currentUser;
-          if (updatedUser != null && updatedUser.emailVerified) {
-            if (!mounted) return;
-            _navigateToBadgetsScreen();
-          }
-        }
-      }
+    await user.reload();
+    if (user.emailVerified) {
+      _navigateToBadgetsScreen();
     }
   }
 
@@ -132,7 +84,6 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
   Future<void> _sendVerificationEmail() async {
     final user = _auth.currentUser;
     if (user == null) {
-      if (!mounted) return;
       setState(() {
         _message = 'Kullanıcı oturumu alınamadı.';
       });
@@ -140,21 +91,17 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
     }
 
     if (_emailController.text.trim() != user.email) {
-      if (!mounted) return;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Lütfen giriş yaptığınız mail adresini girin.'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen giriş yaptığınız mail adresini girin.'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     }
 
     try {
-      if (!mounted) return;
       setState(() {
         _isLoading = true;
         _message = 'Doğrulama e-postası gönderiliyor...';
@@ -163,17 +110,15 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
       await user.sendEmailVerification();
       await user.reload();
 
-      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _message =
-            'Doğrulama e-postası **${_emailController.text}** adresine gönderildi. Mail kutunuzu kontrol edin ve linke tıklayın.';
+            'Doğrulama e-postası **${_emailController.text}** adresine gönderildi. Lütfen mail kutunuzu kontrol edin ve linke tıklayın. Uygulamaya dönüp tekrar giriş yaptığınızda doğrulamanız kontrol edilecektir.';
       });
 
       _startCountdown();
       _showSpamCheckSnackbar();
     } catch (e) {
-      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _message = 'E-posta gönderilemedi. Lütfen tekrar deneyin.';

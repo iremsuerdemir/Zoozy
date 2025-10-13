@@ -1,9 +1,33 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'confirm_email_screen.dart';
 
-class MyBadgetsScreen extends StatelessWidget {
+class MyBadgetsScreen extends StatefulWidget {
   const MyBadgetsScreen({super.key});
+
+  @override
+  State<MyBadgetsScreen> createState() => _MyBadgetsScreenState();
+}
+
+class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
+  bool _isEmailVerified = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkEmailVerification();
+  }
+
+  Future<void> _checkEmailVerification() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.reload(); // Güncel veriyi al
+      setState(() {
+        _isEmailVerified = user.emailVerified;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,38 +104,60 @@ class MyBadgetsScreen extends StatelessWidget {
                             child: Column(
                               children: [
                                 const SizedBox(height: 8),
+                                // Email Rozeti
                                 InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ConfirmEmailScreen(
-                                              email: 'example@mail.com',
+                                  onTap: _isEmailVerified
+                                      ? null
+                                      : () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ConfirmEmailScreen(
+                                                    email:
+                                                        FirebaseAuth
+                                                            .instance
+                                                            .currentUser
+                                                            ?.email ??
+                                                        '',
+                                                  ),
                                             ),
-                                      ),
-                                    );
-                                  },
+                                          ).then(
+                                            (_) => _checkEmailVerification(),
+                                          );
+                                        },
                                   child: RozetItem(
                                     icon: Icons.mail_outline,
                                     baslik: 'E-posta',
-                                    durumMetni: 'Şimdi Doğrula',
-                                    durumRengi: Colors.black54,
+                                    durumMetni: _isEmailVerified
+                                        ? 'Doğrulandı'
+                                        : 'Şimdi Doğrula',
+                                    durumRengi: _isEmailVerified
+                                        ? Colors.green
+                                        : Colors.black54,
+                                    trailingIcon: _isEmailVerified
+                                        ? Icons.verified
+                                        : null,
+                                    trailingIconColor: _isEmailVerified
+                                        ? Colors.green
+                                        : null,
                                   ),
                                 ),
-                                const RozetItem(
+
+                                // Diğer Rozetler (sabit örnek)
+                                RozetItem(
                                   icon: Icons.phone_android,
                                   baslik: 'Telefon',
                                   durumMetni: 'Şimdi Doğrula',
                                   durumRengi: Colors.black54,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.person_outline,
                                   baslik: 'Kimlik Doğrulaması',
                                   durumMetni: 'Şimdi Doğrula',
                                   durumRengi: Colors.black54,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.facebook,
                                   baslik: 'Facebook',
                                   durumMetni: 'Doğrulandı',
@@ -119,7 +165,7 @@ class MyBadgetsScreen extends StatelessWidget {
                                   trailingIcon: Icons.verified,
                                   trailingIconColor: Colors.green,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.account_circle_outlined,
                                   baslik: 'Google',
                                   durumMetni: 'Doğrulandı',
@@ -127,37 +173,37 @@ class MyBadgetsScreen extends StatelessWidget {
                                   trailingIcon: Icons.verified,
                                   trailingIconColor: Colors.green,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.assignment_turned_in_outlined,
                                   baslik: 'Sertifikalar',
                                   durumMetni: 'Şimdi Doğrula',
                                   durumRengi: Colors.black54,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.work_outline,
                                   baslik: 'İşletme Lisansı',
                                   durumMetni: 'Şimdi Doğrula',
                                   durumRengi: Colors.black54,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.fingerprint,
                                   baslik: 'Adli Sicil Belgesi',
                                   durumMetni: 'Şimdi Doğrula',
                                   durumRengi: Colors.black54,
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.description_outlined,
                                   baslik: 'Online Test',
                                   durumMetni: 'Şimdi Katıl',
-                                  durumRengi: Color(0xFF6A1B9A),
+                                  durumRengi: const Color(0xFF6A1B9A),
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.pets_outlined,
                                   baslik: 'Pet Sitter Tanıtım Testi',
                                   durumMetni: 'Şimdi Katıl',
-                                  durumRengi: Color(0xFF6A1B9A),
+                                  durumRengi: const Color(0xFF6A1B9A),
                                 ),
-                                const RozetItem(
+                                RozetItem(
                                   icon: Icons.folder_open_outlined,
                                   baslik: 'Diğer Belgeler',
                                   durumMetni:
