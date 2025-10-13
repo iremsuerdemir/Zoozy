@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: ^2.2.2
   path_provider: ^2.1.2
   path: ^1.9.0
+  firebase_dynamic_links: ^6.1.10
 
   # Cupertino icons
   cupertino_icons: ^1.0.8
@@ -53,11 +54,16 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/images/caregiver1.png
+    - assets/images/caregiver2.jpeg
+    - assets/images/caregiver3.jpg
+    - assets/images/forgot_password.png
+    - assets/images/jobs.png
     - assets/images/login_1.png
     - assets/images/login_2.png
     - assets/images/login_3.png
     - assets/images/login_4.png
-    - assets/images/forgot_password.png
-    - assets/images/jobs.png
-    - assets/sounds/havhav.ogg
-    - assets/sounds/miyav.ogg
+    - assets/images/pet1.jpeg
+    - assets/images/pet2.jpeg
+    - assets/images/pet3.jpg
+    - assets/images/sitter_banner.jpg

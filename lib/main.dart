@@ -25,6 +25,7 @@ import 'package:zoozy/screens/settings_screen.dart';
 import 'package:zoozy/screens/upload_photo_screen.dart';
 import 'package:zoozy/screens/visit_type_page.dart';
 import 'package:zoozy/screens/walk_count_page.dart';
+import 'package:zoozy/screens/explore_screen.dart';
 
 // Web için GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -77,7 +78,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ProfileScreen(),
+      home: const ExploreScreen(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
       },
