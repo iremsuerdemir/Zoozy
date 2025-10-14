@@ -1,10 +1,11 @@
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+
+// Sayfalar
 import 'package:zoozy/screens/about_me_page.dart';
 import 'package:zoozy/screens/add_location.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart'
@@ -13,8 +14,10 @@ import 'package:zoozy/screens/describe_services_page.dart';
 import 'package:zoozy/screens/groomer_note.dart';
 import 'package:zoozy/screens/grooming_service_page.dart';
 import 'package:zoozy/screens/help_center_page.dart';
+import 'package:zoozy/screens/identification_document_page.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/login_page.dart';
+import 'package:zoozy/screens/my_badgets_screen.dart';
 import 'package:zoozy/screens/owner_Login_Page.dart';
 import 'package:zoozy/screens/password_forgot_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
@@ -28,8 +31,9 @@ import 'package:zoozy/screens/upload_photo_screen.dart';
 import 'package:zoozy/screens/visit_type_page.dart';
 import 'package:zoozy/screens/walk_count_page.dart';
 import 'package:zoozy/screens/explore_screen.dart';
+import 'package:zoozy/screens/confirm_phone_screen.dart';
 
-// Web için GoogleSignIn
+// GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
   clientId: "301880499217-webab6f352ce3c0e0df43a5b0.apps.googleusercontent.com",
   scopes: ['email'],
@@ -47,10 +51,11 @@ Future<void> main() async {
       storageBucket: "zoozy-proje.appspot.com",
       messagingSenderId: "301880499217",
       appId: "1:301880499217:web:ab6f352ce3c0e0df43a5b0",
+      measurementId: "G-KKZ5HXFDFD",
     ),
   );
 
-  // 🔹 Web için Facebook SDK başlat
+  // Web için Facebook SDK başlat
   if (kIsWeb) {
     await FacebookAuth.i.webAndDesktopInitialize(
       appId: "2324446061343469",
@@ -58,7 +63,6 @@ Future<void> main() async {
       xfbml: true,
       version: "v15.0",
     );
-
     if (!FacebookAuth.i.isWebSdkInitialized) {
       print("Facebook Web SDK başlatılamadı!");
     } else {
@@ -80,9 +84,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const OwnerLoginPage(),
+      // Başlangıç ekranı: OwnerLoginPage veya ConfirmPhoneScreen
+      home: const MyBadgetsScreen(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
+        '/confirmPhone': (context) => const ConfirmPhoneScreen(),
       },
     );
   }

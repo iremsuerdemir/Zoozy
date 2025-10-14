@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:zoozy/screens/confirm_phone_screen.dart'; // Yeni eklendi
+import 'package:zoozy/screens/identification_document_page.dart';
 import 'confirm_email_screen.dart';
 
 class MyBadgetsScreen extends StatefulWidget {
@@ -12,11 +14,16 @@ class MyBadgetsScreen extends StatefulWidget {
 
 class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
   bool _isEmailVerified = false;
+  bool _isPhoneVerified = false; // Yeni eklendi
+  bool _isIdVerified = false;
 
   @override
   void initState() {
     super.initState();
     _checkEmailVerification();
+    // Telefon ve Kimlik doğrulamaları için başlangıç kontrolleri buraya eklenebilir.
+    // Ancak Firebase'de telefon doğrulaması farklı bir yapı gerektirdiği için
+    // şimdilik varsayılan değerler kullanıldı, siz ihtiyacınıza göre düzenleyebilirsiniz.
   }
 
   Future<void> _checkEmailVerification() async {
@@ -27,6 +34,19 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
         _isEmailVerified = user.emailVerified;
       });
     }
+  }
+
+  // Sadece örnek amaçlı bir metot, gerçek bir kontrol mekanizması gerektirir.
+  Future<void> _checkPhoneVerification() async {
+    // Gerçek telefon doğrulaması kontrol mantığı buraya gelir (örneğin bir API çağrısı).
+    // Şimdilik state'i manuel olarak güncelleyelim.
+    // Eğer ConfirmPhoneScreen'den başarılı sonuç dönerse güncellenecektir.
+  }
+
+  // Sadece örnek amaçlı bir metot, gerçek bir kontrol mekanizması gerektirir.
+  Future<void> _checkIdVerification() async {
+    // Gerçek kimlik doğrulaması kontrol mantığı buraya gelir.
+    // Eğer IdentificationDocumentPage'den başarılı sonuç dönerse güncellenecektir.
   }
 
   @override
@@ -82,7 +102,6 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                         constraints.maxWidth * 0.92,
                         900,
                       );
-
                       return Center(
                         child: Container(
                           width: maxWidth,
@@ -103,8 +122,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                             physics: const BouncingScrollPhysics(),
                             child: Column(
                               children: [
-                                const SizedBox(height: 8),
-                                // Email Rozeti
+                                // E-posta Rozeti
                                 InkWell(
                                   onTap: _isEmailVerified
                                       ? null
@@ -144,19 +162,82 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   ),
                                 ),
 
-                                // Diğer Rozetler (sabit örnek)
-                                RozetItem(
-                                  icon: Icons.phone_android,
-                                  baslik: 'Telefon',
-                                  durumMetni: 'Şimdi Doğrula',
-                                  durumRengi: Colors.black54,
+                                // Telefon Rozeti (Yeni Eklendi)
+                                InkWell(
+                                  onTap: _isPhoneVerified
+                                      ? null
+                                      : () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ConfirmPhoneScreen(),
+                                            ),
+                                          ).then((result) {
+                                            if (result == true) {
+                                              setState(() {
+                                                _isPhoneVerified = true;
+                                              });
+                                            }
+                                            _checkPhoneVerification(); // İsteğe bağlı olarak kontrolü tekrar çağır
+                                          });
+                                        },
+                                  child: RozetItem(
+                                    icon: Icons.phone_android,
+                                    baslik: 'Telefon',
+                                    durumMetni: _isPhoneVerified
+                                        ? 'Doğrulandı'
+                                        : 'Şimdi Doğrula',
+                                    durumRengi: _isPhoneVerified
+                                        ? Colors.green
+                                        : Colors.black54,
+                                    trailingIcon: _isPhoneVerified
+                                        ? Icons.verified
+                                        : null,
+                                    trailingIconColor: _isPhoneVerified
+                                        ? Colors.green
+                                        : null,
+                                  ),
                                 ),
-                                RozetItem(
-                                  icon: Icons.person_outline,
-                                  baslik: 'Kimlik Doğrulaması',
-                                  durumMetni: 'Şimdi Doğrula',
-                                  durumRengi: Colors.black54,
+
+                                // Kimlik Rozeti
+                                InkWell(
+                                  onTap: _isIdVerified
+                                      ? null
+                                      : () async {
+                                          final result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const IdentificationDocumentPage(),
+                                            ),
+                                          );
+                                          if (result == true) {
+                                            setState(() {
+                                              _isIdVerified = true;
+                                            });
+                                          }
+                                          _checkIdVerification(); // İsteğe bağlı olarak kontrolü tekrar çağır
+                                        },
+                                  child: RozetItem(
+                                    icon: Icons.person_outline,
+                                    baslik: 'Kimlik Doğrulaması',
+                                    durumMetni: _isIdVerified
+                                        ? 'Doğrulandı'
+                                        : 'Şimdi Doğrula',
+                                    durumRengi: _isIdVerified
+                                        ? Colors.green
+                                        : Colors.black54,
+                                    trailingIcon: _isIdVerified
+                                        ? Icons.verified
+                                        : null,
+                                    trailingIconColor: _isIdVerified
+                                        ? Colors.green
+                                        : null,
+                                  ),
                                 ),
+
+                                // Diğer Rozetler (sabit örnekler)
                                 RozetItem(
                                   icon: Icons.facebook,
                                   baslik: 'Facebook',
@@ -191,25 +272,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   durumMetni: 'Şimdi Doğrula',
                                   durumRengi: Colors.black54,
                                 ),
-                                RozetItem(
-                                  icon: Icons.description_outlined,
-                                  baslik: 'Online Test',
-                                  durumMetni: 'Şimdi Katıl',
-                                  durumRengi: const Color(0xFF6A1B9A),
-                                ),
-                                RozetItem(
-                                  icon: Icons.pets_outlined,
-                                  baslik: 'Pet Sitter Tanıtım Testi',
-                                  durumMetni: 'Şimdi Katıl',
-                                  durumRengi: const Color(0xFF6A1B9A),
-                                ),
-                                RozetItem(
-                                  icon: Icons.folder_open_outlined,
-                                  baslik: 'Diğer Belgeler',
-                                  durumMetni:
-                                      'Doğrulama Bekleyen: 0\nDoğrulanmış Belgeler: 0',
-                                  durumRengi: Colors.black54,
-                                ),
+
                                 const SizedBox(height: 16),
                                 const Padding(
                                   padding: EdgeInsets.symmetric(
