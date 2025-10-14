@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:zoozy/screens/confirm_phone_screen.dart'; // Yeni eklendi
+import 'package:zoozy/screens/certification_screen.dart';
+import 'package:zoozy/screens/confirm_phone_screen.dart';
 import 'package:zoozy/screens/identification_document_page.dart';
 import 'confirm_email_screen.dart';
 
@@ -14,39 +16,32 @@ class MyBadgetsScreen extends StatefulWidget {
 
 class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
   bool _isEmailVerified = false;
-  bool _isPhoneVerified = false; // Yeni eklendi
+  bool _isPhoneVerified = false;
   bool _isIdVerified = false;
+  bool _isCertificatesVerified = false;
 
   @override
   void initState() {
     super.initState();
     _checkEmailVerification();
-    // Telefon ve Kimlik doğrulamaları için başlangıç kontrolleri buraya eklenebilir.
-    // Ancak Firebase'de telefon doğrulaması farklı bir yapı gerektirdiği için
-    // şimdilik varsayılan değerler kullanıldı, siz ihtiyacınıza göre düzenleyebilirsiniz.
   }
 
   Future<void> _checkEmailVerification() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await user.reload(); // Güncel veriyi al
+      await user.reload();
       setState(() {
         _isEmailVerified = user.emailVerified;
       });
     }
   }
 
-  // Sadece örnek amaçlı bir metot, gerçek bir kontrol mekanizması gerektirir.
   Future<void> _checkPhoneVerification() async {
-    // Gerçek telefon doğrulaması kontrol mantığı buraya gelir (örneğin bir API çağrısı).
-    // Şimdilik state'i manuel olarak güncelleyelim.
-    // Eğer ConfirmPhoneScreen'den başarılı sonuç dönerse güncellenecektir.
+    // Telefon doğrulama kontrolü, gerçek senaryoda API veya Firebase çağrısı ile yapılabilir
   }
 
-  // Sadece örnek amaçlı bir metot, gerçek bir kontrol mekanizması gerektirir.
   Future<void> _checkIdVerification() async {
-    // Gerçek kimlik doğrulaması kontrol mantığı buraya gelir.
-    // Eğer IdentificationDocumentPage'den başarılı sonuç dönerse güncellenecektir.
+    // Kimlik doğrulama kontrolü, gerçek senaryoda API veya SharedPreferences ile yapılabilir
   }
 
   @override
@@ -66,6 +61,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
           SafeArea(
             child: Column(
               children: [
+                // Üst başlık
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -162,7 +158,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   ),
                                 ),
 
-                                // Telefon Rozeti (Yeni Eklendi)
+                                // Telefon Rozeti
                                 InkWell(
                                   onTap: _isPhoneVerified
                                       ? null
@@ -179,7 +175,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                                 _isPhoneVerified = true;
                                               });
                                             }
-                                            _checkPhoneVerification(); // İsteğe bağlı olarak kontrolü tekrar çağır
+                                            _checkPhoneVerification();
                                           });
                                         },
                                   child: RozetItem(
@@ -217,7 +213,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                               _isIdVerified = true;
                                             });
                                           }
-                                          _checkIdVerification(); // İsteğe bağlı olarak kontrolü tekrar çağır
+                                          _checkIdVerification();
                                         },
                                   child: RozetItem(
                                     icon: Icons.person_outline,
@@ -237,7 +233,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   ),
                                 ),
 
-                                // Diğer Rozetler (sabit örnekler)
+                                // Diğer Rozetler
                                 RozetItem(
                                   icon: Icons.facebook,
                                   baslik: 'Facebook',
@@ -254,12 +250,42 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   trailingIcon: Icons.verified,
                                   trailingIconColor: Colors.green,
                                 ),
-                                RozetItem(
-                                  icon: Icons.assignment_turned_in_outlined,
-                                  baslik: 'Sertifikalar',
-                                  durumMetni: 'Şimdi Doğrula',
-                                  durumRengi: Colors.black54,
+
+                                // Sertifikalar Rozeti
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CertificationScreen(),
+                                      ),
+                                    ).then((result) {
+                                      if (result == true) {
+                                        setState(() {
+                                          _isCertificatesVerified = true;
+                                        });
+                                      }
+                                    });
+                                  },
+                                  child: RozetItem(
+                                    icon: Icons.assignment_turned_in_outlined,
+                                    baslik: 'Sertifikalar',
+                                    durumMetni: _isCertificatesVerified
+                                        ? 'Doğrulandı'
+                                        : 'Şimdi Doğrula',
+                                    durumRengi: _isCertificatesVerified
+                                        ? Colors.green
+                                        : Colors.black54,
+                                    trailingIcon: _isCertificatesVerified
+                                        ? Icons.verified
+                                        : null,
+                                    trailingIconColor: _isCertificatesVerified
+                                        ? Colors.green
+                                        : null,
+                                  ),
                                 ),
+
                                 RozetItem(
                                   icon: Icons.work_outline,
                                   baslik: 'İşletme Lisansı',
