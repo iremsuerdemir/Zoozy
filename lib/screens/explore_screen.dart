@@ -15,33 +15,33 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     final categories = [
-      {"icon": Icons.house, "label": "Boarding"},
-      {"icon": Icons.wb_sunny, "label": "Daycare"},
-      {"icon": Icons.chair_alt, "label": "Sitting"},
-      {"icon": Icons.directions_walk, "label": "Walking"},
-      {"icon": Icons.local_taxi, "label": "Taxi"},
-      {"icon": Icons.cut, "label": "Grooming"},
-      {"icon": Icons.school, "label": "Training"},
-      {"icon": Icons.more_horiz, "label": "More"},
+      {"icon": Icons.house, "label": "Pansiyon"},
+      {"icon": Icons.wb_sunny, "label": "Gündüz Bakımı"},
+      {"icon": Icons.chair_alt, "label": "Evde Bakım"},
+      {"icon": Icons.directions_walk, "label": "Gezdirme"},
+      {"icon": Icons.local_taxi, "label": "Taksi"},
+      {"icon": Icons.cut, "label": "Bakım"},
+      {"icon": Icons.school, "label": "Eğitim"},
+      {"icon": Icons.more_horiz, "label": "Diğer"},
     ];
 
     final caregivers = [
       {
         "name": "İstanbul, Juliet Wan",
         "image": "assets/images/caregiver1.png",
-        "suitability": "Walking",
+        "suitability": "Gezdirme",
         "price": 315.0,
       },
       {
-        "name": "Emy For Dog Boarding",
+        "name": "Emy Pansiyon",
         "image": "assets/images/caregiver2.jpeg",
-        "suitability": "Boarding",
+        "suitability": "Pansiyon",
         "price": 1600.0,
       },
       {
         "name": "Animal Care Pro",
         "image": "assets/images/caregiver3.jpg",
-        "suitability": "Daycare",
+        "suitability": "Gündüz Bakımı",
         "price": 1175.0,
       },
     ];
@@ -56,7 +56,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 2, // AppBar altındaki çizgi için
+        elevation: 2,
         leading: const Padding(
           padding: EdgeInsets.only(left: 16.0),
           child: Icon(Icons.pets, color: Colors.deepPurple, size: 28),
@@ -139,13 +139,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Backers nearby",
+                  "Yakınınızdaki Backer'lar",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 TextButton(
                   onPressed: () {},
                   child: const Text(
-                    "See More >",
+                    "Daha Fazla >",
                     style: TextStyle(
                       color: Colors.purple,
                       fontWeight: FontWeight.w600,
@@ -181,7 +181,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
             // --- PETS IN THE COMMUNITY ---
             const Text(
-              "Pets in the Community",
+              "Topluluktaki Evcil Hayvanlar",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 8),
@@ -235,9 +235,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Colors.transparent, // üstten hafif geçiş
-                              Color(0xAA6B46C1), // orta koyuluk
-                              Color(0xFF6B46C1), // alt tam koyu mor
+                              Colors.transparent,
+                              Color(0xAA6B46C1),
+                              Color(0xFF6B46C1),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -256,7 +256,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text(
-                            "Become a Sitter",
+                            "Bakıcı Olun",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 22,
@@ -273,7 +273,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            "Join our community and start caring for pets near you. Earn while doing what you love!",
+                            "Topluluğumuza katılın ve yakınınızdaki evcil hayvanlara bakım yapmaya başlayın. Sevdiğiniz işi yaparken kazanın!",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -302,7 +302,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               ),
                             ),
                             child: const Text(
-                              "Learn More",
+                              "Detaylı Bilgi",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
