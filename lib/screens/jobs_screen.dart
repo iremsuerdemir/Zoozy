@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
+import 'package:zoozy/screens/indexbox_message.dart';
+import 'package:zoozy/screens/minimal_calendar_page.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 
 class JobsScreen extends StatefulWidget {
@@ -24,9 +26,19 @@ class _JobsScreenState extends State<JobsScreen> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedIndex = _getIndexFromText(text);
-        });
+        if (text == "Takvim") {
+          // Takvim ikonuna basıldığında yönlendirme
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MinimalCalendarPage(),
+            ),
+          );
+        } else {
+          setState(() {
+            selectedIndex = _getIndexFromText(text);
+          });
+        }
       },
       child: Column(
         children: [
@@ -110,9 +122,19 @@ class _JobsScreenState extends State<JobsScreen> {
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.chat_bubble_outline,
-                    color: primaryPurple, size: 24),
-                onPressed: () {},
+                icon: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: primaryPurple,
+                  size: 24,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => IndexboxMessageScreen(),
+                    ),
+                  );
+                },
               ),
               Positioned(
                 right: 8,
@@ -121,7 +143,7 @@ class _JobsScreenState extends State<JobsScreen> {
                   width: 10,
                   height: 10,
                   decoration: const BoxDecoration(
-                    color: Colors.red,
+                    //color: Colors.red,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -173,8 +195,10 @@ class _JobsScreenState extends State<JobsScreen> {
                   left: screenWidth * 0.06,
                   right: screenWidth * 0.06,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -231,8 +255,10 @@ class _JobsScreenState extends State<JobsScreen> {
                 backgroundColor: Colors.white,
                 foregroundColor: primaryPurple,
                 side: const BorderSide(color: primaryPurple, width: 1.5),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -242,7 +268,8 @@ class _JobsScreenState extends State<JobsScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const AgreementScreen()),
+                    builder: (context) => const AgreementScreen(),
+                  ),
                 );
               },
               child: const Text(

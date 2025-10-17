@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 // Sayfalar
 import 'package:zoozy/screens/about_me_page.dart';
@@ -41,6 +42,9 @@ final GoogleSignIn googleSignIn = GoogleSignIn(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Yerel ayar verilerini yükle (Locale)
+  await initializeDateFormatting(); // artık doğru çalışacak
 
   // Firebase initialize
   await Firebase.initializeApp(
@@ -84,11 +88,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // Başlangıç ekranı: OwnerLoginPage veya ConfirmPhoneScreen
-      home: const MyBadgetsScreen(),
+      // Başlangıç ekranı
+      home: const RequestsScreen(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),
+        // Diğer sayfa route’larını buraya ekleyebilirsin
       },
     );
   }

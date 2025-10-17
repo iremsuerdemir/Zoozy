@@ -255,7 +255,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   width: 10,
                   height: 10,
                   decoration: const BoxDecoration(
-                    color: Colors.red,
+                    //   color: Colors.red,
                     shape: BoxShape.circle,
                   ),
                 ),
