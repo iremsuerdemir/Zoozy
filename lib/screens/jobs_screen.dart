@@ -4,6 +4,8 @@ import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/minimal_calendar_page.dart';
 import 'package:zoozy/screens/profile_screen.dart';
+// HelpCenterPage importunu eklemeyi unutma
+import 'package:zoozy/screens/help_center_page.dart';
 
 class JobsScreen extends StatefulWidget {
   const JobsScreen({super.key});
@@ -16,7 +18,7 @@ class _JobsScreenState extends State<JobsScreen> {
   // Seçilen ikon index'i
   int selectedIndex = 0;
 
-  //   Renk paleti
+  // Renk paleti
   static const Color primaryPurple = Color.fromARGB(255, 111, 79, 172);
   static const Color softPink = Color(0xFFF48FB1);
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
@@ -33,6 +35,12 @@ class _JobsScreenState extends State<JobsScreen> {
             MaterialPageRoute(
               builder: (context) => const MinimalCalendarPage(),
             ),
+          );
+        } else if (text == "Yardım") {
+          // Yardım ikonuna basıldığında yönlendirme
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HelpCenterPage()),
           );
         } else {
           setState(() {

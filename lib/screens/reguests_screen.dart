@@ -3,6 +3,8 @@ import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/profile_screen.dart';
+// HelpCenterPage dosyanı eklemeyi unutma
+import 'package:zoozy/screens/help_center_page.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -29,10 +31,16 @@ class _RequestsScreenState extends State<RequestsScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedIndex = _getIndexFromText(
-            text,
-          ); // Tıklanan ikon seçili olacak
+          selectedIndex = _getIndexFromText(text);
         });
+
+        // Yardım sayfasına yönlendirme
+        if (text == "Yardım") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HelpCenterPage()),
+          );
+        }
       },
       child: Column(
         children: [
