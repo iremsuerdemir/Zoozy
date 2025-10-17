@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/CaregiverCard.dart';
 import 'package:zoozy/components/SimplePetCard.dart';
+import 'package:zoozy/components/bottom_navigation_bar.dart';
+import 'package:zoozy/components/bottom_navigation_bar.dart'; // bottom nav import
+import 'package:zoozy/screens/jobs_screen.dart';
+import 'package:zoozy/screens/profile_screen.dart';
+import 'package:zoozy/screens/reguests_screen.dart'; // doğru ekranı import et
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -131,9 +136,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 );
               },
             ),
-
             const SizedBox(height: 20),
-
             // --- CAREGIVER BAŞLIK ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -155,7 +158,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ],
             ),
             const SizedBox(height: 8),
-
             // --- CAREGIVER KARTLARI ---
             SizedBox(
               height: 230,
@@ -176,16 +178,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 },
               ),
             ),
-
             const SizedBox(height: 24),
-
             // --- PETS IN THE COMMUNITY ---
             const Text(
               "Topluluktaki Evcil Hayvanlar",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 8),
-
             SizedBox(
               height: 180,
               child: ListView.builder(
@@ -204,8 +203,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 },
               ),
             ),
-
             const SizedBox(height: 24),
+            // --- BANNER ---
             Container(
               width: double.infinity,
               height: 300,
@@ -217,15 +216,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 borderRadius: BorderRadius.circular(16),
                 child: Stack(
                   children: [
-                    // Resim
                     Positioned.fill(
                       child: Image.asset(
                         "assets/images/sitter_banner.jpg",
                         fit: BoxFit.cover,
                       ),
                     ),
-
-                    // Gradient geçiş
                     Positioned(
                       bottom: 0,
                       left: 0,
@@ -246,8 +242,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                       ),
                     ),
-
-                    // İçerik
                     Positioned(
                       bottom: 20,
                       left: 20,
@@ -316,6 +310,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
             const SizedBox(height: 24),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0, // Keşfet aktif
+        selectedColor: Colors.deepPurple,
+        unselectedColor: Colors.grey,
       ),
     );
   }
