@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zoozy/screens/jobs_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import '../screens/reguests_screen.dart'; // doğru ekranı import et
+import '../screens/explore_screen.dart'; // ExploreScreen importu eklendi
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -26,21 +27,27 @@ class CustomBottomNavBar extends StatelessWidget {
       unselectedItemColor: unselectedColor,
       showUnselectedLabels: true,
       onTap: (index) {
-        if (index == 4) {
+        if (index == 0) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            MaterialPageRoute(builder: (context) => const ExploreScreen()),
+          );
+        } else if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RequestsScreen(),
+            ), // doğru isim
           );
         } else if (index == 3) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const JobsScreen()),
           );
-        } else if (index == 1) {
+        } else if (index == 4) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const RequestsScreen()), // doğru isim
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
           );
         } else {
           if (onTap != null) {
@@ -57,10 +64,7 @@ class CustomBottomNavBar extends StatelessWidget {
           icon: Icon(Icons.receipt_long),
           label: 'Talepler',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.image),
-          label: 'Anlar',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Anlar'),
         BottomNavigationBarItem(
           icon: Icon(Icons.monetization_on_outlined),
           label: 'İşler',

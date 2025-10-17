@@ -314,36 +314,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // --- GREY INFORMATION AREA ---
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: Colors.grey.shade300,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Information",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "This area can contain useful info, tips, rules, or any text you'd like. Currently it is empty.",
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "⚠️ Rules, Tips, or Notices can be added here",
-                    style: TextStyle(color: Colors.black45, fontSize: 12),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              ),
-            ),
           ],
         ),
       ),
