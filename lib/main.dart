@@ -43,10 +43,8 @@ final GoogleSignIn googleSignIn = GoogleSignIn(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Yerel ayar verilerini yükle (Locale)
-  await initializeDateFormatting(); // artık doğru çalışacak
+  await initializeDateFormatting(); // Yerel tarih formatları
 
-  // Firebase initialize
   await Firebase.initializeApp(
     options: const FirebaseOptions(
       apiKey: "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4",
@@ -59,7 +57,6 @@ Future<void> main() async {
     ),
   );
 
-  // Web için Facebook SDK başlat
   if (kIsWeb) {
     await FacebookAuth.i.webAndDesktopInitialize(
       appId: "2324446061343469",
@@ -88,12 +85,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // Başlangıç ekranı
-      home: const RequestsScreen(),
+      home: const ConfirmPhoneScreen(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),
-        // Diğer sayfa route’larını buraya ekleyebilirsin
+        // Diğer sayfa route’ları
       },
     );
   }

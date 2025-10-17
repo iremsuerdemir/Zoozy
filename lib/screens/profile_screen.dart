@@ -298,8 +298,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const MyBadgetsScreen(), // Yeni ekran ismi
+                                builder: (context) => const MyBadgetsScreen(
+                                  phoneVerified: true,
+                                ), // Yeni ekran ismi
                               ),
                             );
                           },

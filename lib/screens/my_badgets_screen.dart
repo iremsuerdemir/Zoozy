@@ -6,12 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/screens/certification_screen.dart';
+import 'package:zoozy/screens/confirm_email_screen.dart';
 import 'package:zoozy/screens/confirm_phone_screen.dart';
 import 'package:zoozy/screens/identification_document_page.dart';
-import 'confirm_email_screen.dart';
 
 class MyBadgetsScreen extends StatefulWidget {
-  const MyBadgetsScreen({super.key});
+  final bool phoneVerified;
+  const MyBadgetsScreen({super.key, required this.phoneVerified});
 
   @override
   State<MyBadgetsScreen> createState() => _MyBadgetsScreenState();
@@ -22,14 +23,13 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
   bool _isPhoneVerified = false;
   bool _isIdVerified = false;
   bool _isCertificatesVerified = false;
-
-  // SharedPreferences ile kalıcı olarak saklanacak veriler
   bool _isBusinessLicenseVerified = false;
   bool _isCriminalRecordVerified = false;
 
   @override
   void initState() {
     super.initState();
+    _isPhoneVerified = widget.phoneVerified;
     _checkEmailVerification();
     _loadSavedStatuses();
   }
@@ -38,21 +38,13 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       await user.reload();
-      setState(() {
-        _isEmailVerified = user.emailVerified;
-      });
+      setState(() => _isEmailVerified = user.emailVerified);
     }
   }
 
-  Future<void> _checkPhoneVerification() async {
-    // Telefon doğrulama kontrolü, gerçek senaryoda API veya Firebase çağrısı ile yapılabilir
-  }
+  Future<void> _checkPhoneVerification() async {}
+  Future<void> _checkIdVerification() async {}
 
-  Future<void> _checkIdVerification() async {
-    // Kimlik doğrulama kontrolü, gerçek senaryoda API veya SharedPreferences ile yapılabilir
-  }
-
-  // SharedPreferences'tan verileri yükle
   Future<void> _loadSavedStatuses() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -61,94 +53,89 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
     });
   }
 
-  // SharedPreferences'a kaydet
   Future<void> _saveStatus(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
   }
 
-  // Dosya seçme popup
   Future<bool?> _dosyaSecPopup(String belgeTipi, String prefKey) async {
     final ImagePicker _picker = ImagePicker();
-
     return showModalBottomSheet<bool>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "$belgeTipi Yükle",
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "$belgeTipi Yükle",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple.shade700,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text("Galeriden Seç"),
+                onTap: () async {
+                  final picked = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
+                  if (picked != null) {
+                    await _saveStatus(prefKey, true);
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined),
+                title: const Text("Fotoğraf Çek"),
+                onTap: () async {
+                  final picked = await _picker.pickImage(
+                    source: ImageSource.camera,
+                  );
+                  if (picked != null) {
+                    await _saveStatus(prefKey, true);
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.picture_as_pdf),
+                title: const Text("PDF Seç"),
+                onTap: () async {
+                  FilePickerResult? result = await FilePicker.platform
+                      .pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['pdf'],
+                      );
+                  if (result != null && result.files.isNotEmpty) {
+                    await _saveStatus(prefKey, true);
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(
+                  "Kapat",
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple.shade700,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: const Text("Galeriden Seç"),
-                  onTap: () async {
-                    final picked = await _picker.pickImage(
-                      source: ImageSource.gallery,
-                    );
-                    if (picked != null) {
-                      await _saveStatus(prefKey, true);
-                      Navigator.pop(context, true); // Tek pop
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.camera_alt_outlined),
-                  title: const Text("Fotoğraf Çek"),
-                  onTap: () async {
-                    final picked = await _picker.pickImage(
-                      source: ImageSource.camera,
-                    );
-                    if (picked != null) {
-                      await _saveStatus(prefKey, true);
-                      Navigator.pop(context, true); // Tek pop
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.picture_as_pdf),
-                  title: const Text("PDF Seç"),
-                  onTap: () async {
-                    FilePickerResult? result = await FilePicker.platform
-                        .pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['pdf'],
-                        );
-                    if (result != null && result.files.isNotEmpty) {
-                      await _saveStatus(prefKey, true);
-                      Navigator.pop(context, true); // Tek pop
-                    }
-                  },
-                ),
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text(
-                    "Kapat",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -160,8 +147,6 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
                 colors: [Color(0xFFB39DDB), Color(0xFFF48FB1)],
               ),
             ),
@@ -169,11 +154,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
           SafeArea(
             child: Column(
               children: [
-                // Üst başlık
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -209,7 +193,7 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                       return Center(
                         child: Container(
                           width: maxWidth,
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -226,15 +210,29 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                             physics: const BouncingScrollPhysics(),
                             child: Column(
                               children: [
-                                // E-posta Rozeti
-                                InkWell(
+                                // Rozetler
+                                RozetItem(
+                                  icon: Icons.mail_outline,
+                                  baslik: 'E-posta',
+                                  durumMetni: _isEmailVerified
+                                      ? 'Doğrulandı'
+                                      : 'Şimdi Doğrula',
+                                  durumRengi: _isEmailVerified
+                                      ? Colors.green
+                                      : Colors.black54,
+                                  trailingIcon: _isEmailVerified
+                                      ? Icons.verified
+                                      : null,
+                                  trailingIconColor: _isEmailVerified
+                                      ? Colors.green
+                                      : null,
                                   onTap: _isEmailVerified
                                       ? null
                                       : () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
+                                              builder: (_) =>
                                                   ConfirmEmailScreen(
                                                     email:
                                                         FirebaseAuth
@@ -248,100 +246,72 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                             (_) => _checkEmailVerification(),
                                           );
                                         },
-                                  child: RozetItem(
-                                    icon: Icons.mail_outline,
-                                    baslik: 'E-posta',
-                                    durumMetni: _isEmailVerified
-                                        ? 'Doğrulandı'
-                                        : 'Şimdi Doğrula',
-                                    durumRengi: _isEmailVerified
-                                        ? Colors.green
-                                        : Colors.black54,
-                                    trailingIcon: _isEmailVerified
-                                        ? Icons.verified
-                                        : null,
-                                    trailingIconColor: _isEmailVerified
-                                        ? Colors.green
-                                        : null,
-                                  ),
                                 ),
-
-                                // Telefon Rozeti
-                                InkWell(
+                                RozetItem(
+                                  icon: Icons.phone_android,
+                                  baslik: 'Telefon',
+                                  durumMetni: _isPhoneVerified
+                                      ? 'Doğrulandı'
+                                      : 'Şimdi Doğrula',
+                                  durumRengi: _isPhoneVerified
+                                      ? Colors.green
+                                      : Colors.black54,
+                                  trailingIcon: _isPhoneVerified
+                                      ? Icons.verified
+                                      : null,
+                                  trailingIconColor: _isPhoneVerified
+                                      ? Colors.green
+                                      : null,
                                   onTap: _isPhoneVerified
                                       ? null
                                       : () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
+                                              builder: (_) =>
                                                   const ConfirmPhoneScreen(),
                                             ),
                                           ).then((result) {
-                                            if (result == true) {
-                                              setState(() {
-                                                _isPhoneVerified = true;
-                                              });
-                                            }
+                                            if (result == true)
+                                              setState(
+                                                () => _isPhoneVerified = true,
+                                              );
                                             _checkPhoneVerification();
                                           });
                                         },
-                                  child: RozetItem(
-                                    icon: Icons.phone_android,
-                                    baslik: 'Telefon',
-                                    durumMetni: _isPhoneVerified
-                                        ? 'Doğrulandı'
-                                        : 'Şimdi Doğrula',
-                                    durumRengi: _isPhoneVerified
-                                        ? Colors.green
-                                        : Colors.black54,
-                                    trailingIcon: _isPhoneVerified
-                                        ? Icons.verified
-                                        : null,
-                                    trailingIconColor: _isPhoneVerified
-                                        ? Colors.green
-                                        : null,
-                                  ),
                                 ),
-
-                                // Kimlik Rozeti
-                                InkWell(
+                                RozetItem(
+                                  icon: Icons.person_outline,
+                                  baslik: 'Kimlik Doğrulaması',
+                                  durumMetni: _isIdVerified
+                                      ? 'Doğrulandı'
+                                      : 'Şimdi Doğrula',
+                                  durumRengi: _isIdVerified
+                                      ? Colors.green
+                                      : Colors.black54,
+                                  trailingIcon: _isIdVerified
+                                      ? Icons.verified
+                                      : null,
+                                  trailingIconColor: _isIdVerified
+                                      ? Colors.green
+                                      : null,
                                   onTap: _isIdVerified
                                       ? null
                                       : () async {
                                           final result = await Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
+                                              builder: (_) =>
                                                   const IdentificationDocumentPage(),
                                             ),
                                           );
-                                          if (result == true) {
-                                            setState(() {
-                                              _isIdVerified = true;
-                                            });
-                                          }
+                                          if (result == true)
+                                            setState(
+                                              () => _isIdVerified = true,
+                                            );
                                           _checkIdVerification();
                                         },
-                                  child: RozetItem(
-                                    icon: Icons.person_outline,
-                                    baslik: 'Kimlik Doğrulaması',
-                                    durumMetni: _isIdVerified
-                                        ? 'Doğrulandı'
-                                        : 'Şimdi Doğrula',
-                                    durumRengi: _isIdVerified
-                                        ? Colors.green
-                                        : Colors.black54,
-                                    trailingIcon: _isIdVerified
-                                        ? Icons.verified
-                                        : null,
-                                    trailingIconColor: _isIdVerified
-                                        ? Colors.green
-                                        : null,
-                                  ),
                                 ),
-
-                                // Diğer Rozetler
                                 RozetItem(
                                   icon: Icons.facebook,
                                   baslik: 'Facebook',
@@ -358,107 +328,88 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   trailingIcon: Icons.verified,
                                   trailingIconColor: Colors.green,
                                 ),
-
-                                // Sertifikalar Rozeti
-                                InkWell(
+                                RozetItem(
+                                  icon: Icons.assignment_turned_in_outlined,
+                                  baslik: 'Sertifikalar',
+                                  durumMetni: _isCertificatesVerified
+                                      ? 'Doğrulandı'
+                                      : 'Şimdi Doğrula',
+                                  durumRengi: _isCertificatesVerified
+                                      ? Colors.green
+                                      : Colors.black54,
+                                  trailingIcon: _isCertificatesVerified
+                                      ? Icons.verified
+                                      : null,
+                                  trailingIconColor: _isCertificatesVerified
+                                      ? Colors.green
+                                      : null,
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
+                                        builder: (_) =>
                                             const CertificationScreen(),
                                       ),
                                     ).then((result) {
-                                      if (result == true) {
-                                        setState(() {
-                                          _isCertificatesVerified = true;
-                                        });
-                                      }
+                                      if (result == true)
+                                        setState(
+                                          () => _isCertificatesVerified = true,
+                                        );
                                     });
                                   },
-                                  child: RozetItem(
-                                    icon: Icons.assignment_turned_in_outlined,
-                                    baslik: 'Sertifikalar',
-                                    durumMetni: _isCertificatesVerified
-                                        ? 'Doğrulandı'
-                                        : 'Şimdi Doğrula',
-                                    durumRengi: _isCertificatesVerified
-                                        ? Colors.green
-                                        : Colors.black54,
-                                    trailingIcon: _isCertificatesVerified
-                                        ? Icons.verified
-                                        : null,
-                                    trailingIconColor: _isCertificatesVerified
-                                        ? Colors.green
-                                        : null,
-                                  ),
                                 ),
-
-                                // İşletme Lisansı Rozeti
-                                // İşletme Lisansı Rozeti
-                                InkWell(
+                                RozetItem(
+                                  icon: Icons.work_outline,
+                                  baslik: 'İşletme Lisansı',
+                                  durumMetni: _isBusinessLicenseVerified
+                                      ? 'Doğrulandı'
+                                      : 'Şimdi Doğrula',
+                                  durumRengi: _isBusinessLicenseVerified
+                                      ? Colors.green
+                                      : Colors.black54,
+                                  trailingIcon: _isBusinessLicenseVerified
+                                      ? Icons.verified
+                                      : null,
+                                  trailingIconColor: _isBusinessLicenseVerified
+                                      ? Colors.green
+                                      : null,
                                   onTap: () async {
                                     final result = await _dosyaSecPopup(
                                       'İşletme Lisansı',
                                       'business_license',
                                     );
-                                    if (result == true) {
-                                      setState(() {
-                                        _isBusinessLicenseVerified =
-                                            true; // Hemen tik gözüksün
-                                      });
-                                    }
+                                    if (result == true)
+                                      setState(
+                                        () => _isBusinessLicenseVerified = true,
+                                      );
                                   },
-                                  child: RozetItem(
-                                    icon: Icons.work_outline,
-                                    baslik: 'İşletme Lisansı',
-                                    durumMetni: _isBusinessLicenseVerified
-                                        ? 'Doğrulandı'
-                                        : 'Şimdi Doğrula',
-                                    durumRengi: _isBusinessLicenseVerified
-                                        ? Colors.green
-                                        : Colors.black54,
-                                    trailingIcon: _isBusinessLicenseVerified
-                                        ? Icons.verified
-                                        : null,
-                                    trailingIconColor:
-                                        _isBusinessLicenseVerified
-                                        ? Colors.green
-                                        : null,
-                                  ),
                                 ),
-
-                                // Adli Sicil Belgesi Rozeti
-                                InkWell(
+                                RozetItem(
+                                  icon: Icons.fingerprint,
+                                  baslik: 'Adli Sicil Belgesi',
+                                  durumMetni: _isCriminalRecordVerified
+                                      ? 'Doğrulandı'
+                                      : 'Şimdi Doğrula',
+                                  durumRengi: _isCriminalRecordVerified
+                                      ? Colors.green
+                                      : Colors.black54,
+                                  trailingIcon: _isCriminalRecordVerified
+                                      ? Icons.verified
+                                      : null,
+                                  trailingIconColor: _isCriminalRecordVerified
+                                      ? Colors.green
+                                      : null,
                                   onTap: () async {
                                     final result = await _dosyaSecPopup(
                                       'Adli Sicil Belgesi',
                                       'criminal_record',
                                     );
-                                    if (result == true) {
-                                      setState(() {
-                                        _isCriminalRecordVerified = true;
-                                      });
-                                    }
+                                    if (result == true)
+                                      setState(
+                                        () => _isCriminalRecordVerified = true,
+                                      );
                                   },
-                                  child: RozetItem(
-                                    icon: Icons.fingerprint,
-                                    baslik: 'Adli Sicil Belgesi',
-                                    durumMetni: _isCriminalRecordVerified
-                                        ? 'Doğrulandı'
-                                        : 'Şimdi Doğrula',
-                                    durumRengi: _isCriminalRecordVerified
-                                        ? Colors.green
-                                        : Colors.black54,
-                                    trailingIcon: _isCriminalRecordVerified
-                                        ? Icons.verified
-                                        : null,
-                                    trailingIconColor: _isCriminalRecordVerified
-                                        ? Colors.green
-                                        : null,
-                                  ),
                                 ),
-
                                 const SizedBox(height: 16),
                                 const Padding(
                                   padding: EdgeInsets.symmetric(
@@ -499,6 +450,7 @@ class RozetItem extends StatelessWidget {
   final Color durumRengi;
   final IconData? trailingIcon;
   final Color? trailingIconColor;
+  final VoidCallback? onTap;
 
   const RozetItem({
     super.key,
@@ -508,6 +460,7 @@ class RozetItem extends StatelessWidget {
     required this.durumRengi,
     this.trailingIcon,
     this.trailingIconColor,
+    this.onTap,
   });
 
   @override
@@ -524,6 +477,7 @@ class RozetItem extends StatelessWidget {
           side: BorderSide(color: Colors.grey.shade300, width: 0.8),
         ),
         child: ListTile(
+          onTap: onTap,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 8.0,
             horizontal: 16.0,

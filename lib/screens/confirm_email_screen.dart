@@ -42,7 +42,7 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MyBadgetsScreen()),
+        MaterialPageRoute(builder: (_) => MyBadgetsScreen(phoneVerified: true)),
       );
     });
   }

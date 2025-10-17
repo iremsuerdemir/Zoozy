@@ -82,7 +82,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
     }
   }
 
-  /// ✅ Web ve mobil uyumlu Google ile giriş işlemi
+  ///  Web ve mobil uyumlu Google ile giriş işlemi
   Future<void> _signInWithGoogle() async {
     try {
       final FirebaseAuth auth = FirebaseAuth.instance;
