@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'dart:html' as html;
 
 class ConfirmPhoneScreen extends StatefulWidget {
   const ConfirmPhoneScreen({super.key});

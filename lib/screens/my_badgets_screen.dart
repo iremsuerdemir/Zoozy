@@ -2,6 +2,9 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/screens/certification_screen.dart';
 import 'package:zoozy/screens/confirm_phone_screen.dart';
 import 'package:zoozy/screens/identification_document_page.dart';
@@ -20,10 +23,15 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
   bool _isIdVerified = false;
   bool _isCertificatesVerified = false;
 
+  // SharedPreferences ile kalıcı olarak saklanacak veriler
+  bool _isBusinessLicenseVerified = false;
+  bool _isCriminalRecordVerified = false;
+
   @override
   void initState() {
     super.initState();
     _checkEmailVerification();
+    _loadSavedStatuses();
   }
 
   Future<void> _checkEmailVerification() async {
@@ -42,6 +50,106 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
 
   Future<void> _checkIdVerification() async {
     // Kimlik doğrulama kontrolü, gerçek senaryoda API veya SharedPreferences ile yapılabilir
+  }
+
+  // SharedPreferences'tan verileri yükle
+  Future<void> _loadSavedStatuses() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isBusinessLicenseVerified = prefs.getBool('business_license') ?? false;
+      _isCriminalRecordVerified = prefs.getBool('criminal_record') ?? false;
+    });
+  }
+
+  // SharedPreferences'a kaydet
+  Future<void> _saveStatus(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value);
+  }
+
+  // Dosya seçme popup
+  Future<bool?> _dosyaSecPopup(String belgeTipi, String prefKey) async {
+    final ImagePicker _picker = ImagePicker();
+
+    return showModalBottomSheet<bool>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "$belgeTipi Yükle",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple.shade700,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text("Galeriden Seç"),
+                  onTap: () async {
+                    final picked = await _picker.pickImage(
+                      source: ImageSource.gallery,
+                    );
+                    if (picked != null) {
+                      await _saveStatus(prefKey, true);
+                      Navigator.pop(context, true); // Tek pop
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: const Text("Fotoğraf Çek"),
+                  onTap: () async {
+                    final picked = await _picker.pickImage(
+                      source: ImageSource.camera,
+                    );
+                    if (picked != null) {
+                      await _saveStatus(prefKey, true);
+                      Navigator.pop(context, true); // Tek pop
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.picture_as_pdf),
+                  title: const Text("PDF Seç"),
+                  onTap: () async {
+                    FilePickerResult? result = await FilePicker.platform
+                        .pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['pdf'],
+                        );
+                    if (result != null && result.files.isNotEmpty) {
+                      await _saveStatus(prefKey, true);
+                      Navigator.pop(context, true); // Tek pop
+                    }
+                  },
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text(
+                    "Kapat",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -286,17 +394,69 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   ),
                                 ),
 
-                                RozetItem(
-                                  icon: Icons.work_outline,
-                                  baslik: 'İşletme Lisansı',
-                                  durumMetni: 'Şimdi Doğrula',
-                                  durumRengi: Colors.black54,
+                                // İşletme Lisansı Rozeti
+                                // İşletme Lisansı Rozeti
+                                InkWell(
+                                  onTap: () async {
+                                    final result = await _dosyaSecPopup(
+                                      'İşletme Lisansı',
+                                      'business_license',
+                                    );
+                                    if (result == true) {
+                                      setState(() {
+                                        _isBusinessLicenseVerified =
+                                            true; // Hemen tik gözüksün
+                                      });
+                                    }
+                                  },
+                                  child: RozetItem(
+                                    icon: Icons.work_outline,
+                                    baslik: 'İşletme Lisansı',
+                                    durumMetni: _isBusinessLicenseVerified
+                                        ? 'Doğrulandı'
+                                        : 'Şimdi Doğrula',
+                                    durumRengi: _isBusinessLicenseVerified
+                                        ? Colors.green
+                                        : Colors.black54,
+                                    trailingIcon: _isBusinessLicenseVerified
+                                        ? Icons.verified
+                                        : null,
+                                    trailingIconColor:
+                                        _isBusinessLicenseVerified
+                                        ? Colors.green
+                                        : null,
+                                  ),
                                 ),
-                                RozetItem(
-                                  icon: Icons.fingerprint,
-                                  baslik: 'Adli Sicil Belgesi',
-                                  durumMetni: 'Şimdi Doğrula',
-                                  durumRengi: Colors.black54,
+
+                                // Adli Sicil Belgesi Rozeti
+                                InkWell(
+                                  onTap: () async {
+                                    final result = await _dosyaSecPopup(
+                                      'Adli Sicil Belgesi',
+                                      'criminal_record',
+                                    );
+                                    if (result == true) {
+                                      setState(() {
+                                        _isCriminalRecordVerified = true;
+                                      });
+                                    }
+                                  },
+                                  child: RozetItem(
+                                    icon: Icons.fingerprint,
+                                    baslik: 'Adli Sicil Belgesi',
+                                    durumMetni: _isCriminalRecordVerified
+                                        ? 'Doğrulandı'
+                                        : 'Şimdi Doğrula',
+                                    durumRengi: _isCriminalRecordVerified
+                                        ? Colors.green
+                                        : Colors.black54,
+                                    trailingIcon: _isCriminalRecordVerified
+                                        ? Icons.verified
+                                        : null,
+                                    trailingIconColor: _isCriminalRecordVerified
+                                        ? Colors.green
+                                        : null,
+                                  ),
                                 ),
 
                                 const SizedBox(height: 16),
