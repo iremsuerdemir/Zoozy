@@ -3,8 +3,8 @@ import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-// HelpCenterPage dosyanı eklemeyi unutma
 import 'package:zoozy/screens/help_center_page.dart';
+import 'package:zoozy/screens/my_pets_page.dart'; // <- MyPetsPage import
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -14,15 +14,12 @@ class RequestsScreen extends StatefulWidget {
 }
 
 class _RequestsScreenState extends State<RequestsScreen> {
-  // Seçilen ikon index'i
   int selectedIndex = 0;
 
-  //  Renk paleti
   static const Color primaryPurple = Color.fromARGB(255, 111, 79, 172);
   static const Color softPink = Color(0xFFF48FB1);
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
 
-  // İkonlu kart oluşturma metodu
   Widget _buildIconTextCard(
     IconData icon,
     String text, {
@@ -34,7 +31,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
           selectedIndex = _getIndexFromText(text);
         });
 
-        // Yardım sayfasına yönlendirme
         if (text == "Yardım") {
           Navigator.push(
             context,
@@ -94,7 +90,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
     }
   }
 
-  // Yeni eklenecek hizmet seçimi modalı için kart
   Widget _buildServiceSelectionCard(
     BuildContext context,
     IconData icon,
@@ -103,7 +98,55 @@ class _RequestsScreenState extends State<RequestsScreen> {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
+          Navigator.pop(context); // Modalı kapat
+
+          // Her hizmet kartı için yönlendirme
+          switch (text) {
+            case "Pansiyon":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            case "Gündüz Bakımı":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            case "Evde Bakım":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            case "Gezdirme":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            case "Taksi":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            case "Bakım":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            case "Eğitim":
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
+              );
+              break;
+            default:
+              break;
+          }
         },
         child: Column(
           children: [
@@ -128,7 +171,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
     );
   }
 
-  // Broadcast Request modalını gösteren metot
   void _showBroadcastRequestModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -262,10 +304,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 child: Container(
                   width: 10,
                   height: 10,
-                  decoration: const BoxDecoration(
-                    //   color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
                 ),
               ),
             ],
