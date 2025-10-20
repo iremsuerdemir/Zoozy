@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
 
 void main() {
@@ -258,7 +259,12 @@ class _LoginPageState extends State<LoginPage> {
                 metin: 'Keşfet',
                 renk: const Color(0xFFB2A4FF), // açık mor
                 metinRengi: Colors.white,
-                tiklamaFonksiyonu: () {},
+                tiklamaFonksiyonu: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ExploreScreen()),
+                  );
+                },
                 cizgili: true,
               ),
 

@@ -1,3 +1,8 @@
+// ✅ YUKARI KISMADA BUNU EKLE (importlar arasında)
+import 'package:zoozy/screens/help_center_page.dart';
+
+// AŞAĞISI KENDİ KODUNUN TAMAMI (SADECE YARDIM MERKEZİ DÜZENLENDİ)
+
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -9,7 +14,6 @@ import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
-import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -109,7 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
 
-    // Eğer onTap tanımlandıysa GestureDetector ile sar
     return GestureDetector(onTap: onTap, child: content);
   }
 
@@ -131,7 +134,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Üst başlık
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -184,8 +186,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Profil Kartı
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -277,8 +277,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Bilançolar
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
@@ -298,9 +296,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MyBadgetsScreen(
-                                  phoneVerified: true,
-                                ), // Yeni ekran ismi
+                                builder: (context) =>
+                                    const MyBadgetsScreen(phoneVerified: true),
                               ),
                             );
                           },
@@ -309,8 +306,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Menü Butonları
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -337,14 +332,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         buildMenuButton(Icons.pets, 'Evcil Hayvanlarım'),
                         buildMenuButton(Icons.military_tech, 'Rozetlerim'),
                         buildMenuButton(Icons.handshake, 'Sponsor / Üyelik'),
-                        buildMenuButton(Icons.help_center, 'Yardım Merkezi'),
+
+                        // ✅ SADECE BURASI DEĞİŞTİ
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HelpCenterPage(),
+                              ),
+                            );
+                          },
+                          child: buildMenuButton(
+                            Icons.help_center,
+                            'Yardım Merkezi',
+                          ),
+                        ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // Listings Başlığı
                   Row(
                     children: [
                       const Text(
@@ -374,10 +381,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-
-                  // Add Pet Service Kartı
                   InkWell(
                     onTap: () {
                       Navigator.push(
