@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
-import 'package:zoozy/screens/home_screen.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,29 +33,34 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithPopup(googleProvider);
 
       // SharedPreferences kaydı
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
-          'username', userCredential.user?.displayName ?? 'Kullanıcı');
+        'username',
+        userCredential.user?.displayName ?? 'Kullanıcı',
+      );
       await prefs.setString(
-          'email', (userCredential.user?.email ?? '').toLowerCase());
+        'email',
+        (userCredential.user?.email ?? '').toLowerCase(),
+      );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text("Hoş geldiniz ${userCredential.user?.displayName ?? ""}!"),
+          content: Text(
+            "Hoş geldiniz ${userCredential.user?.displayName ?? ""}!",
+          ),
           backgroundColor: Colors.green,
         ),
       );
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const ExploreScreen()),
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -62,15 +68,17 @@ class _RegisterPageState extends State<RegisterPage> {
       if (e.code == 'popup-closed-by-user') {
         errorMessage = 'Giriş penceresi kullanıcı tarafından kapatıldı.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                'Google ile giriş sırasında beklenmeyen bir hata oluştu!')),
+          content: Text(
+            'Google ile giriş sırasında beklenmeyen bir hata oluştu!',
+          ),
+        ),
       );
     }
   }
@@ -136,8 +144,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -155,14 +166,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
-                      controller: emailController,
-                      hintText: 'Email',
-                      errorText: emailError),
+                    controller: emailController,
+                    hintText: 'Email',
+                    errorText: emailError,
+                  ),
                   const SizedBox(height: 15),
                   _buildTextField(
-                      controller: usernameController,
-                      hintText: 'Kullanıcı Adı',
-                      errorText: usernameError),
+                    controller: usernameController,
+                    hintText: 'Kullanıcı Adı',
+                    errorText: usernameError,
+                  ),
                   const SizedBox(height: 15),
                   _buildTextField(
                     controller: passwordController,
@@ -170,9 +183,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: obscurePassword,
                     errorText: passwordError,
                     suffixIcon: IconButton(
-                      icon: Icon(obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
                       onPressed: () {
                         setState(() {
                           obscurePassword = !obscurePassword;
@@ -187,9 +202,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: obscureRePassword,
                     errorText: rePasswordError,
                     suffixIcon: IconButton(
-                      icon: Icon(obscureRePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(
+                        obscureRePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
                       onPressed: () {
                         setState(() {
                           obscureRePassword = !obscureRePassword;
@@ -221,37 +238,47 @@ class _RegisterPageState extends State<RegisterPage> {
                             UserCredential userCredential = await FirebaseAuth
                                 .instance
                                 .createUserWithEmailAndPassword(
-                              email: emailController.text.trim(),
-                              password: passwordController.text.trim(),
-                            );
+                                  email: emailController.text.trim(),
+                                  password: passwordController.text.trim(),
+                                );
 
                             // Kullanıcı adını ekle
-                            await userCredential.user
-                                ?.updateDisplayName(usernameController.text);
+                            await userCredential.user?.updateDisplayName(
+                              usernameController.text,
+                            );
 
                             // SharedPreferences kaydı
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setString(
-                                'username', usernameController.text);
-                            await prefs.setString('email',
-                                emailController.text.trim().toLowerCase());
+                              'username',
+                              usernameController.text,
+                            );
                             await prefs.setString(
-                                'password', passwordController.text.trim());
+                              'email',
+                              emailController.text.trim().toLowerCase(),
+                            );
+                            await prefs.setString(
+                              'password',
+                              passwordController.text.trim(),
+                            );
 
                             if (!mounted) return;
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text(
-                                  "Kayıt başarılı! Giriş ekranına yönlendiriliyorsunuz..."),
-                              backgroundColor: Colors.green,
-                            ));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Kayıt başarılı! Giriş ekranına yönlendiriliyorsunuz...",
+                                ),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
 
                             await Future.delayed(const Duration(seconds: 2));
                             if (mounted) {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const OwnerLoginPage()),
+                                  builder: (_) => const OwnerLoginPage(),
+                                ),
                               );
                             }
                           } on FirebaseAuthException catch (e) {
@@ -386,11 +413,14 @@ class _RegisterPageState extends State<RegisterPage> {
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: Colors.white,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 18,
+            ),
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
         if (errorText != null)

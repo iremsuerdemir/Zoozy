@@ -11,6 +11,7 @@ import 'package:zoozy/screens/about_me_page.dart';
 import 'package:zoozy/screens/add_location.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart'
     show AddServiceRatePageFromPrefs;
+import 'package:zoozy/screens/caregiverProfilPage.dart';
 import 'package:zoozy/screens/describe_services_page.dart';
 import 'package:zoozy/screens/groomer_note.dart';
 import 'package:zoozy/screens/grooming_service_page.dart';
@@ -85,7 +86,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ProfileScreen(),
+      home: LoginPage(),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),

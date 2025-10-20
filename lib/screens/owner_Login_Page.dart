@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/forgot_password.dart';
-import 'package:zoozy/screens/home_screen.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
 import 'package:zoozy/screens/register_page.dart';
 import 'package:zoozy/screens/terms_of_service_page.dart';
@@ -55,7 +55,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            MaterialPageRoute(builder: (_) => const ExploreScreen()),
           );
         }
       } on FirebaseAuthException catch (e) {
@@ -131,7 +131,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            MaterialPageRoute(builder: (_) => const ExploreScreen()),
           );
         }
       }

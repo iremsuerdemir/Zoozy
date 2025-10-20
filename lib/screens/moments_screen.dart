@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/components/moments_postCard.dart';
+import 'package:zoozy/screens/explore_screen.dart';
+import 'package:zoozy/screens/profile_screen.dart';
+import 'package:zoozy/screens/reguests_screen.dart'; // Yol farklıysa düzenle
+
+const Color primaryPurple = Colors.deepPurple; // Sabitin yoksa böyle ekledim
 
 class MomentsScreen extends StatefulWidget {
   const MomentsScreen({super.key});
@@ -49,15 +55,20 @@ class _MomentsScreenState extends State<MomentsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
-          child: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.pets, color: Colors.deepPurple, size: 28),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.deepPurple,
+            size: 28,
           ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const ExploreScreen()),
+            );
+          },
         ),
+
         title: const Text(
           "MOMENTS",
           style: TextStyle(
@@ -97,6 +108,24 @@ class _MomentsScreenState extends State<MomentsScreen> {
             comments: post["comments"],
             timePosted: post["timePosted"],
           );
+        },
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 2,
+        selectedColor: primaryPurple,
+        unselectedColor: Colors.grey[700]!,
+        onTap: (index) {
+          if (index == 3) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const RequestsScreen()),
+            );
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          }
         },
       ),
     );

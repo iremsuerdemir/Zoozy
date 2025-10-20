@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:zoozy/screens/home_screen.dart';
+
 import 'package:zoozy/screens/owner_login_page.dart';
 import 'package:zoozy/screens/privacy_policy_page.dart';
 

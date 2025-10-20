@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:zoozy/screens/home_screen.dart';
+import 'package:zoozy/screens/explore_screen.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
   /// Yeni parametre: Sayfanın bir "onay" akışının parçası mı (örneğin ilk girişte)
@@ -178,7 +178,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
           ? () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                MaterialPageRoute(builder: (context) => const ExploreScreen()),
                 (route) => false,
               );
             }
