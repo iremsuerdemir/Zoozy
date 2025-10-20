@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoozy/models/favori_item.dart';
 
 class MomentsPostCard extends StatefulWidget {
   final String userName;
@@ -34,24 +37,84 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
   void initState() {
     super.initState();
     likeCount = widget.likes;
+    _checkIfLiked(); // Favori durumunu kontrol et
   }
 
-  void toggleLike() {
+  // SharedPreferences'te daha önce favorilenmiş mi kontrolü
+  Future<void> _checkIfLiked() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> favs = prefs.getStringList("favoriler") ?? [];
+
+    final exists = favs.any((element) {
+      final item = FavoriteItem.fromJson(jsonDecode(element));
+      return item.imageUrl == widget.postImage;
+    });
+
+    if (exists) {
+      setState(() {
+        isLiked = true;
+        likeCount =
+            widget.likes + 1; // Favori zaten ekliyse like sayısını artır
+      });
+    }
+  }
+
+  // Favori toggle
+  void toggleLike() async {
     setState(() {
       isLiked = !isLiked;
       likeCount += isLiked ? 1 : -1;
     });
+
+    if (isLiked) {
+      await _favoriyeEkle();
+    } else {
+      await _favoridenSil();
+    }
+  }
+
+  Future<void> _favoriyeEkle() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+
+    final favItem = FavoriteItem(
+      title: widget.displayName,
+      subtitle: widget.description,
+      imageUrl: widget.postImage,
+      profileImageUrl: widget.userPhoto,
+    );
+
+    mevcutFavoriler.add(jsonEncode(favItem.toJson()));
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+  }
+
+  Future<void> _favoridenSil() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+
+    mevcutFavoriler.removeWhere((element) {
+      final item = FavoriteItem.fromJson(jsonDecode(element));
+      return item.imageUrl == widget.postImage;
+    });
+
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Favorilerden kaldırıldı!")));
   }
 
   void onCommentTap() {
-    // Yorum sayfasına yönlendirme kodu buraya
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Yorum sayfasına yönlendirildi!")),
     );
   }
 
   void onUserTap() {
-    // Kullanıcı profiline yönlendirme kodu buraya
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("${widget.displayName} profiline gidiliyor...")),
     );
@@ -118,7 +181,10 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                 const SizedBox(width: 20),
                 IconButton(
                   iconSize: 26,
-                  icon: const Icon(Icons.mode_comment_outlined, color: Colors.grey),
+                  icon: const Icon(
+                    Icons.mode_comment_outlined,
+                    color: Colors.grey,
+                  ),
                   onPressed: onCommentTap,
                 ),
                 Text(

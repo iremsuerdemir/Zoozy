@@ -1,11 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/components/moments_postCard.dart';
 import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/reguests_screen.dart'; // Yol farklıysa düzenle
+import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/screens/favori_page.dart';
 
-const Color primaryPurple = Colors.deepPurple; // Sabitin yoksa böyle ekledim
+const Color primaryPurple = Colors.deepPurple;
 
 class MomentsScreen extends StatefulWidget {
   const MomentsScreen({super.key});
@@ -48,6 +52,26 @@ class _MomentsScreenState extends State<MomentsScreen> {
     },
   ];
 
+  // ✅ Favoriye ekleme fonksiyonu
+  Future<void> _favoriyeEkle(Map<String, dynamic> post) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+
+    final item = FavoriteItem(
+      title: post["displayName"],
+      subtitle: post["description"],
+      imageUrl: post["postImage"],
+      profileImageUrl: post["userPhoto"],
+    );
+
+    mevcutFavoriler.add(jsonEncode(item.toJson()));
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +92,6 @@ class _MomentsScreenState extends State<MomentsScreen> {
             );
           },
         ),
-
         title: const Text(
           "MOMENTS",
           style: TextStyle(
@@ -81,9 +104,7 @@ class _MomentsScreenState extends State<MomentsScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              // İleride paylaşım ekleme
-            },
+            onPressed: () {},
             icon: const Icon(
               Icons.add_a_photo_outlined,
               color: Colors.deepPurple,
@@ -98,15 +119,19 @@ class _MomentsScreenState extends State<MomentsScreen> {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
-          return MomentsPostCard(
-            userName: post["userName"],
-            displayName: post["displayName"],
-            userPhoto: post["userPhoto"],
-            postImage: post["postImage"],
-            description: post["description"],
-            likes: post["likes"],
-            comments: post["comments"],
-            timePosted: post["timePosted"],
+          return Stack(
+            children: [
+              MomentsPostCard(
+                userName: post["userName"],
+                displayName: post["displayName"],
+                userPhoto: post["userPhoto"],
+                postImage: post["postImage"],
+                description: post["description"],
+                likes: post["likes"],
+                comments: post["comments"],
+                timePosted: post["timePosted"],
+              ),
+            ],
           );
         },
       ),

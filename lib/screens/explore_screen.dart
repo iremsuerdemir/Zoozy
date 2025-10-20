@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/components/CaregiverCard.dart';
 import 'package:zoozy/components/SimplePetCard.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
-import 'package:zoozy/components/bottom_navigation_bar.dart'; // bottom nav import
-import 'package:zoozy/screens/jobs_screen.dart';
+import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/reguests_screen.dart'; // doğru ekranı import et
+import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/screens/jobs_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -16,6 +19,52 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   int selectedCategoryIndex = -1;
+
+  final caregivers = [
+    {
+      "name": "İstanbul, Juliet Wan",
+      "image": "assets/images/caregiver1.png",
+      "suitability": "Gezdirme",
+      "price": 315.0,
+    },
+    {
+      "name": "Emy Pansiyon",
+      "image": "assets/images/caregiver2.jpeg",
+      "suitability": "Pansiyon",
+      "price": 1600.0,
+    },
+    {
+      "name": "Animal Care Pro",
+      "image": "assets/images/caregiver3.jpg",
+      "suitability": "Gündüz Bakımı",
+      "price": 1175.0,
+    },
+  ];
+
+  Future<void> favoriyeEkle(FavoriteItem item) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+    mevcutFavoriler.add(jsonEncode(item.toJson()));
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+  }
+
+  void _favoriTumu() {
+    // AppBar'daki ikon, tüm caregiverları favoriye ekle
+    for (var c in caregivers) {
+      favoriyeEkle(
+        FavoriteItem(
+          title: c["name"] as String,
+          subtitle: c["suitability"] as String,
+          imageUrl: c["image"] as String,
+          profileImageUrl: "assets/profile_pic.png",
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,27 +77,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
       {"icon": Icons.cut, "label": "Bakım"},
       {"icon": Icons.school, "label": "Eğitim"},
       {"icon": Icons.more_horiz, "label": "Diğer"},
-    ];
-
-    final caregivers = [
-      {
-        "name": "İstanbul, Juliet Wan",
-        "image": "assets/images/caregiver1.png",
-        "suitability": "Gezdirme",
-        "price": 315.0,
-      },
-      {
-        "name": "Emy Pansiyon",
-        "image": "assets/images/caregiver2.jpeg",
-        "suitability": "Pansiyon",
-        "price": 1600.0,
-      },
-      {
-        "name": "Animal Care Pro",
-        "image": "assets/images/caregiver3.jpg",
-        "suitability": "Gündüz Bakımı",
-        "price": 1175.0,
-      },
     ];
 
     final pets = [
@@ -142,7 +170,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Yakınınızdaki Backer'lar",
+                  "Yakınınızdaki Bakıcılar",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 TextButton(
@@ -166,14 +194,34 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 itemCount: caregivers.length,
                 itemBuilder: (context, index) {
                   final c = caregivers[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: CaregiverCardAsset(
-                      name: c["name"] as String,
-                      imagePath: c["image"] as String,
-                      suitability: c["suitability"] as String,
-                      price: c["price"] as double,
-                    ),
+                  return Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: CaregiverCardAsset(
+                          name: c["name"] as String,
+                          imagePath: c["image"] as String,
+                          suitability: c["suitability"] as String,
+                          price: c["price"] as double,
+                        ),
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 20,
+                        child: GestureDetector(
+                          onTap: () {
+                            favoriyeEkle(
+                              FavoriteItem(
+                                title: c["name"] as String,
+                                subtitle: c["suitability"] as String,
+                                imageUrl: c["image"] as String,
+                                profileImageUrl: "assets/profile_pic.png",
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
@@ -204,115 +252,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // --- BANNER ---
-            Container(
-              width: double.infinity,
-              height: 300,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Colors.transparent,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: Image.asset(
-                        "assets/images/sitter_banner.jpg",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 180,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent,
-                              Color(0xAA6B46C1),
-                              Color(0xFF6B46C1),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            stops: [0.0, 0.3, 1.0],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      left: 20,
-                      right: 20,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            "Bakıcı Olun",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(0, 1),
-                                  blurRadius: 3,
-                                  color: Colors.black38,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            "Topluluğumuza katılın ve yakınınızdaki evcil hayvanlara bakım yapmaya başlayın. Sevdiğiniz işi yaparken kazanın!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(0, 1),
-                                  blurRadius: 2,
-                                  color: Colors.black26,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Color(0xFF6B46C1),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 28,
-                                vertical: 10,
-                              ),
-                            ),
-                            child: const Text(
-                              "Detaylı Bilgi",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0, // Keşfet aktif
+        currentIndex: 0,
         selectedColor: Colors.deepPurple,
         unselectedColor: Colors.grey,
       ),

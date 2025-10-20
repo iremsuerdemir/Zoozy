@@ -1,7 +1,6 @@
-// ✅ YUKARI KISMADA BUNU EKLE (importlar arasında)
+// ✅ YUKARI KISIMDA EKLENECEK IMPORTLAR
+import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/screens/help_center_page.dart';
-
-// AŞAĞISI KENDİ KODUNUN TAMAMI (SADECE YARDIM MERKEZİ DÜZENLENDİ)
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -327,13 +326,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Icons.monetization_on,
                           'Referans Programı',
                         ),
-                        buildMenuButton(Icons.favorite, 'Favorilerim'),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FavoriPage(),
+                              ),
+                            );
+                          },
+                          child: buildMenuButton(Icons.favorite, 'Favorilerim'),
+                        ),
                         buildMenuButton(Icons.account_balance_wallet, 'Bakiye'),
                         buildMenuButton(Icons.pets, 'Evcil Hayvanlarım'),
                         buildMenuButton(Icons.military_tech, 'Rozetlerim'),
                         buildMenuButton(Icons.handshake, 'Sponsor / Üyelik'),
-
-                        // ✅ SADECE BURASI DEĞİŞTİ
                         InkWell(
                           onTap: () {
                             Navigator.push(

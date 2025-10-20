@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/components/commentItem.dart';
 import 'package:zoozy/components/moments_postCard.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/screens/favori_page.dart';
 
 const Color primaryPurple = Colors.deepPurple;
 
@@ -34,6 +38,26 @@ class CaregiverProfilpage extends StatelessWidget {
     this.followers = 0,
     this.following = 0,
   }) : super(key: key);
+
+  // 🔹 Favorilere ekleme fonksiyonu
+  Future<void> _favoriyeEkle(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+
+    final item = FavoriteItem(
+      title: displayName,
+      subtitle: "Bakıcı - $userName",
+      imageUrl: userPhoto,
+      profileImageUrl: "assets/profile_pic.png", // placeholder
+    );
+
+    mevcutFavoriler.add(jsonEncode(item.toJson()));
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +97,13 @@ class CaregiverProfilpage extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
+          // 🔹 Favoriye ekle butonu
           IconButton(
-            onPressed: () {},
+            onPressed: () => _favoriyeEkle(context),
             icon: const Icon(
-              Icons.add_a_photo_outlined,
-              color: Colors.deepPurple,
-              size: 26,
+              Icons.favorite_border,
+              color: Colors.red,
+              size: 28,
             ),
           ),
           const SizedBox(width: 8),
@@ -247,10 +272,8 @@ class CaregiverProfilpage extends StatelessWidget {
           ],
         ),
       ),
-
-      /// ✅ BURAYA EKLENDİ
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4, // Profil sayfası kaçıncı index ise ayarla
+        currentIndex: 4, // Profil sayfası index
         selectedColor: primaryPurple,
         unselectedColor: Colors.grey[700]!,
         onTap: (index) {

@@ -86,7 +86,53 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginPage(),
+      home: CaregiverProfilpage(
+        displayName: "Berk Şahin",
+        userName: "berkshn",
+        location: "İstanbul", // artık email yerine location
+        bio: "Hayvansever & bakıcı",
+        userPhoto: "assets/images/caregiver3.jpg",
+        userSkills: "Köpek bakımı, Gündüz bakımı, Oyun ve eğitim",
+        otherSkills: "Evcil kuşlar, Kedi bakımı",
+        moments: [
+          {
+            "userName": "berkshn",
+            "displayName": "Berk",
+            "userPhoto": "assets/images/caregiver3.jpg",
+            "postImage": "assets/images/caregiver3.jpg",
+            "description": "Bugün Bunny ile parkta yürüyüşteydik",
+            "likes": 15,
+            "comments": 4,
+            "timePosted": DateTime.now().subtract(const Duration(hours: 1)),
+          },
+          {
+            "userName": "berkshn",
+            "displayName": "Berk",
+            "userPhoto": "assets/images/caregiver3.jpg",
+            "postImage": "assets/images/caregiver2.jpeg",
+            "description": "Yeni müşterimle ilk gün",
+            "likes": 8,
+            "comments": 2,
+            "timePosted": DateTime.now().subtract(const Duration(days: 1)),
+          },
+        ],
+        reviews: [
+          {
+            "name": "Jane Smith",
+            "comment": "Berk harika bir bakıcı!",
+            "photoUrl": "assets/images/caregiver1.png",
+            "timePosted": DateTime.now().subtract(const Duration(days: 2)),
+          },
+          {
+            "name": "Bob Brown",
+            "comment": "Köpeğimle çok iyi ilgilendi.",
+            "photoUrl": "assets/images/caregiver2.jpeg",
+            "timePosted": DateTime.now().subtract(const Duration(days: 5)),
+          },
+        ],
+        followers: 120,
+        following: 75,
+      ),
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),
