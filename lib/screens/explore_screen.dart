@@ -19,6 +19,7 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   int selectedCategoryIndex = -1;
+  Set<String> favoriIsimleri = {}; // 🔹 Favorilerdeki kişileri tutar
 
   final caregivers = [
     {
@@ -41,29 +42,54 @@ class _ExploreScreenState extends State<ExploreScreen> {
     },
   ];
 
-  Future<void> favoriyeEkle(FavoriteItem item) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
-    mevcutFavoriler.add(jsonEncode(item.toJson()));
-    await prefs.setStringList("favoriler", mevcutFavoriler);
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+  @override
+  void initState() {
+    super.initState();
+    _favorileriYukle();
   }
 
-  void _favoriTumu() {
-    // AppBar'daki ikon, tüm caregiverları favoriye ekle
-    for (var c in caregivers) {
-      favoriyeEkle(
-        FavoriteItem(
-          title: c["name"] as String,
-          subtitle: c["suitability"] as String,
-          imageUrl: c["image"] as String,
-          profileImageUrl: "assets/profile_pic.png",
-        ),
-      );
+  // 🔹 Favorileri SharedPreferences'tan yükler
+  Future<void> _favorileriYukle() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favStrings = prefs.getStringList("favoriler") ?? [];
+    final mevcutIsimler = favStrings.map((e) {
+      final decoded = jsonDecode(e);
+      return decoded["title"] as String;
+    }).toSet();
+
+    setState(() {
+      favoriIsimleri = mevcutIsimler;
+    });
+  }
+
+  // 🔹 Favoriye ekleme / çıkarma işlemi
+  Future<void> _favoriToggle(FavoriteItem item) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+
+    bool zatenFavoride = favoriIsimleri.contains(item.title);
+
+    if (zatenFavoride) {
+      // ❌ Favoriden çıkar
+      mevcutFavoriler.removeWhere((f) {
+        final decoded = jsonDecode(f);
+        return decoded["title"] == item.title;
+      });
+      favoriIsimleri.remove(item.title);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Favorilerden çıkarıldı.")));
+    } else {
+      // ❤️ Favoriye ekle
+      mevcutFavoriler.add(jsonEncode(item.toJson()));
+      favoriIsimleri.add(item.title);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
     }
+
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+    setState(() {});
   }
 
   @override
@@ -106,6 +132,30 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.favorite_border,
+              color: Colors.red,
+              size: 28,
+            ),
+            onPressed: () async {
+              // 🔹 Favori sayfasına git ve geri dönünce yenile
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriPage(
+                    favoriTipi: "explore",
+                    previousScreen: const ExploreScreen(),
+                  ),
+                ),
+              );
+
+              _favorileriYukle();
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -165,6 +215,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               },
             ),
             const SizedBox(height: 20),
+
             // --- CAREGIVER BAŞLIK ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,6 +237,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ],
             ),
             const SizedBox(height: 8),
+
             // --- CAREGIVER KARTLARI ---
             SizedBox(
               height: 230,
@@ -194,6 +246,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 itemCount: caregivers.length,
                 itemBuilder: (context, index) {
                   final c = caregivers[index];
+                  final isFav = favoriIsimleri.contains(c["name"]);
+
                   return Stack(
                     children: [
                       Padding(
@@ -205,20 +259,41 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           price: c["price"] as double,
                         ),
                       ),
+                      // 🔹 Favori ikonu
                       Positioned(
                         top: 10,
                         right: 20,
                         child: GestureDetector(
                           onTap: () {
-                            favoriyeEkle(
+                            _favoriToggle(
                               FavoriteItem(
                                 title: c["name"] as String,
                                 subtitle: c["suitability"] as String,
                                 imageUrl: c["image"] as String,
                                 profileImageUrl: "assets/profile_pic.png",
+                                tip: "keşfet",
                               ),
                             );
                           },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isFav ? Icons.favorite : Icons.favorite_border,
+                              color: isFav ? Colors.red : Colors.grey,
+                              size: 22,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -227,7 +302,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // --- PETS IN THE COMMUNITY ---
+
+            // --- PETS ---
             const Text(
               "Topluluktaki Evcil Hayvanlar",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),

@@ -5,12 +5,14 @@ class FavoriteItem {
   final String subtitle;
   final String imageUrl;
   final String profileImageUrl;
+  final String tip; // "explore", "moments", "caregiver" gibi
 
   FavoriteItem({
     required this.title,
     required this.subtitle,
     required this.imageUrl,
     required this.profileImageUrl,
+    required this.tip,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,6 +21,7 @@ class FavoriteItem {
       "subtitle": subtitle,
       "imageUrl": imageUrl,
       "profileImageUrl": profileImageUrl,
+      "tip": tip,
     };
   }
 
@@ -28,6 +31,7 @@ class FavoriteItem {
       subtitle: json["subtitle"],
       imageUrl: json["imageUrl"],
       profileImageUrl: json["profileImageUrl"],
+      tip: json["tip"],
     );
   }
 

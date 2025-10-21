@@ -19,7 +19,7 @@ class MomentsScreen extends StatefulWidget {
 }
 
 class _MomentsScreenState extends State<MomentsScreen> {
-  final List<Map<String, dynamic>> posts = [
+  List<Map<String, dynamic>> posts = [
     {
       "userName": "berkshn",
       "displayName": "Berk",
@@ -52,24 +52,25 @@ class _MomentsScreenState extends State<MomentsScreen> {
     },
   ];
 
-  // ✅ Favoriye ekleme fonksiyonu
-  Future<void> _favoriyeEkle(Map<String, dynamic> post) async {
+  Set<String> favoriIsimleri = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _favorileriYukle();
+  }
+
+  Future<void> _favorileriYukle() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+    final favStrings = prefs.getStringList("favoriler") ?? [];
+    final mevcutIsimler = favStrings.map((e) {
+      final decoded = jsonDecode(e);
+      return decoded["title"] as String;
+    }).toSet();
 
-    final item = FavoriteItem(
-      title: post["displayName"],
-      subtitle: post["description"],
-      imageUrl: post["postImage"],
-      profileImageUrl: post["userPhoto"],
-    );
-
-    mevcutFavoriler.add(jsonEncode(item.toJson()));
-    await prefs.setStringList("favoriler", mevcutFavoriler);
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+    setState(() {
+      favoriIsimleri = mevcutIsimler;
+    });
   }
 
   @override
@@ -104,12 +105,23 @@ class _MomentsScreenState extends State<MomentsScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
             icon: const Icon(
-              Icons.add_a_photo_outlined,
-              color: Colors.deepPurple,
-              size: 26,
+              Icons.favorite_border,
+              color: Colors.red, // kırmızı değil
+              size: 28,
             ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriPage(
+                    favoriTipi: "moments",
+                    previousScreen:
+                        MomentsScreen(), // Burada widget örneğini geçiyoruz
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 8),
         ],
@@ -119,19 +131,19 @@ class _MomentsScreenState extends State<MomentsScreen> {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
-          return Stack(
-            children: [
-              MomentsPostCard(
-                userName: post["userName"],
-                displayName: post["displayName"],
-                userPhoto: post["userPhoto"],
-                postImage: post["postImage"],
-                description: post["description"],
-                likes: post["likes"],
-                comments: post["comments"],
-                timePosted: post["timePosted"],
-              ),
-            ],
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: MomentsPostCard(
+              userName: post["userName"],
+              displayName: post["displayName"],
+              userPhoto: post["userPhoto"],
+              postImage: post["postImage"],
+              description: post["description"],
+              likes: post["likes"],
+              comments: post["comments"],
+              timePosted: post["timePosted"],
+            ),
           );
         },
       ),

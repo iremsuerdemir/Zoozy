@@ -30,18 +30,17 @@ class MomentsPostCard extends StatefulWidget {
 }
 
 class _MomentsPostCardState extends State<MomentsPostCard> {
-  bool isLiked = false;
+  bool isFavorite = false;
   late int likeCount;
 
   @override
   void initState() {
     super.initState();
     likeCount = widget.likes;
-    _checkIfLiked(); // Favori durumunu kontrol et
+    _checkIfFavorite();
   }
 
-  // SharedPreferences'te daha önce favorilenmiş mi kontrolü
-  Future<void> _checkIfLiked() async {
+  Future<void> _checkIfFavorite() async {
     final prefs = await SharedPreferences.getInstance();
     List<String> favs = prefs.getStringList("favoriler") ?? [];
 
@@ -50,23 +49,21 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
       return item.imageUrl == widget.postImage;
     });
 
-    if (exists) {
+    if (exists && !isFavorite) {
       setState(() {
-        isLiked = true;
-        likeCount =
-            widget.likes + 1; // Favori zaten ekliyse like sayısını artır
+        isFavorite = true;
+        likeCount = widget.likes + 1;
       });
     }
   }
 
-  // Favori toggle
-  void toggleLike() async {
+  void toggleFavorite() async {
     setState(() {
-      isLiked = !isLiked;
-      likeCount += isLiked ? 1 : -1;
+      isFavorite = !isFavorite;
+      likeCount += isFavorite ? 1 : -1;
     });
 
-    if (isLiked) {
+    if (isFavorite) {
       await _favoriyeEkle();
     } else {
       await _favoridenSil();
@@ -82,14 +79,21 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
       subtitle: widget.description,
       imageUrl: widget.postImage,
       profileImageUrl: widget.userPhoto,
+      tip: "moments",
     );
 
-    mevcutFavoriler.add(jsonEncode(favItem.toJson()));
-    await prefs.setStringList("favoriler", mevcutFavoriler);
+    if (!mevcutFavoriler.any(
+      (element) =>
+          FavoriteItem.fromJson(jsonDecode(element)).imageUrl ==
+          favItem.imageUrl,
+    )) {
+      mevcutFavoriler.add(jsonEncode(favItem.toJson()));
+      await prefs.setStringList("favoriler", mevcutFavoriler);
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+    }
   }
 
   Future<void> _favoridenSil() async {
@@ -98,7 +102,7 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
 
     mevcutFavoriler.removeWhere((element) {
       final item = FavoriteItem.fromJson(jsonDecode(element));
-      return item.imageUrl == widget.postImage;
+      return item.imageUrl == widget.postImage && item.tip == "moments";
     });
 
     await prefs.setStringList("favoriler", mevcutFavoriler);
@@ -129,11 +133,10 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Kullanıcı bilgisi
           ListTile(
             onTap: onUserTap,
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(widget.userPhoto),
+              backgroundImage: AssetImage(widget.userPhoto),
               radius: 24,
             ),
             title: Text(
@@ -149,19 +152,15 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
-
-          // Gönderi resmi
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.network(
+            child: Image.asset(
               widget.postImage,
               width: double.infinity,
               height: 300,
               fit: BoxFit.cover,
             ),
           ),
-
-          // Beğeni ve yorum satırı
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
@@ -169,10 +168,10 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                 IconButton(
                   iconSize: 28,
                   icon: Icon(
-                    isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: isLiked ? Colors.red : Colors.grey[600],
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : Colors.grey[600],
                   ),
-                  onPressed: toggleLike,
+                  onPressed: toggleFavorite,
                 ),
                 Text(
                   '$likeCount',
@@ -194,8 +193,6 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
               ],
             ),
           ),
-
-          // Açıklama
           if (widget.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -204,7 +201,6 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                 style: const TextStyle(fontSize: 15, height: 1.4),
               ),
             ),
-
           const SizedBox(height: 10),
         ],
       ),

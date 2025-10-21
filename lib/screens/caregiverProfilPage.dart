@@ -39,7 +39,6 @@ class CaregiverProfilpage extends StatelessWidget {
     this.following = 0,
   }) : super(key: key);
 
-  // 🔹 Favorilere ekleme fonksiyonu
   Future<void> _favoriyeEkle(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
@@ -48,15 +47,52 @@ class CaregiverProfilpage extends StatelessWidget {
       title: displayName,
       subtitle: "Bakıcı - $userName",
       imageUrl: userPhoto,
-      profileImageUrl: "assets/profile_pic.png", // placeholder
+      profileImageUrl: "assets/profile_pic.png",
+      tip: "caregiver",
     );
 
-    mevcutFavoriler.add(jsonEncode(item.toJson()));
-    await prefs.setStringList("favoriler", mevcutFavoriler);
+    // Aynı favori zaten varsa ekleme
+    bool zatenVar = mevcutFavoriler.any((f) {
+      final decoded = jsonDecode(f);
+      return decoded["title"] == item.title &&
+          decoded["subtitle"] == item.subtitle;
+    });
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+    if (!zatenVar) {
+      mevcutFavoriler.add(jsonEncode(item.toJson()));
+      await prefs.setStringList("favoriler", mevcutFavoriler);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+
+      // 🔹 Favori sayfasına yönlendir, önceki ekranı buradan gönder
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FavoriPage(
+            favoriTipi: "caregiver",
+            previousScreen: CaregiverProfilpage(
+              displayName: displayName,
+              userName: userName,
+              location: location,
+              bio: bio,
+              userPhoto: userPhoto,
+              userSkills: userSkills,
+              otherSkills: otherSkills,
+              moments: moments,
+              reviews: reviews,
+              followers: followers,
+              following: following,
+            ),
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Bu kişi zaten favorilerde!")),
+      );
+    }
   }
 
   @override
