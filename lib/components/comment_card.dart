@@ -13,15 +13,10 @@ class CommentCard extends StatelessWidget {
     final now = DateTime.now();
     final difference = now.difference(date);
 
-    if (difference.inDays > 0) {
-      return '${difference.inDays} gün önce';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} saat önce';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} dakika önce';
-    } else {
-      return 'Az önce';
-    }
+    if (difference.inDays > 0) return '${difference.inDays} gün önce';
+    if (difference.inHours > 0) return '${difference.inHours} saat önce';
+    if (difference.inMinutes > 0) return '${difference.inMinutes} dakika önce';
+    return 'Az önce';
   }
 
   @override
@@ -37,7 +32,6 @@ class CommentCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Üst kısım: Avatar, isim ve tarih
             Row(
               children: [
                 CircleAvatar(
@@ -66,7 +60,6 @@ class CommentCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Yıldızlar
                 Row(
                   children: List.generate(5, (index) {
                     return Icon(
@@ -79,8 +72,6 @@ class CommentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            
-            // Yorum metni
             Text(
               comment.message,
               style: const TextStyle(fontSize: 14),

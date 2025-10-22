@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/models/comment.dart';
 import 'package:zoozy/services/comment_service.dart';
-import 'package:zoozy/components/comment_dialog.dart';
 import 'package:zoozy/components/comment_card.dart';
+import 'package:zoozy/components/comment_dialog.dart';
 
 class MomentsPostCard extends StatefulWidget {
   final String userName;
@@ -49,13 +49,18 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
   }
 
   void _loadComments() {
+    // Moment kartı için unique cardId kullanıyoruz
+    final cardId =
+        "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}";
     setState(() {
-      _comments = _commentService.getCommentsForCard(widget.userName);
+      _comments = _commentService.getCommentsForCard(cardId);
     });
   }
 
   void _onCommentAdded(Comment comment) {
-    _commentService.addComment(widget.userName, comment);
+    final cardId =
+        "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}";
+    _commentService.addComment(cardId, comment);
     _loadComments();
   }
 
@@ -76,11 +81,7 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
 
     setState(() {
       isFavorite = exists;
-      if (exists) {
-        likeCount = widget.likes + 1;
-      } else {
-        likeCount = widget.likes;
-      }
+      likeCount = widget.likes + (exists ? 1 : 0);
     });
   }
 
@@ -109,17 +110,14 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
       tip: "moments",
     );
 
-    if (!mevcutFavoriler.any(
-      (element) =>
-          FavoriteItem.fromJson(jsonDecode(element)).imageUrl ==
-          favItem.imageUrl,
-    )) {
+    if (!mevcutFavoriler.any((element) =>
+        FavoriteItem.fromJson(jsonDecode(element)).imageUrl ==
+        favItem.imageUrl)) {
       mevcutFavoriler.add(jsonEncode(favItem.toJson()));
       await prefs.setStringList("favoriler", mevcutFavoriler);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
     }
   }
 
@@ -134,21 +132,8 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
 
     await prefs.setStringList("favoriler", mevcutFavoriler);
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Favorilerden kaldırıldı!")));
-  }
-
-  void onCommentTap() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Yorum sayfasına yönlendirildi!")),
-    );
-  }
-
-  void onUserTap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("${widget.displayName} profiline gidiliyor...")),
-    );
+        const SnackBar(content: Text("Favorilerden kaldırıldı!")));
   }
 
   @override
@@ -161,19 +146,15 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            onTap: onUserTap,
             leading: CircleAvatar(
               backgroundImage: AssetImage(widget.userPhoto),
               radius: 24,
             ),
-            title: Text(
-              widget.displayName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            subtitle: Text(
-              '@${widget.userName}',
-              style: const TextStyle(color: Colors.blueAccent),
-            ),
+            title: Text(widget.displayName,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            subtitle: Text('@${widget.userName}',
+                style: const TextStyle(color: Colors.blueAccent)),
             trailing: Text(
               timeAgo(widget.timePosted),
               style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -200,79 +181,54 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                   ),
                   onPressed: toggleFavorite,
                 ),
-                Text(
-                  '$likeCount',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
+                Text('$likeCount',
+                    style: const TextStyle(fontWeight: FontWeight.w500)),
                 const SizedBox(width: 20),
                 IconButton(
                   iconSize: 26,
-                  icon: const Icon(
-                    Icons.mode_comment_outlined,
-                    color: Colors.grey,
-                  ),
+                  icon: const Icon(Icons.mode_comment_outlined,
+                      color: Colors.grey),
                   onPressed: () {
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(
-                        cardId: widget.userName,
+                        cardId:
+                            "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}",
                         onCommentAdded: _onCommentAdded,
                       ),
                     );
                   },
                 ),
-                Text(
-                  '${_comments.length}',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
+                Text('${_comments.length}',
+                    style: const TextStyle(fontWeight: FontWeight.w500)),
               ],
             ),
           ),
-          if (widget.description.isNotEmpty)
+          if (_showComments)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Text(
-                widget.description,
-                style: const TextStyle(fontSize: 15, height: 1.4),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Column(
+                children: _comments
+                    .map((comment) => CommentCard(comment: comment))
+                    .toList(),
               ),
             ),
-          
-          // Yorumları göster/gizle butonu
-          if (_comments.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: _toggleComments,
-                    icon: Icon(
-                      _showComments ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                      size: 16,
-                    ),
-                    label: Text(
-                      _showComments ? 'Yorumları Gizle' : '${_comments.length} Yorumu Gör',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          
-          // Yorumlar listesi
-          if (_showComments && _comments.isNotEmpty)
-            ..._comments.map((comment) => CommentCard(comment: comment)).toList(),
-          
-          const SizedBox(height: 10),
+          TextButton(
+            onPressed: _toggleComments,
+            child: Text(_showComments ? 'Yorumları Gizle' : 'Yorumları Göster'),
+          ),
         ],
       ),
     );
   }
 
   String timeAgo(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 1) return 'az önce';
-    if (diff.inHours < 1) return '${diff.inMinutes} dk önce';
-    if (diff.inDays < 1) return '${diff.inHours} sa önce';
-    return '${diff.inDays} gün önce';
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays >= 1) return '${difference.inDays} gün önce';
+    if (difference.inHours >= 1) return '${difference.inHours} saat önce';
+    if (difference.inMinutes >= 1) return '${difference.inMinutes} dakika önce';
+    return 'Az önce';
   }
 }

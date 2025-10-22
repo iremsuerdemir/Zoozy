@@ -116,20 +116,7 @@ class MyApp extends StatelessWidget {
             "timePosted": DateTime.now().subtract(const Duration(days: 1)),
           },
         ],
-        reviews: [
-          {
-            "name": "Jane Smith",
-            "comment": "Berk harika bir bakıcı!",
-            "photoUrl": "assets/images/caregiver1.png",
-            "timePosted": DateTime.now().subtract(const Duration(days: 2)),
-          },
-          {
-            "name": "Bob Brown",
-            "comment": "Köpeğimle çok iyi ilgilendi.",
-            "photoUrl": "assets/images/caregiver2.jpeg",
-            "timePosted": DateTime.now().subtract(const Duration(days: 5)),
-          },
-        ],
+        reviews: [],
         followers: 120,
         following: 75,
       ),

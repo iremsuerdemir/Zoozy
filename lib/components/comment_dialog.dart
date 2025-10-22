@@ -18,8 +18,8 @@ class CommentDialog extends StatefulWidget {
 class _CommentDialogState extends State<CommentDialog> {
   final TextEditingController _messageController = TextEditingController();
   int _selectedRating = 5;
-  final String _authorName = "Kullanıcı"; // Geçici kullanıcı adı
-  final String _authorAvatar = "assets/images/caregiver1.png"; // Geçici avatar
+  final String _authorName = "Kullanıcı";
+  final String _authorAvatar = "assets/images/caregiver1.png";
 
   @override
   void dispose() {
@@ -46,7 +46,7 @@ class _CommentDialogState extends State<CommentDialog> {
 
     widget.onCommentAdded(comment);
     Navigator.of(context).pop();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Yorumunuz eklendi!")),
     );
@@ -61,7 +61,6 @@ class _CommentDialogState extends State<CommentDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Yıldız değerlendirmesi
             const Text(
               "Değerlendirme:",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -84,8 +83,6 @@ class _CommentDialogState extends State<CommentDialog> {
               }),
             ),
             const SizedBox(height: 16),
-            
-            // Yorum metni
             const Text(
               "Yorumunuz:",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

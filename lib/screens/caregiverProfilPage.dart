@@ -2,10 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
-import 'package:zoozy/components/commentItem.dart';
-import 'package:zoozy/components/moments_postCard.dart';
-import 'package:zoozy/components/comment_dialog.dart';
 import 'package:zoozy/components/comment_card.dart';
+import 'package:zoozy/components/comment_dialog.dart';
+import 'package:zoozy/components/moments_postCard.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
 import 'package:zoozy/screens/favori_page.dart';
@@ -50,7 +49,6 @@ class CaregiverProfilpage extends StatefulWidget {
 class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
   final CommentService _commentService = CommentService();
   List<Comment> _comments = [];
-  bool _showComments = false;
 
   @override
   void initState() {
@@ -69,12 +67,6 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
     _loadComments();
   }
 
-  void _toggleComments() {
-    setState(() {
-      _showComments = !_showComments;
-    });
-  }
-
   Future<void> _favoriyeEkle(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
@@ -87,7 +79,6 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
       tip: "caregiver",
     );
 
-    // Aynı favori zaten varsa ekleme
     bool zatenVar = mevcutFavoriler.any((f) {
       final decoded = jsonDecode(f);
       return decoded["title"] == item.title &&
@@ -147,7 +138,6 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
         ),
         centerTitle: true,
         actions: [
-          // 🔹 Favori sayfasına git butonu
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -186,6 +176,7 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Profil üst kısmı
             Row(
               children: [
                 CircleAvatar(
@@ -244,56 +235,13 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      // Yorum butonları
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => CommentDialog(
-                                  cardId: widget.userName,
-                                  onCommentAdded: _onCommentAdded,
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.comment, size: 18),
-                            label: Text("Yorum Ekle (${_comments.length})"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              minimumSize: const Size(150, 36),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton.icon(
-                            onPressed: _toggleComments,
-                            icon: Icon(
-                              _showComments ? Icons.visibility_off : Icons.visibility,
-                              size: 18,
-                            ),
-                            label: Text(_showComments ? "Yorumları Gizle" : "Yorumları Göster"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              minimumSize: const Size(150, 36),
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
+            // İstatistikler
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -336,6 +284,7 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
               ],
             ),
             const SizedBox(height: 16),
+            // Hakkında
             const Text(
               'About Me',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -343,6 +292,7 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
             const SizedBox(height: 4),
             Text(widget.bio),
             const SizedBox(height: 16),
+            // Skills
             if (widget.userSkills.isNotEmpty) ...[
               const Text(
                 'Skills & Qualifications',
@@ -361,6 +311,7 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
               Text(widget.otherSkills),
               const SizedBox(height: 16),
             ],
+            // Moments
             if (widget.moments.isNotEmpty) ...[
               const Text(
                 'Moments',
@@ -385,51 +336,57 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
               ),
               const SizedBox(height: 16),
             ],
-            if (widget.reviews.isNotEmpty) ...[
-              const Text(
-                'Reviews',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Column(
-                children: widget.reviews
-                    .map(
-                      (review) => CommentItem(
-                        name: review['name'],
-                        comment: review['comment'],
-                        photoUrl: review['photoUrl'],
-                        timePosted: review['timePosted'],
+            // Reviews ve Yorumlar
+            const Text(
+              'Reviews',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Column(
+              children: [
+                ...widget.reviews.map((review) => CommentCard(
+                      comment: Comment(
+                        id: review['id'] ?? '',
+                        message: review['comment'] ?? '',
+                        rating: review['rating']?.toInt() ?? 0,
+                        createdAt: review['timePosted'] != null
+                            ? DateTime.parse(review['timePosted'])
+                            : DateTime.now(),
+                        authorName: review['name'] ?? '',
+                        authorAvatar: review['photoUrl'] ?? '',
                       ),
-                    )
-                    .toList(),
-              ),
-            ],
-            
-            // Yorumlar bölümü
-            if (_showComments) ...[
-              const SizedBox(height: 20),
-              const Text(
-                'Yorumlar',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              if (_comments.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text(
-                    'Henüz yorum yok. İlk yorumu siz yapın!',
-                    style: TextStyle(color: Colors.grey),
-                    textAlign: TextAlign.center,
+                    )),
+                ..._comments.map((comment) => CommentCard(comment: comment)),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => CommentDialog(
+                        cardId: widget.userName,
+                        onCommentAdded: _onCommentAdded,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.comment, size: 18),
+                  label: Text(
+                      "Yorum Ekle (${_commentService.getCommentCountForCard(widget.userName)})"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    minimumSize: const Size(150, 36),
                   ),
-                )
-              else
-                ..._comments.map((comment) => CommentCard(comment: comment)).toList(),
-            ],
+                ),
+              ],
+            ),
           ],
         ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4, // Profil sayfası index
+        currentIndex: 4,
         selectedColor: primaryPurple,
         unselectedColor: Colors.grey[700]!,
         onTap: (index) {
