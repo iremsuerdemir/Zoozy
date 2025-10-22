@@ -1,14 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/components/CaregiverCard.dart';
 import 'package:zoozy/components/SimplePetCard.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/favori_page.dart';
-import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/reguests_screen.dart';
-import 'package:zoozy/screens/jobs_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -60,36 +56,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     setState(() {
       favoriIsimleri = mevcutIsimler;
     });
-  }
-
-  // 🔹 Favoriye ekleme / çıkarma işlemi
-  Future<void> _favoriToggle(FavoriteItem item) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
-
-    bool zatenFavoride = favoriIsimleri.contains(item.title);
-
-    if (zatenFavoride) {
-      // ❌ Favoriden çıkar
-      mevcutFavoriler.removeWhere((f) {
-        final decoded = jsonDecode(f);
-        return decoded["title"] == item.title;
-      });
-      favoriIsimleri.remove(item.title);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Favorilerden çıkarıldı.")));
-    } else {
-      // ❤️ Favoriye ekle
-      mevcutFavoriler.add(jsonEncode(item.toJson()));
-      favoriIsimleri.add(item.title);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
-    }
-
-    await prefs.setStringList("favoriler", mevcutFavoriler);
-    setState(() {});
   }
 
   @override
@@ -149,9 +115,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     previousScreen: const ExploreScreen(),
                   ),
                 ),
-              );
-
-              _favorileriYukle();
+              ).then((_) {
+                // Geri dönünce favorileri yenile
+                _favorileriYukle();
+              });
             },
           ),
           const SizedBox(width: 8),
@@ -248,55 +215,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   final c = caregivers[index];
                   final isFav = favoriIsimleri.contains(c["name"]);
 
-                  return Stack(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: CaregiverCardAsset(
-                          name: c["name"] as String,
-                          imagePath: c["image"] as String,
-                          suitability: c["suitability"] as String,
-                          price: c["price"] as double,
-                        ),
-                      ),
-                      // 🔹 Favori ikonu
-                      Positioned(
-                        top: 10,
-                        right: 20,
-                        child: GestureDetector(
-                          onTap: () {
-                            _favoriToggle(
-                              FavoriteItem(
-                                title: c["name"] as String,
-                                subtitle: c["suitability"] as String,
-                                imageUrl: c["image"] as String,
-                                profileImageUrl: "assets/profile_pic.png",
-                                tip: "keşfet",
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              isFav ? Icons.favorite : Icons.favorite_border,
-                              color: isFav ? Colors.red : Colors.grey,
-                              size: 22,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: CaregiverCardAsset(
+                      name: c["name"] as String,
+                      imagePath: c["image"] as String,
+                      suitability: c["suitability"] as String,
+                      price: c["price"] as double,
+                      isFavorite: isFav,
+                      onFavoriteChanged: () {
+                        _favorileriYukle();
+                      },
+                    ),
                   );
                 },
               ),

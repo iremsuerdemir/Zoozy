@@ -5,7 +5,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.9.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -57,16 +57,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/caregiver1.png
-    - assets/images/caregiver2.jpeg
-    - assets/images/caregiver3.jpg
-    - assets/images/forgot_password.png
-    - assets/images/jobs.png
-    - assets/images/login_1.png
-    - assets/images/login_2.png
-    - assets/images/login_3.png
-    - assets/images/login_4.png
-    - assets/images/pet1.jpeg
-    - assets/images/pet2.jpeg
-    - assets/images/pet3.jpg
-    - assets/images/sitter_banner.jpg
+    - assets/images/

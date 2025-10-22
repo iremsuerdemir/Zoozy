@@ -6,8 +6,8 @@ import 'package:zoozy/components/commentItem.dart';
 import 'package:zoozy/components/moments_postCard.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
-import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/screens/favori_page.dart';
+import 'package:zoozy/models/favori_item.dart';
 
 const Color primaryPurple = Colors.deepPurple;
 
@@ -47,7 +47,7 @@ class CaregiverProfilpage extends StatelessWidget {
       title: displayName,
       subtitle: "Bakıcı - $userName",
       imageUrl: userPhoto,
-      profileImageUrl: "assets/profile_pic.png",
+      profileImageUrl: userPhoto,
       tip: "caregiver",
     );
 
@@ -55,38 +55,16 @@ class CaregiverProfilpage extends StatelessWidget {
     bool zatenVar = mevcutFavoriler.any((f) {
       final decoded = jsonDecode(f);
       return decoded["title"] == item.title &&
-          decoded["subtitle"] == item.subtitle;
+          decoded["subtitle"] == item.subtitle &&
+          decoded["tip"] == item.tip;
     });
 
     if (!zatenVar) {
       mevcutFavoriler.add(jsonEncode(item.toJson()));
       await prefs.setStringList("favoriler", mevcutFavoriler);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
-
-      // 🔹 Favori sayfasına yönlendir, önceki ekranı buradan gönder
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FavoriPage(
-            favoriTipi: "caregiver",
-            previousScreen: CaregiverProfilpage(
-              displayName: displayName,
-              userName: userName,
-              location: location,
-              bio: bio,
-              userPhoto: userPhoto,
-              userSkills: userSkills,
-              otherSkills: otherSkills,
-              moments: moments,
-              reviews: reviews,
-              followers: followers,
-              following: following,
-            ),
-          ),
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Favorilere eklendi!")),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -133,9 +111,31 @@ class CaregiverProfilpage extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          // 🔹 Favoriye ekle butonu
+          // 🔹 Favori sayfasına git butonu
           IconButton(
-            onPressed: () => _favoriyeEkle(context),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriPage(
+                    favoriTipi: "caregiver",
+                    previousScreen: CaregiverProfilpage(
+                      displayName: displayName,
+                      userName: userName,
+                      location: location,
+                      bio: bio,
+                      userPhoto: userPhoto,
+                      userSkills: userSkills,
+                      otherSkills: otherSkills,
+                      moments: moments,
+                      reviews: reviews,
+                      followers: followers,
+                      following: following,
+                    ),
+                  ),
+                ),
+              );
+            },
             icon: const Icon(
               Icons.favorite_border,
               color: Colors.red,
@@ -175,19 +175,38 @@ class CaregiverProfilpage extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(location),
                       const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              minimumSize: const Size(100, 36),
+                            ),
+                            child: const Text(
+                              "Follow",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
-                          minimumSize: const Size(100, 36),
-                        ),
-                        child: const Text(
-                          "Follow",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => _favoriyeEkle(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              minimumSize: const Size(100, 36),
+                            ),
+                            child: const Text(
+                              "Favoriye Ekle",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

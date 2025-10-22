@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoozy/models/favori_item.dart';
 
 class CaregiverCardAsset extends StatefulWidget {
   final String name;
   final String imagePath;
   final String suitability;
   final double price;
+  final bool isFavorite; // Dışarıdan favori durumunu al
+  final VoidCallback? onFavoriteChanged; // Favori durumu değiştiğinde callback
 
   const CaregiverCardAsset({
     super.key,
@@ -12,6 +17,8 @@ class CaregiverCardAsset extends StatefulWidget {
     required this.imagePath,
     required this.suitability,
     required this.price,
+    this.isFavorite = false,
+    this.onFavoriteChanged,
   });
 
   @override
@@ -19,15 +26,55 @@ class CaregiverCardAsset extends StatefulWidget {
 }
 
 class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
-  bool liked = false;
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
+
+    final item = FavoriteItem(
+      title: widget.name,
+      subtitle: widget.suitability,
+      imageUrl: widget.imagePath,
+      profileImageUrl: "assets/images/caregiver1.png",
+      tip: "explore",
+    );
+
+    bool zatenFavoride = mevcutFavoriler.any((f) {
+      final decoded = jsonDecode(f);
+      return decoded["title"] == item.title && decoded["tip"] == item.tip;
+    });
+
+    if (zatenFavoride) {
+      // Favoriden çıkar
+      mevcutFavoriler.removeWhere((f) {
+        final decoded = jsonDecode(f);
+        return decoded["title"] == item.title && decoded["tip"] == item.tip;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Favorilerden çıkarıldı.")));
+    } else {
+      // Favoriye ekle
+      mevcutFavoriler.add(jsonEncode(item.toJson()));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Favorilere eklendi!")));
+    }
+
+    await prefs.setStringList("favoriler", mevcutFavoriler);
+
+    // Callback'i çağır
+    if (widget.onFavoriteChanged != null) {
+      widget.onFavoriteChanged!();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${widget.name} seçildi')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${widget.name} seçildi')));
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.40,
@@ -41,7 +88,6 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
         ),
         child: Stack(
           children: [
-            
             Positioned(
               left: 0,
               right: 0,
@@ -66,15 +112,12 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
               ),
             ),
 
-          
             Positioned(
               top: 8,
               right: 8,
               child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    liked = !liked;
-                  });
+                onTap: () async {
+                  await _toggleFavorite();
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -84,7 +127,7 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
                   padding: const EdgeInsets.all(6),
                   child: Icon(
                     Icons.favorite,
-                    color: liked ? Colors.redAccent : Colors.white,
+                    color: widget.isFavorite ? Colors.redAccent : Colors.white,
                     size: 20,
                     shadows: const [
                       Shadow(
@@ -98,7 +141,6 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
               ),
             ),
 
-         
             Positioned(
               left: 12,
               bottom: 12,
@@ -128,7 +170,9 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.25),
                           borderRadius: BorderRadius.circular(12),
@@ -145,7 +189,9 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.25),
                           borderRadius: BorderRadius.circular(12),

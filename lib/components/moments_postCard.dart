@@ -46,15 +46,17 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
 
     final exists = favs.any((element) {
       final item = FavoriteItem.fromJson(jsonDecode(element));
-      return item.imageUrl == widget.postImage;
+      return item.imageUrl == widget.postImage && item.tip == "moments";
     });
 
-    if (exists && !isFavorite) {
-      setState(() {
-        isFavorite = true;
+    setState(() {
+      isFavorite = exists;
+      if (exists) {
         likeCount = widget.likes + 1;
-      });
-    }
+      } else {
+        likeCount = widget.likes;
+      }
+    });
   }
 
   void toggleFavorite() async {

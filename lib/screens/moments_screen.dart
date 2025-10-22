@@ -6,7 +6,6 @@ import 'package:zoozy/components/moments_postCard.dart';
 import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
-import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/screens/favori_page.dart';
 
 const Color primaryPurple = Colors.deepPurple;
@@ -116,11 +115,13 @@ class _MomentsScreenState extends State<MomentsScreen> {
                 MaterialPageRoute(
                   builder: (context) => FavoriPage(
                     favoriTipi: "moments",
-                    previousScreen:
-                        MomentsScreen(), // Burada widget örneğini geçiyoruz
+                    previousScreen: const MomentsScreen(),
                   ),
                 ),
-              );
+              ).then((_) {
+                // Geri dönünce favorileri yenile
+                _favorileriYukle();
+              });
             },
           ),
           const SizedBox(width: 8),

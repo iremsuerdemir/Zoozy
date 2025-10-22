@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/models/favori_item.dart';
 import 'explore_screen.dart';
+import 'moments_screen.dart';
 import '../components/bottom_navigation_bar.dart'; // CustomBottomNavBar importu
 
 class FavoriPage extends StatefulWidget {
@@ -38,19 +39,6 @@ class _FavoriPageState extends State<FavoriPage> {
           .map((e) => FavoriteItem.fromJson(jsonDecode(e)))
           .where((item) => item.tip == widget.favoriTipi)
           .toList();
-
-      // Eğer listede hiç eleman yoksa örnek bir eleman ekle
-      if (favoriler.isEmpty) {
-        favoriler = [
-          FavoriteItem(
-            title: 'İstanbul',
-            subtitle: 'İstanbul’dan',
-            imageUrl: 'assets/image_3cde23_main.png',
-            profileImageUrl: 'assets/image_3cde23_profile.png',
-            tip: widget.favoriTipi,
-          ),
-        ];
-      }
     });
   }
 
@@ -248,9 +236,10 @@ class _FavoriPageState extends State<FavoriPage> {
                     backgroundImage: AssetImage(item.profileImageUrl),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    "Lidyalılar",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  Text(
+                    item.title, // Favori item'ın title'ını göster
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -278,20 +267,36 @@ class _FavoriPageState extends State<FavoriPage> {
               child: const Icon(Icons.pets, size: 60, color: Colors.purple),
             ),
             const SizedBox(height: 30),
-            const Text(
-              "Henüz favori listesi yok.\nBeğendiğin bir ilanı kalp ikonuna dokunarak kaydedebilirsin.",
+            Text(
+              "Henüz ${widget.favoriTipi} favori listesi yok.\nBeğendiğin bir ${widget.favoriTipi == 'explore' ? 'ilanı' : widget.favoriTipi == 'moments' ? 'anı' : 'bakıcıyı'} kalp ikonuna dokunarak kaydedebilirsin.",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.black87),
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ExploreScreen(),
-                  ),
-                );
+                if (widget.favoriTipi == 'explore') {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ExploreScreen(),
+                    ),
+                  );
+                } else if (widget.favoriTipi == 'moments') {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MomentsScreen(),
+                    ),
+                  );
+                } else if (widget.favoriTipi == 'caregiver') {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ExploreScreen(),
+                    ),
+                  );
+                }
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -311,9 +316,13 @@ class _FavoriPageState extends State<FavoriPage> {
                     ),
                   ],
                 ),
-                child: const Text(
-                  "Keşfetmeye Başla",
-                  style: TextStyle(
+                child: Text(
+                  widget.favoriTipi == 'explore'
+                      ? 'Keşfetmeye Başla'
+                      : widget.favoriTipi == 'moments'
+                          ? 'Anları Gör'
+                          : 'Bakıcıları Keşfet',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
