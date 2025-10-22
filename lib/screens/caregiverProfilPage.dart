@@ -4,14 +4,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/components/commentItem.dart';
 import 'package:zoozy/components/moments_postCard.dart';
+import 'package:zoozy/components/comment_dialog.dart';
+import 'package:zoozy/components/comment_card.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
 import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/models/comment.dart';
+import 'package:zoozy/services/comment_service.dart';
 
 const Color primaryPurple = Colors.deepPurple;
 
-class CaregiverProfilpage extends StatelessWidget {
+class CaregiverProfilpage extends StatefulWidget {
   final String displayName;
   final String userName;
   final String location;
@@ -39,15 +43,47 @@ class CaregiverProfilpage extends StatelessWidget {
     this.following = 0,
   }) : super(key: key);
 
+  @override
+  State<CaregiverProfilpage> createState() => _CaregiverProfilpageState();
+}
+
+class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
+  final CommentService _commentService = CommentService();
+  List<Comment> _comments = [];
+  bool _showComments = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadComments();
+  }
+
+  void _loadComments() {
+    setState(() {
+      _comments = _commentService.getCommentsForCard(widget.userName);
+    });
+  }
+
+  void _onCommentAdded(Comment comment) {
+    _commentService.addComment(widget.userName, comment);
+    _loadComments();
+  }
+
+  void _toggleComments() {
+    setState(() {
+      _showComments = !_showComments;
+    });
+  }
+
   Future<void> _favoriyeEkle(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
 
     final item = FavoriteItem(
-      title: displayName,
-      subtitle: "Bakıcı - $userName",
-      imageUrl: userPhoto,
-      profileImageUrl: userPhoto,
+      title: widget.displayName,
+      subtitle: "Bakıcı - ${widget.userName}",
+      imageUrl: widget.userPhoto,
+      profileImageUrl: widget.userPhoto,
       tip: "caregiver",
     );
 
@@ -120,17 +156,17 @@ class CaregiverProfilpage extends StatelessWidget {
                   builder: (context) => FavoriPage(
                     favoriTipi: "caregiver",
                     previousScreen: CaregiverProfilpage(
-                      displayName: displayName,
-                      userName: userName,
-                      location: location,
-                      bio: bio,
-                      userPhoto: userPhoto,
-                      userSkills: userSkills,
-                      otherSkills: otherSkills,
-                      moments: moments,
-                      reviews: reviews,
-                      followers: followers,
-                      following: following,
+                      displayName: widget.displayName,
+                      userName: widget.userName,
+                      location: widget.location,
+                      bio: widget.bio,
+                      userPhoto: widget.userPhoto,
+                      userSkills: widget.userSkills,
+                      otherSkills: widget.otherSkills,
+                      moments: widget.moments,
+                      reviews: widget.reviews,
+                      followers: widget.followers,
+                      following: widget.following,
                     ),
                   ),
                 ),
@@ -154,7 +190,7 @@ class CaregiverProfilpage extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage(userPhoto),
+                  backgroundImage: AssetImage(widget.userPhoto),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -162,18 +198,18 @@ class CaregiverProfilpage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        displayName,
+                        widget.displayName,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        '@$userName',
+                        '@${widget.userName}',
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 4),
-                      Text(location),
+                      Text(widget.location),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -208,6 +244,50 @@ class CaregiverProfilpage extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      // Yorum butonları
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => CommentDialog(
+                                  cardId: widget.userName,
+                                  onCommentAdded: _onCommentAdded,
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.comment, size: 18),
+                            label: Text("Yorum Ekle (${_comments.length})"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              minimumSize: const Size(150, 36),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            onPressed: _toggleComments,
+                            icon: Icon(
+                              _showComments ? Icons.visibility_off : Icons.visibility,
+                              size: 18,
+                            ),
+                            label: Text(_showComments ? "Yorumları Gizle" : "Yorumları Göster"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              minimumSize: const Size(150, 36),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -220,7 +300,7 @@ class CaregiverProfilpage extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      followers.toString(),
+                      widget.followers.toString(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -232,7 +312,7 @@ class CaregiverProfilpage extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      following.toString(),
+                      widget.following.toString(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -244,7 +324,7 @@ class CaregiverProfilpage extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      reviews.length.toString(),
+                      widget.reviews.length.toString(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -261,34 +341,34 @@ class CaregiverProfilpage extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            Text(bio),
+            Text(widget.bio),
             const SizedBox(height: 16),
-            if (userSkills.isNotEmpty) ...[
+            if (widget.userSkills.isNotEmpty) ...[
               const Text(
                 'Skills & Qualifications',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text(userSkills),
+              Text(widget.userSkills),
               const SizedBox(height: 16),
             ],
-            if (otherSkills.isNotEmpty) ...[
+            if (widget.otherSkills.isNotEmpty) ...[
               const Text(
                 'Other Skills',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text(otherSkills),
+              Text(widget.otherSkills),
               const SizedBox(height: 16),
             ],
-            if (moments.isNotEmpty) ...[
+            if (widget.moments.isNotEmpty) ...[
               const Text(
                 'Moments',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Column(
-                children: moments
+                children: widget.moments
                     .map(
                       (moment) => MomentsPostCard(
                         userName: moment['userName'],
@@ -305,14 +385,14 @@ class CaregiverProfilpage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            if (reviews.isNotEmpty) ...[
+            if (widget.reviews.isNotEmpty) ...[
               const Text(
                 'Reviews',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Column(
-                children: reviews
+                children: widget.reviews
                     .map(
                       (review) => CommentItem(
                         name: review['name'],
@@ -323,6 +403,27 @@ class CaregiverProfilpage extends StatelessWidget {
                     )
                     .toList(),
               ),
+            ],
+            
+            // Yorumlar bölümü
+            if (_showComments) ...[
+              const SizedBox(height: 20),
+              const Text(
+                'Yorumlar',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              if (_comments.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text(
+                    'Henüz yorum yok. İlk yorumu siz yapın!',
+                    style: TextStyle(color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              else
+                ..._comments.map((comment) => CommentCard(comment: comment)).toList(),
             ],
           ],
         ),

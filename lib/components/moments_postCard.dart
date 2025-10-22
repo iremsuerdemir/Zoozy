@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/models/comment.dart';
+import 'package:zoozy/services/comment_service.dart';
+import 'package:zoozy/components/comment_dialog.dart';
+import 'package:zoozy/components/comment_card.dart';
 
 class MomentsPostCard extends StatefulWidget {
   final String userName;
@@ -32,12 +36,33 @@ class MomentsPostCard extends StatefulWidget {
 class _MomentsPostCardState extends State<MomentsPostCard> {
   bool isFavorite = false;
   late int likeCount;
+  final CommentService _commentService = CommentService();
+  List<Comment> _comments = [];
+  bool _showComments = false;
 
   @override
   void initState() {
     super.initState();
     likeCount = widget.likes;
     _checkIfFavorite();
+    _loadComments();
+  }
+
+  void _loadComments() {
+    setState(() {
+      _comments = _commentService.getCommentsForCard(widget.userName);
+    });
+  }
+
+  void _onCommentAdded(Comment comment) {
+    _commentService.addComment(widget.userName, comment);
+    _loadComments();
+  }
+
+  void _toggleComments() {
+    setState(() {
+      _showComments = !_showComments;
+    });
   }
 
   Future<void> _checkIfFavorite() async {
@@ -186,10 +211,18 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                     Icons.mode_comment_outlined,
                     color: Colors.grey,
                   ),
-                  onPressed: onCommentTap,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => CommentDialog(
+                        cardId: widget.userName,
+                        onCommentAdded: _onCommentAdded,
+                      ),
+                    );
+                  },
                 ),
                 Text(
-                  '${widget.comments}',
+                  '${_comments.length}',
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
               ],
@@ -203,6 +236,32 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                 style: const TextStyle(fontSize: 15, height: 1.4),
               ),
             ),
+          
+          // Yorumları göster/gizle butonu
+          if (_comments.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: _toggleComments,
+                    icon: Icon(
+                      _showComments ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      size: 16,
+                    ),
+                    label: Text(
+                      _showComments ? 'Yorumları Gizle' : '${_comments.length} Yorumu Gör',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Yorumlar listesi
+          if (_showComments && _comments.isNotEmpty)
+            ..._comments.map((comment) => CommentCard(comment: comment)).toList(),
+          
           const SizedBox(height: 10),
         ],
       ),
