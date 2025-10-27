@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'my_cities_page.dart'; // MyCitiesPage dosyanızın doğru yolunu yazın
+import 'package:zoozy/screens/reguests_screen.dart';
+import 'service_date_page.dart'; // MyCitiesPage dosyanızın doğru yolunu yazın
 
 class MyPetsPage extends StatelessWidget {
   final List<Map<String, dynamic>> pets = [
@@ -59,7 +60,8 @@ class MyPetsPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               if (Navigator.canPop(context)) {
-                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => RequestsScreen()));
               }
             },
           ),
@@ -102,7 +104,7 @@ class MyPetsPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyCitiesPage(),
+                    builder: (context) => ServiceDatePage(),
                   ),
                 );
               },

@@ -5,12 +5,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 // Sayfalar
 import 'package:zoozy/screens/about_me_page.dart';
 import 'package:zoozy/screens/add_location.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart'
     show AddServiceRatePageFromPrefs;
+import 'package:zoozy/screens/board_note_page.dart';
 import 'package:zoozy/screens/caregiverProfilPage.dart';
 import 'package:zoozy/screens/describe_services_page.dart';
 import 'package:zoozy/screens/groomer_note.dart';
@@ -35,7 +37,7 @@ import 'package:zoozy/screens/walk_count_page.dart';
 import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/confirm_phone_screen.dart';
 
-// GoogleSignIn
+//   GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
   clientId: "301880499217-webab6f352ce3c0e0df43a5b0.apps.googleusercontent.com",
   scopes: ['email'],
@@ -44,8 +46,7 @@ final GoogleSignIn googleSignIn = GoogleSignIn(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initializeDateFormatting(); // Yerel tarih formatları
-
+  //   Firebase Başlatma
   await Firebase.initializeApp(
     options: const FirebaseOptions(
       apiKey: "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4",
@@ -58,6 +59,10 @@ Future<void> main() async {
     ),
   );
 
+  //   Tarih formatları & Türkçe ayarlar
+  await initializeDateFormatting('tr_TR', null);
+
+  //   Facebook Web için başlatma
   if (kIsWeb) {
     await FacebookAuth.i.webAndDesktopInitialize(
       appId: "2324446061343469",
@@ -65,11 +70,6 @@ Future<void> main() async {
       xfbml: true,
       version: "v15.0",
     );
-    if (!FacebookAuth.i.isWebSdkInitialized) {
-      print("Facebook Web SDK başlatılamadı!");
-    } else {
-      print("Facebook Web SDK başarıyla başlatıldı.");
-    }
   }
 
   runApp(const MyApp());
@@ -86,44 +86,25 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: CaregiverProfilpage(
-        displayName: "Berk Şahin",
-        userName: "berkshn",
-        location: "İstanbul", // artık email yerine location
-        bio: "Hayvansever & bakıcı",
-        userPhoto: "assets/images/caregiver3.jpg",
-        userSkills: "Köpek bakımı, Gündüz bakımı, Oyun ve eğitim",
-        otherSkills: "Evcil kuşlar, Kedi bakımı",
-        moments: [
-          {
-            "userName": "berkshn",
-            "displayName": "Berk",
-            "userPhoto": "assets/images/caregiver3.jpg",
-            "postImage": "assets/images/caregiver3.jpg",
-            "description": "Bugün Bunny ile parkta yürüyüşteydik",
-            "likes": 15,
-            "comments": 4,
-            "timePosted": DateTime.now().subtract(const Duration(hours: 1)),
-          },
-          {
-            "userName": "berkshn",
-            "displayName": "Berk",
-            "userPhoto": "assets/images/caregiver3.jpg",
-            "postImage": "assets/images/caregiver2.jpeg",
-            "description": "Yeni müşterimle ilk gün",
-            "likes": 8,
-            "comments": 2,
-            "timePosted": DateTime.now().subtract(const Duration(days: 1)),
-          },
-        ],
-        reviews: [],
-        followers: 120,
-        following: 75,
-      ),
+
+      //   Uygulama dili zorunlu Türkçe
+      locale: const Locale('tr', 'TR'),
+      supportedLocales: const [
+        Locale('tr', 'TR'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      //   İlk açılan sayfa
+      home: RequestsScreen(),
+
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),
-        // Diğer sayfa route’ları
+        //   Diğer sayfalar gerektiğinde buraya eklenebilir
       },
     );
   }

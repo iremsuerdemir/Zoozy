@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/board_note_page.dart';
 import 'package:zoozy/screens/my_pets_page.dart';
 import 'package:zoozy/screens/pet_gender_page.dart';
 
@@ -285,7 +286,7 @@ class _MyCitiesPageState extends State<MyCitiesPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                PetGenderPage(),
+                                                BoardNotePage(),
                                           ),
                                         );
                                       });
