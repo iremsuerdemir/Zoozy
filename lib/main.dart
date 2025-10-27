@@ -39,7 +39,8 @@ import 'package:zoozy/screens/confirm_phone_screen.dart';
 
 //   GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
-  clientId: "301880499217-webab6f352ce3c0e0df43a5b0.apps.googleusercontent.com",
+  clientId:
+      "301880499217-ke43kqtvdpue274f5d4lmjnbbt0enorg.apps.googleusercontent.com",
   scopes: ['email'],
 );
 
@@ -89,9 +90,7 @@ class MyApp extends StatelessWidget {
 
       //   Uygulama dili zorunlu Türkçe
       locale: const Locale('tr', 'TR'),
-      supportedLocales: const [
-        Locale('tr', 'TR'),
-      ],
+      supportedLocales: const [Locale('tr', 'TR')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -99,7 +98,7 @@ class MyApp extends StatelessWidget {
       ],
 
       //   İlk açılan sayfa
-      home: RequestsScreen(),
+      home: LoginPage(),
 
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),

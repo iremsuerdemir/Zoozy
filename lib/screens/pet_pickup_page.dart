@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-//import 'requests_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/request_item.dart';
+import 'package:zoozy/screens/reguests_screen.dart';
 
 class PetPickupPage extends StatefulWidget {
   const PetPickupPage({super.key});
@@ -13,7 +15,63 @@ class PetPickupPage extends StatefulWidget {
 class _PetPickupPageState extends State<PetPickupPage> {
   String? _selectedOption;
 
-  void _onNext() {}
+  @override
+  void initState() {
+    super.initState();
+    // args içinden tarih ve saatleri çek (mümkünse null kontrolü)
+  }
+
+  void _onNext() async {
+    if (_selectedOption == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen bir seçenek belirleyin'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final args = ModalRoute.of(context)?.settings.arguments as Map?;
+
+      final newReq = RequestItem(
+        petName: args?['petName']?.toString() ?? '',
+        serviceName: args?['serviceName']?.toString() ?? '',
+        userPhoto: args?['userPhoto']?.toString() ?? '',
+        startDate: args?['startDate'] as DateTime? ?? DateTime.now(),
+        endDate: args?['endDate'] as DateTime? ?? DateTime.now(),
+        dayDiff: ((args?['endDate'] as DateTime? ?? DateTime.now())
+                .difference(args?['startDate'] as DateTime? ?? DateTime.now())
+                .inDays) +
+            1,
+        note: args?['note']?.toString() ?? '',
+        location: args?['location']?.toString() ?? '',
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      final rawList = prefs.getString('requests');
+      List<RequestItem> reqList =
+          rawList != null ? RequestItem.decode(rawList) : [];
+      reqList.add(newReq);
+      await prefs.setString('requests', RequestItem.encode(reqList));
+
+      if (!mounted) return;
+
+      // Navigator push
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const RequestsScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Hata oluştu: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/board_note_page.dart';
 import 'package:zoozy/screens/my_pets_page.dart';
-import 'package:zoozy/screens/pet_gender_page.dart';
 
 class MyCitiesPage extends StatefulWidget {
   const MyCitiesPage({super.key});
@@ -282,11 +281,22 @@ class _MyCitiesPageState extends State<MyCitiesPage> {
                                       Future.delayed(
                                           const Duration(milliseconds: 300),
                                           () {
+                                        final args = ModalRoute.of(context)
+                                            ?.settings
+                                            .arguments as Map;
+
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 BoardNotePage(),
+                                            settings: RouteSettings(
+                                              arguments: {
+                                                ...args,
+                                                'location':
+                                                    city, // bu sayfadan gelen veri
+                                              },
+                                            ),
                                           ),
                                         );
                                       });

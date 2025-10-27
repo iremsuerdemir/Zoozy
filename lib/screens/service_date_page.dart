@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:zoozy/screens/my_cities_page.dart';
-import 'add_location.dart';
 
 class ServiceDatePage extends StatefulWidget {
-  const ServiceDatePage({super.key});
+  final String petName;
+  const ServiceDatePage({super.key, required this.petName});
 
   @override
   State<ServiceDatePage> createState() => _ServiceDatePageState();
@@ -35,10 +35,24 @@ class _ServiceDatePageState extends State<ServiceDatePage> {
       }
     } else {
       if (_endDate != null && _endTime != null) {
-        // Hem başlangıç hem bitiş alındı → AddLocation sayfasına git
+        // Hem başlangıç hem bitiş alındı → MyCitiesPage sayfasına git
+        final args =
+            ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MyCitiesPage()),
+          MaterialPageRoute(
+            builder: (context) => MyCitiesPage(),
+            settings: RouteSettings(
+              arguments: {
+                'petName': widget.petName,
+                'serviceName': args?['serviceName'] ?? '',
+                'startDate': _startDate,
+                'startTime': _startTime,
+                'endDate': _endDate,
+                'endTime': _endTime,
+              },
+            ),
+          ),
         );
       }
     }

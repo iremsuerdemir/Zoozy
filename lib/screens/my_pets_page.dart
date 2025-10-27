@@ -101,10 +101,22 @@ class MyPetsPage extends StatelessWidget {
             return InkWell(
               borderRadius: BorderRadius.circular(16),
               onTap: () {
+                // ModalRoute'dan gelen serviceName'i al
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>?;
+                String? serviceName =
+                    args != null ? args['serviceName'] as String? : null;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ServiceDatePage(),
+                    builder: (context) =>
+                        ServiceDatePage(petName: pets[index]["name"]),
+                    settings: RouteSettings(
+                      arguments: {
+                        'petName': pets[index]["name"],
+                        'serviceName': serviceName ?? '',
+                      },
+                    ),
                   ),
                 );
               },

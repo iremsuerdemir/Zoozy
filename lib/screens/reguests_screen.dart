@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
-import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/screens/my_pets_page.dart'; // <- MyPetsPage import
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/request_item.dart';
+import 'package:intl/intl.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -19,6 +21,22 @@ class _RequestsScreenState extends State<RequestsScreen> {
   static const Color primaryPurple = Color.fromARGB(255, 111, 79, 172);
   static const Color softPink = Color(0xFFF48FB1);
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
+
+  List<RequestItem> requestList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRequests();
+  }
+
+  Future<void> _loadRequests() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rawList = prefs.getString('requests');
+    setState(() {
+      requestList = rawList != null ? RequestItem.decode(rawList) : [];
+    });
+  }
 
   Widget _buildIconTextCard(
     IconData icon,
@@ -105,43 +123,78 @@ class _RequestsScreenState extends State<RequestsScreen> {
             case "Pansiyon":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Pansiyon'},
+                  ),
+                ),
               );
               break;
             case "Gündüz Bakımı":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Gündüz Bakımı'},
+                  ),
+                ),
               );
               break;
             case "Evde Bakım":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Evde Bakım'},
+                  ),
+                ),
               );
               break;
             case "Gezdirme":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Gezdirme'},
+                  ),
+                ),
               );
               break;
             case "Taksi":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Taksi'},
+                  ),
+                ),
               );
               break;
             case "Bakım":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Bakım'},
+                  ),
+                ),
               );
               break;
             case "Eğitim":
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPetsPage()),
+                MaterialPageRoute(
+                  builder: (context) => MyPetsPage(),
+                  settings: RouteSettings(
+                    arguments: {'serviceName': 'Eğitim'},
+                  ),
+                ),
               );
               break;
             default:
@@ -441,6 +494,63 @@ class _RequestsScreenState extends State<RequestsScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            // --- TALEP KARTLARI ---
+            if (requestList.isNotEmpty)
+              ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(top: 30),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: requestList.length,
+                itemBuilder: (context, i) {
+                  final x = requestList[i];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: x.userPhoto.isNotEmpty
+                            ? NetworkImage(x.userPhoto)
+                            : null,
+                        child: x.userPhoto.isEmpty
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text("${x.petName} - ${x.serviceName}"),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              "Tarih: " +
+                                  DateFormat('d MMMM yyyy', 'tr_TR')
+                                      .format(x.startDate) +
+                                  " - " +
+                                  DateFormat('d MMMM yyyy', 'tr_TR')
+                                      .format(x.endDate),
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.black87)),
+                          Text("Süre: ${x.dayDiff - 1} gün",
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.black87)),
+                          if (x.note.isNotEmpty)
+                            Text("Not: ${x.note}",
+                                style: const TextStyle(
+                                    fontSize: 15, color: Colors.black87)),
+                        ],
+                      ),
+                      onTap: () {},
+                    ),
+                  );
+                },
+              )
+            else ...[
+              const SizedBox(height: 30),
+              const Text(
+                'Henüz kayıtlı talep yok.',
+                style: TextStyle(fontSize: 17, color: Colors.black),
+              ),
+            ],
           ],
         ),
       ),
