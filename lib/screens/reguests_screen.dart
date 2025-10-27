@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
@@ -36,6 +37,44 @@ class _RequestsScreenState extends State<RequestsScreen> {
     setState(() {
       requestList = rawList != null ? RequestItem.decode(rawList) : [];
     });
+  }
+
+  Future<ImageProvider?> _loadProfileImageProvider(String userPhoto) async {
+    try {
+      // Eğer userPhoto base64 string ise MemoryImage'a çevir
+      if (userPhoto.startsWith('data:image') ||
+          userPhoto.length > 100 &&
+              RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(userPhoto)) {
+        final bytes = base64Decode(userPhoto);
+        return MemoryImage(bytes);
+      }
+
+      // Eğer URL ise NetworkImage kullan
+      if (userPhoto.isNotEmpty &&
+          (userPhoto.startsWith('http://') ||
+              userPhoto.startsWith('https://'))) {
+        return NetworkImage(userPhoto);
+      }
+
+      // Hiçbiri değilse SharedPreferences'tan profil resmini yükle
+      final prefs = await SharedPreferences.getInstance();
+      final profileImagePath = prefs.getString('profileImagePath');
+
+      if (profileImagePath != null && profileImagePath.isNotEmpty) {
+        try {
+          final bytes = base64Decode(profileImagePath);
+          return MemoryImage(bytes);
+        } catch (e) {
+          print('Profil resmi decode edilemedi: $e');
+          return null;
+        }
+      }
+
+      return null;
+    } catch (e) {
+      print('Profil resmi yüklenirken hata: $e');
+      return null;
+    }
   }
 
   Widget _buildIconTextCard(
@@ -503,44 +542,47 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 itemCount: requestList.length,
                 itemBuilder: (context, i) {
                   final x = requestList[i];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: x.userPhoto.isNotEmpty
-                            ? NetworkImage(x.userPhoto)
-                            : null,
-                        child: x.userPhoto.isEmpty
-                            ? const Icon(Icons.person)
-                            : null,
-                      ),
-                      title: Text("${x.petName} - ${x.serviceName}"),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Tarih: " +
-                                  DateFormat('d MMMM yyyy', 'tr_TR')
-                                      .format(x.startDate) +
-                                  " - " +
-                                  DateFormat('d MMMM yyyy', 'tr_TR')
-                                      .format(x.endDate),
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.black87)),
-                          Text("Süre: ${x.dayDiff - 1} gün",
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.black87)),
-                          if (x.note.isNotEmpty)
-                            Text("Not: ${x.note}",
-                                style: const TextStyle(
-                                    fontSize: 15, color: Colors.black87)),
-                        ],
-                      ),
-                      onTap: () {},
-                    ),
+                  return FutureBuilder<ImageProvider?>(
+                    future: _loadProfileImageProvider(x.userPhoto),
+                    builder: (context, snapshot) {
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: snapshot.data,
+                            child: snapshot.data == null
+                                ? const Icon(Icons.person)
+                                : null,
+                          ),
+                          title: Text("${x.petName} - ${x.serviceName}"),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "Tarih: " +
+                                      DateFormat('d MMMM yyyy', 'tr_TR')
+                                          .format(x.startDate) +
+                                      " - " +
+                                      DateFormat('d MMMM yyyy', 'tr_TR')
+                                          .format(x.endDate),
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.black87)),
+                              Text("Süre: ${x.dayDiff - 1} gün",
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.black87)),
+                              if (x.note.isNotEmpty)
+                                Text("Not: ${x.note}",
+                                    style: const TextStyle(
+                                        fontSize: 15, color: Colors.black87)),
+                            ],
+                          ),
+                          onTap: () {},
+                        ),
+                      );
+                    },
                   );
                 },
               )

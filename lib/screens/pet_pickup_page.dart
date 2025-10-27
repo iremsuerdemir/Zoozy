@@ -35,10 +35,19 @@ class _PetPickupPageState extends State<PetPickupPage> {
     try {
       final args = ModalRoute.of(context)?.settings.arguments as Map?;
 
+      // Profil resmini SharedPreferences'tan al
+      final prefs = await SharedPreferences.getInstance();
+      String profileImageBase64 = '';
+
+      final profileImagePath = prefs.getString('profileImagePath');
+      if (profileImagePath != null && profileImagePath.isNotEmpty) {
+        profileImageBase64 = profileImagePath;
+      }
+
       final newReq = RequestItem(
         petName: args?['petName']?.toString() ?? '',
         serviceName: args?['serviceName']?.toString() ?? '',
-        userPhoto: args?['userPhoto']?.toString() ?? '',
+        userPhoto: profileImageBase64, // Profil resmini kullan
         startDate: args?['startDate'] as DateTime? ?? DateTime.now(),
         endDate: args?['endDate'] as DateTime? ?? DateTime.now(),
         dayDiff: ((args?['endDate'] as DateTime? ?? DateTime.now())
@@ -49,7 +58,6 @@ class _PetPickupPageState extends State<PetPickupPage> {
         location: args?['location']?.toString() ?? '',
       );
 
-      final prefs = await SharedPreferences.getInstance();
       final rawList = prefs.getString('requests');
       List<RequestItem> reqList =
           rawList != null ? RequestItem.decode(rawList) : [];
