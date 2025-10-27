@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/service_date_page.dart';
 
 class GroomingServicePage extends StatefulWidget {
   const GroomingServicePage({super.key});
@@ -185,6 +186,7 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                               GestureDetector(
                                 onTap: selectedServices.isNotEmpty
                                     ? () {
+                                        // Seçilen hizmetleri göster
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           SnackBar(
@@ -192,6 +194,14 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                                             content: Text(
                                               "Seçilen hizmetler: ${selectedServices.join(', ')}",
                                             ),
+                                          ),
+                                        );
+
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ServiceDatePage(),
                                           ),
                                         );
                                       }
@@ -232,7 +242,7 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                                     ),
                                   ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),

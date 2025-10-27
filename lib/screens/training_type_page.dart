@@ -1,28 +1,24 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:zoozy/screens/training_type_page.dart';
+import 'package:zoozy/screens/service_date_page.dart';
 
-class PetTrainingPage extends StatefulWidget {
-  const PetTrainingPage({super.key});
+class TrainingTypePage extends StatefulWidget {
+  const TrainingTypePage({super.key});
 
   @override
-  State<PetTrainingPage> createState() => _PetTrainingPageState();
+  State<TrainingTypePage> createState() => _TrainingTypePageState();
 }
 
-class _PetTrainingPageState extends State<PetTrainingPage> {
-  final List<String> trainingServices = [
-    "Tuvalet Eğitimi",
-    "İtaat Eğitimi",
-    "Davranış Eğitimi",
-    "Çeviklik Eğitimi",
-    "Numara Öğretme",
-    "Terapötik Eğitim",
+class _TrainingTypePageState extends State<TrainingTypePage> {
+  final List<String> trainingOptions = [
+    "Özel eğitim dersleri",
+    "Grup eğitim dersleri",
+    "Yatılı eğitim programları",
   ];
 
-  final Set<String> selectedServices = {};
+  String? selectedOption;
 
-  // Ortak gradient tanımı (kutular + buton)
   final LinearGradient appGradient = const LinearGradient(
     colors: [
       Colors.purple,
@@ -32,17 +28,13 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
     end: Alignment.bottomRight,
   );
 
-  Widget _buildServiceButton(String service, double fontSize) {
-    final isSelected = selectedServices.contains(service);
+  Widget _buildOptionButton(String option, double fontSize) {
+    final bool isSelected = selectedOption == option;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          if (isSelected) {
-            selectedServices.remove(service);
-          } else {
-            selectedServices.add(service);
-          }
+          selectedOption = option;
         });
       },
       child: AnimatedContainer(
@@ -71,7 +63,7 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              service,
+              option,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: fontSize,
@@ -90,26 +82,27 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient arka plan
+          // Arka plan gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
                 colors: [
                   Color(0xFFB39DDB), // Açık mor
                   Color(0xFFF48FB1), // Açık pembe
                 ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
+
           SafeArea(
             child: Column(
               children: [
-                // Üst başlık bar
+                // Üst AppBar benzeri başlık
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -119,33 +112,33 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Text(
-                        "Evcil Hayvan Eğitimi",
+                        "Eğitim Türü",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 48),
+                      const SizedBox(width: 48), // boşluk dengelemek için
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
-                // Ana içerik
+                // İçerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final double maxContentWidth =
                           math.min(constraints.maxWidth * 0.9, 900);
-                      final double fontSize = constraints.maxWidth > 1000
-                          ? 18
-                          : (constraints.maxWidth < 360 ? 14 : 16);
+                      final double fontSize =
+                          constraints.maxWidth < 360 ? 14 : 16;
 
                       return Center(
                         child: Container(
                           width: maxContentWidth,
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -162,50 +155,50 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Evcil hayvanınız için hangi eğitim hizmetlerini almak istiyorsunuz?",
+                                "Özel ders, grup eğitimi veya yatılı eğitim programlarından hangisini tercih ediyorsunuz?",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 20),
+
                               Expanded(
                                 child: GridView.count(
                                   crossAxisCount: 2,
                                   mainAxisSpacing: 16,
                                   crossAxisSpacing: 16,
                                   childAspectRatio: 2.5,
-                                  children: trainingServices
-                                      .map((service) => _buildServiceButton(
-                                          service, fontSize))
+                                  children: trainingOptions
+                                      .map((option) =>
+                                          _buildOptionButton(option, fontSize))
                                       .toList(),
                                 ),
                               ),
+
                               const SizedBox(height: 16),
 
                               // İleri Butonu
                               GestureDetector(
-                                onTap: selectedServices.isNotEmpty
+                                onTap: selectedOption != null
                                     ? () {
-                                        // SnackBar göstermek istersen bunu bırakabilirsin
+                                        // SnackBar göstermek istersen bırakabilirsin
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           SnackBar(
                                             backgroundColor: Colors.green,
                                             content: Text(
-                                              "Seçilen eğitimler: ${selectedServices.join(', ')}",
-                                            ),
+                                                "Seçilen: $selectedOption"),
                                           ),
                                         );
 
-                                        // Seçilen eğitimler varsa TrainingTypePage'e yönlendir
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                TrainingTypePage(
-                                                    // opsiyonel parametre
-                                                    ),
+                                            builder: (context) => ServiceDatePage(
+                                                // selectedServiceOption:
+                                                //selectedOption, // opsiyonel parametre
+                                                ),
                                           ),
                                         );
                                       }
@@ -215,7 +208,7 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
-                                    gradient: selectedServices.isNotEmpty
+                                    gradient: selectedOption != null
                                         ? appGradient
                                         : LinearGradient(
                                             colors: [
@@ -225,7 +218,7 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
                                           ),
                                     borderRadius: BorderRadius.circular(14),
                                     boxShadow: [
-                                      if (selectedServices.isNotEmpty)
+                                      if (selectedOption != null)
                                         const BoxShadow(
                                           color: Colors.purpleAccent,
                                           blurRadius: 8,
@@ -237,7 +230,7 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
                                     child: Text(
                                       "İleri",
                                       style: TextStyle(
-                                        color: selectedServices.isNotEmpty
+                                        color: selectedOption != null
                                             ? Colors.white
                                             : Colors.black54,
                                         fontSize: 18,
@@ -254,6 +247,7 @@ class _PetTrainingPageState extends State<PetTrainingPage> {
                     },
                   ),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),
