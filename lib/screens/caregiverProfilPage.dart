@@ -49,11 +49,13 @@ class CaregiverProfilpage extends StatefulWidget {
 class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
   final CommentService _commentService = CommentService();
   List<Comment> _comments = [];
+  String? _currentUserName;
 
   @override
   void initState() {
     super.initState();
-    _loadComments();
+    _loadCurrentUser(); // Kullanıcı adını yükle
+    _loadComments(); // Yorumları yükle
   }
 
   void _loadComments() {
@@ -65,6 +67,14 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
   void _onCommentAdded(Comment comment) {
     _commentService.addComment(widget.userName, comment);
     _loadComments();
+  }
+
+  // SharedPreferences'tan giriş yapan kullanıcının adını al
+  Future<void> _loadCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentUserName = prefs.getString('username') ?? 'Bilinmeyen Kullanıcı';
+    });
   }
 
   Future<void> _favoriyeEkle(BuildContext context) async {
@@ -330,6 +340,8 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                         likes: moment['likes'],
                         comments: moment['comments'],
                         timePosted: moment['timePosted'],
+                        currentUserName: _currentUserName ??
+                            'Bilinmeyen Kullanıcı', // ✅ Güncellendi
                       ),
                     )
                     .toList(),
@@ -365,6 +377,8 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                       builder: (context) => CommentDialog(
                         cardId: widget.userName,
                         onCommentAdded: _onCommentAdded,
+                        currentUserName: _currentUserName ??
+                            'Bilinmeyen Kullanıcı', // ✅ Güncellendi
                       ),
                     );
                   },

@@ -44,7 +44,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Giriş başarılı! Hoş geldiniz ${userCredential.user?.displayName ?? ""}. Sayfaya yönlendiriliyorsunuz...",
+              "Giriş başarılı!  ${userCredential.user?.displayName ?? ""}. Sayfaya yönlendiriliyorsunuz...",
             ),
             backgroundColor: Colors.green,
           ),

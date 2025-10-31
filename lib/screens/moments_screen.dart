@@ -52,11 +52,13 @@ class _MomentsScreenState extends State<MomentsScreen> {
   ];
 
   Set<String> favoriIsimleri = {};
+  String? _currentUserName; // <-- Burada değişkeni tanımladık
 
   @override
   void initState() {
     super.initState();
     _favorileriYukle();
+    _loadCurrentUserName();
   }
 
   Future<void> _favorileriYukle() async {
@@ -69,6 +71,13 @@ class _MomentsScreenState extends State<MomentsScreen> {
 
     setState(() {
       favoriIsimleri = mevcutIsimler;
+    });
+  }
+
+  Future<void> _loadCurrentUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentUserName = prefs.getString("username") ?? 'Bilinmeyen Kullanıcı';
     });
   }
 
@@ -106,7 +115,7 @@ class _MomentsScreenState extends State<MomentsScreen> {
           IconButton(
             icon: const Icon(
               Icons.favorite_border,
-              color: Colors.red, // kırmızı değil
+              color: Colors.red,
               size: 28,
             ),
             onPressed: () {
@@ -119,7 +128,6 @@ class _MomentsScreenState extends State<MomentsScreen> {
                   ),
                 ),
               ).then((_) {
-                // Geri dönünce favorileri yenile
                 _favorileriYukle();
               });
             },
@@ -144,6 +152,7 @@ class _MomentsScreenState extends State<MomentsScreen> {
               likes: post["likes"],
               comments: post["comments"],
               timePosted: post["timePosted"],
+              currentUserName: _currentUserName ?? 'Bilinmeyen Kullanıcı',
             ),
           );
         },

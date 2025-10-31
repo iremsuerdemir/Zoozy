@@ -16,6 +16,7 @@ class MomentsPostCard extends StatefulWidget {
   final int likes;
   final int comments;
   final DateTime timePosted;
+  final currentUserName;
 
   const MomentsPostCard({
     Key? key,
@@ -27,6 +28,7 @@ class MomentsPostCard extends StatefulWidget {
     required this.likes,
     required this.comments,
     required this.timePosted,
+    required this.currentUserName,
   }) : super(key: key);
 
   @override
@@ -192,6 +194,7 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(
+                        currentUserName: widget.currentUserName,
                         cardId:
                             "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}",
                         onCommentAdded: _onCommentAdded,
