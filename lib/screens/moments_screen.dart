@@ -7,6 +7,7 @@ import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
 import 'package:zoozy/screens/favori_page.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 const Color primaryPurple = Colors.deepPurple;
 
@@ -118,7 +119,10 @@ class _MomentsScreenState extends State<MomentsScreen> {
               color: Colors.red,
               size: 28,
             ),
-            onPressed: () {
+            onPressed: () async {
+              if (!await GuestAccessService.ensureLoggedIn(context)) {
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(

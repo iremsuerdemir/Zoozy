@@ -3,7 +3,6 @@ import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/screens/help_center_page.dart';
 
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
@@ -14,6 +13,7 @@ import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 import 'package:zoozy/screens/settings_screen.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -407,7 +407,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      if (!await GuestAccessService.ensureLoggedIn(context)) {
+                        return;
+                      }
                       Navigator.push(
                         context,
                         MaterialPageRoute(

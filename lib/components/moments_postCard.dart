@@ -6,6 +6,7 @@ import 'package:zoozy/models/comment.dart';
 import 'package:zoozy/services/comment_service.dart';
 import 'package:zoozy/components/comment_card.dart';
 import 'package:zoozy/components/comment_dialog.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 class MomentsPostCard extends StatefulWidget {
   final String userName;
@@ -88,6 +89,9 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
   }
 
   void toggleFavorite() async {
+    if (!await GuestAccessService.ensureLoggedIn(context)) {
+      return;
+    }
     setState(() {
       isFavorite = !isFavorite;
       likeCount += isFavorite ? 1 : -1;
@@ -190,7 +194,10 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                   iconSize: 26,
                   icon: const Icon(Icons.mode_comment_outlined,
                       color: Colors.grey),
-                  onPressed: () {
+                  onPressed: () async {
+                    if (!await GuestAccessService.ensureLoggedIn(context)) {
+                      return;
+                    }
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(

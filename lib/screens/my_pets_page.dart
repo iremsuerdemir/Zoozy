@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 import 'service_date_page.dart'; // MyCitiesPage dosyanızın doğru yolunu yazın
 
 class MyPetsPage extends StatelessWidget {
@@ -58,10 +59,17 @@ class MyPetsPage extends StatelessWidget {
           ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
+            onPressed: () async {
+              if (!await GuestAccessService.ensureLoggedIn(context)) {
+                return;
+              }
               if (Navigator.canPop(context)) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => RequestsScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RequestsScreen(),
+                  ),
+                );
               }
             },
           ),
@@ -100,7 +108,10 @@ class MyPetsPage extends StatelessWidget {
           itemBuilder: (context, index) {
             return InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () {
+              onTap: () async {
+                if (!await GuestAccessService.ensureLoggedIn(context)) {
+                  return;
+                }
                 // ModalRoute'dan gelen serviceName'i al
                 final args = ModalRoute.of(context)?.settings.arguments
                     as Map<String, dynamic>?;

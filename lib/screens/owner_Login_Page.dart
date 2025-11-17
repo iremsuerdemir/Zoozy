@@ -8,6 +8,7 @@ import 'package:zoozy/screens/terms_of_service_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 class OwnerLoginPage extends StatefulWidget {
   const OwnerLoginPage({super.key});
@@ -39,6 +40,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
           userCredential.user?.displayName ?? 'Kullanıcı',
         );
         await prefs.setString('email', email.toLowerCase());
+        await GuestAccessService.disableGuestMode();
 
         // Başarılı giriş bildirimi ve 4 saniye bekletme
         ScaffoldMessenger.of(context).showSnackBar(
@@ -118,6 +120,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', user.displayName ?? 'Kullanıcı');
         await prefs.setString('email', (user.email ?? '').toLowerCase());
+        await GuestAccessService.disableGuestMode();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

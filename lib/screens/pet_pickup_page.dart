@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/request_item.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 class PetPickupPage extends StatefulWidget {
   const PetPickupPage({super.key});
@@ -22,6 +23,9 @@ class _PetPickupPageState extends State<PetPickupPage> {
   }
 
   void _onNext() async {
+    if (!await GuestAccessService.ensureLoggedIn(context)) {
+      return;
+    }
     if (_selectedOption == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

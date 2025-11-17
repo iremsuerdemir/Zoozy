@@ -8,6 +8,7 @@ import 'package:zoozy/screens/my_pets_page.dart'; // <- MyPetsPage import
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/request_item.dart';
 import 'package:intl/intl.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -83,7 +84,11 @@ class _RequestsScreenState extends State<RequestsScreen> {
     bool isSelected = false,
   }) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        if (text == "Köpek Gezdir" || text == "Yardım") {
+          final allowed = await GuestAccessService.ensureLoggedIn(context);
+          if (!allowed) return;
+        }
         setState(() {
           selectedIndex = _getIndexFromText(text);
         });
@@ -526,7 +531,12 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 ),
                 elevation: 0,
               ),
-              onPressed: () => _showBroadcastRequestModal(context),
+              onPressed: () async {
+                if (!await GuestAccessService.ensureLoggedIn(context)) {
+                  return;
+                }
+                _showBroadcastRequestModal(context);
+              },
               child: Text(
                 selectedIndex == 1 ? "ŞİMDİ HİZMET ALIN" : "ŞİMDİ HİZMET SUNUN",
                 style:

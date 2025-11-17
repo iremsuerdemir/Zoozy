@@ -11,6 +11,7 @@ import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/models/comment.dart';
 import 'package:zoozy/services/comment_service.dart';
+import 'package:zoozy/services/guest_access_service.dart';
 
 const Color primaryPurple = Colors.deepPurple;
 
@@ -78,6 +79,9 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
   }
 
   Future<void> _favoriyeEkle(BuildContext context) async {
+    if (!await GuestAccessService.ensureLoggedIn(context)) {
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
     List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
 
@@ -149,7 +153,10 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
+              if (!await GuestAccessService.ensureLoggedIn(context)) {
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -229,8 +236,8 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () => _favoriyeEkle(context),
+                ElevatedButton(
+                  onPressed: () => _favoriyeEkle(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               shape: RoundedRectangleBorder(
@@ -371,7 +378,10 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                 ..._comments.map((comment) => CommentCard(comment: comment)),
                 const SizedBox(height: 8),
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
+                    if (!await GuestAccessService.ensureLoggedIn(context)) {
+                      return;
+                    }
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(
