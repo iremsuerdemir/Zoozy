@@ -38,11 +38,12 @@ dependencies:
   google_sign_in: ^6.2.1
   image_picker: ^1.1.2
   shared_preferences: ^2.2.2
-  file_picker: ^8.0.0
+  file_picker: ^10.3.6
 
   path_provider: ^2.1.2
   path: ^1.9.0
   firebase_dynamic_links: ^6.1.10
+  http: ^1.2.2
 
   # Cupertino icons
   cupertino_icons: ^1.0.8
@@ -51,7 +52,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

@@ -85,7 +85,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
           ),
           TextSpan(
             text:
-                "PetBacker, kullanıcılarından hesap oluşturma, rezervasyon yapma veya hizmet sunma gibi "
+                "PetBacker, kullanıcılarından hesap oluşturma, rezervasyon yapma veya ma gibi "
                 "etkileşimler sırasında kişisel bilgiler toplar. Bu bilgiler ad, e-posta adresi, telefon numarası, "
                 "konum bilgisi gibi verileri içerebilir.\n\n",
           ),

@@ -98,14 +98,15 @@ class MyApp extends StatelessWidget {
       ],
 
       //   İlk açılan sayfa
-      home: CaregiverProfilpage(
+      home: LoginPage(),
+      /*CaregiverProfilpage(
         displayName: "İrem Su Erdemir",
         userName: "iremsuerdemir",
         location: "Edirne, Türkiye",
         bio: "Hayvanları çok seven, profesyonel bakım sağlayıcı.",
         userPhoto: "https://cdn-icons-png.flaticon.com/512/194/194938.png",
       ),
-
+*/
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),

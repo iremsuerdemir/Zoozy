@@ -527,11 +527,13 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 elevation: 0,
               ),
               onPressed: () => _showBroadcastRequestModal(context),
-              child: const Text(
-                "ŞİMDİ HİZMET SUNUN",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              child: Text(
+                selectedIndex == 1 ? "ŞİMDİ HİZMET ALIN" : "ŞİMDİ HİZMET SUNUN",
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
+
             const SizedBox(height: 20),
             // --- TALEP KARTLARI ---
             if (requestList.isNotEmpty)
