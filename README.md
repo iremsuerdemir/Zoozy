@@ -60,9 +60,6 @@ API taban adresini build sırasında `ZOOZY_API_URL` ile geçebilirsiniz:
 flutter run --dart-define=ZOOZY_API_URL=https://10.0.2.2:5001/api
 ```
 
-Uygulama açıldığında iki sekme bulunur:
 
-- **Proje Raporu** – akademik rapor metni.
-- **API Verileri** – `ZoozyApiService` aracılığıyla MSSQL’deki pet, hizmet sağlayıcı ve talepleri canlı olarak çeker.
 
 Servis katmanı `lib/services/zoozy_api_service.dart` dosyasında yer alır ve `ZoozyApiService.fetchDashboardData()` metodu üzerinden tüm veri akışını sunar.
