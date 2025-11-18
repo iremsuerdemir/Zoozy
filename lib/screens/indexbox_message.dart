@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/_inbox_actions_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
+import 'package:zoozy/screens/chat_conversation_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Mevcut kodunuzdaki Talepler, İşler ve Bildirimler Ekranları değişmiyor.
 // Ancak, IlanYayiniEkrani artık modal bottom sheet olarak kullanılacağı için
@@ -163,24 +167,190 @@ class _InboxTabBar extends StatelessWidget {
 }
 
 /// Talepler Sekmesi
-class TaleplerEkrani extends StatelessWidget {
+class TaleplerEkrani extends StatefulWidget {
   const TaleplerEkrani({super.key});
 
-  // Modal bottom sheet'i gösteren yeni metod
+  @override
+  State<TaleplerEkrani> createState() => _TaleplerEkraniState();
+}
+
+class _TaleplerEkraniState extends State<TaleplerEkrani> {
+  static final List<_ChatPreview> _sampleChats = [
+    _ChatPreview(
+      contactName: 'Callum Smith',
+      contactUsername: 'Callum_D_Smith',
+      avatar: 'assets/images/caregiver1.png',
+      phoneNumber: '+905301234567',
+      quoteAmount: 'TRY 6,534.00',
+      statusMessage: 'Talebinizi iptal ettiniz',
+      lastMessagePreview:
+          'Merhaba İrem Su! Ben Callum, İstanbul Üniversitesinde okuyan Güney Afrikalı bir öğrenciyim...',
+      messages: [
+        ChatMessage(
+          text:
+              'Merhaba İrem Su!\n\nBenim adım Callum Smith. Sana kendimi tanıtmak istedim. İstanbul Üniversitesinde okuyan Güney Afrikalı bir öğrenciyim ve hayvanlara büyük bir sevgi duyuyorum. Çocukluğum 5 kedi, köpekler, çinçillalar, hamsterlar, leopar gekolar ve hatta mirketlerle geçti!\n\nOldukça sakin ve sabırlı biriyim; hayvanlar da bu enerjiyi hemen hisseder. Sen şehir dışındayken patili dostlarına ben bakmaktan mutluluk duyarım.\n\nDönüşünü sabırsızlıkla bekliyorum!',
+          timestamp: DateTime(2024, 11, 18, 14, 1),
+        ),
+      ],
+    ),
+  ];
+
   void _showIlanYayiniModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // İçeriğe göre yüksekliği ayarlamak için
-      backgroundColor: Colors.transparent, // Köşe yuvarlaklığını korumak için
-      builder: (context) {
-        // Modalın üst kısmına yuvarlak köşe vermek için ClipRRect kullanıyoruz
-        return const IlanYayiniIcerigi();
-      },
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const IlanYayiniIcerigi(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_sampleChats.isEmpty) {
+      return _buildEmptyState(context);
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Son Mesajlar',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        ..._sampleChats.map((chat) => _buildChatTile(context, chat)),
+        const SizedBox(height: 24),
+        OutlinedButton(
+          onPressed: () => _showIlanYayiniModal(context),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+            side: const BorderSide(color: Color(0xFFB39DDB), width: 1.5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: const Text(
+            'TALEP OLUŞTUR',
+            style: TextStyle(
+              color: Color(0xFFB39DDB),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChatTile(BuildContext context, _ChatPreview chat) {
+    final avatar = _resolveAvatar(chat.avatar);
+
+    return FutureBuilder<_StoredChatData>(
+      future: _loadStoredChat(chat),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 12),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: const SizedBox(
+              height: 88,
+              child: Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          );
+        }
+
+        final data = snapshot.data ??
+            _StoredChatData(messages: chat.messages, isDeleted: false);
+
+        if (data.isDeleted && data.messages.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final messages = data.messages;
+        final previewText =
+            messages.isNotEmpty ? messages.last.text.replaceAll('\n', ' ') : '';
+
+        return Card(
+          elevation: 0,
+          margin: const EdgeInsets.only(bottom: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: CircleAvatar(
+              radius: 26,
+              backgroundImage: avatar,
+              child: avatar == null
+                  ? Text(
+                      chat.contactName.characters.first,
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : null,
+            ),
+            title: Text(
+              chat.contactName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                previewText,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  chat.quoteAmount,
+                  style: const TextStyle(
+                    color: Color(0xFF7A4FAD),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Icon(Icons.chevron_right, color: Colors.grey),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChatConversationScreen(
+                    contactName: chat.contactName,
+                    contactUsername: chat.contactUsername,
+                    contactAvatar: chat.avatar,
+                    phoneNumber: chat.phoneNumber,
+                    quoteAmount: chat.quoteAmount,
+                    statusMessage: chat.statusMessage,
+                    messages: messages,
+                  ),
+                ),
+              ).then((_) {
+                if (mounted) {
+                  setState(() {});
+                }
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -204,8 +374,7 @@ class TaleplerEkrani extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             OutlinedButton(
-              onPressed: () =>
-                  _showIlanYayiniModal(context), // Modal gösteriliyor
+              onPressed: () => _showIlanYayiniModal(context),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 40,
@@ -230,6 +399,85 @@ class TaleplerEkrani extends StatelessWidget {
       ),
     );
   }
+
+  Future<_StoredChatData> _loadStoredChat(_ChatPreview chat) async {
+    final prefs = await SharedPreferences.getInstance();
+    final historyKey = 'chat_history_${chat.contactUsername}';
+    final deletedKey = 'chat_deleted_${chat.contactUsername}';
+    final rawHistory = prefs.getString(historyKey);
+    final isDeleted = prefs.getBool(deletedKey) ?? false;
+
+    if (rawHistory != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(rawHistory) as List<dynamic>;
+        final messages = decoded
+            .map(
+              (e) => ChatMessage.fromJson(
+                Map<String, dynamic>.from(
+                  e as Map<dynamic, dynamic>,
+                ),
+              ),
+            )
+            .toList();
+        return _StoredChatData(messages: messages, isDeleted: isDeleted);
+      } catch (_) {
+        // ignore and fallback below
+      }
+    }
+
+    if (isDeleted) {
+      return const _StoredChatData(messages: [], isDeleted: true);
+    }
+
+    return _StoredChatData(messages: chat.messages, isDeleted: false);
+  }
+
+  static ImageProvider? _resolveAvatar(String avatar) {
+    if (avatar.startsWith('http')) {
+      return NetworkImage(avatar);
+    }
+    if (avatar.startsWith('assets/')) {
+      return AssetImage(avatar);
+    }
+    if (avatar.isNotEmpty) {
+      try {
+        return MemoryImage(base64Decode(avatar));
+      } catch (_) {}
+    }
+    return null;
+  }
+}
+
+class _ChatPreview {
+  final String contactName;
+  final String contactUsername;
+  final String avatar;
+  final String phoneNumber;
+  final String quoteAmount;
+  final String statusMessage;
+  final String lastMessagePreview;
+  final List<ChatMessage> messages;
+
+  const _ChatPreview({
+    required this.contactName,
+    required this.contactUsername,
+    required this.avatar,
+    required this.phoneNumber,
+    required this.quoteAmount,
+    required this.statusMessage,
+    required this.lastMessagePreview,
+    required this.messages,
+  });
+}
+
+class _StoredChatData {
+  final List<ChatMessage> messages;
+  final bool isDeleted;
+
+  const _StoredChatData({
+    required this.messages,
+    required this.isDeleted,
+  });
 }
 
 /// İşler Sekmesi
