@@ -6,10 +6,6 @@ import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/chat_conversation_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Mevcut kodunuzdaki Talepler, İşler ve Bildirimler Ekranları değişmiyor.
-// Ancak, IlanYayiniEkrani artık modal bottom sheet olarak kullanılacağı için
-// yapısını değiştiriyoruz.
-
 class IndexboxMessageScreen extends StatefulWidget {
   const IndexboxMessageScreen({super.key});
 
@@ -177,18 +173,18 @@ class TaleplerEkrani extends StatefulWidget {
 class _TaleplerEkraniState extends State<TaleplerEkrani> {
   static final List<_ChatPreview> _sampleChats = [
     _ChatPreview(
-      contactName: 'Callum Smith',
-      contactUsername: 'Callum_D_Smith',
+      contactName: 'Emir Öztürk',
+      contactUsername: 'Emir_Ozturk',
       avatar: 'assets/images/caregiver1.png',
-      phoneNumber: '+905301234567',
+      phoneNumber: '+905306403286',
       quoteAmount: 'TRY 6,534.00',
       statusMessage: 'Talebinizi iptal ettiniz',
       lastMessagePreview:
-          'Merhaba İrem Su! Ben Callum, İstanbul Üniversitesinde okuyan Güney Afrikalı bir öğrenciyim...',
+          'Merhaba İrem Su! Ben Emir, Trakya Üniversitesi Bilgisayar Mühendisliği bölümünde Doçent Dr. olarak görev yapıyorum...',
       messages: [
         ChatMessage(
           text:
-              'Merhaba İrem Su!\n\nBenim adım Callum Smith. Sana kendimi tanıtmak istedim. İstanbul Üniversitesinde okuyan Güney Afrikalı bir öğrenciyim ve hayvanlara büyük bir sevgi duyuyorum. Çocukluğum 5 kedi, köpekler, çinçillalar, hamsterlar, leopar gekolar ve hatta mirketlerle geçti!\n\nOldukça sakin ve sabırlı biriyim; hayvanlar da bu enerjiyi hemen hisseder. Sen şehir dışındayken patili dostlarına ben bakmaktan mutluluk duyarım.\n\nDönüşünü sabırsızlıkla bekliyorum!',
+              'Merhaba İrem Su!\n\nBenim adım Emir Öztürk. Trakya Üniversitesi Bilgisayar Mühendisliği bölümünde Doçent Dr. olarak görev yapıyorum ve yoğun akademik tempoma rağmen hayvan sevgimi her zaman hayatımın merkezinde tutuyorum. Evimde kedi ve köpeklerle büyüdüm; yıllar içinde birçok can dostunun bakımını üstlenerek onların ihtiyaçlarını yakından öğrendim.\n\nPlanlı, sakin ve güven veren bir yapım var; bu yüzden hayvanlar bana kısa sürede alışıyor. Şehir dışındayken patili dostlarını emanet etmek istersen onları titizlikle ve sevgiyle misafir etmekten mutluluk duyarım.\n\nDönüşünü sabırsızlıkla bekliyorum!',
           timestamp: DateTime(2024, 11, 18, 14, 1),
         ),
       ],
