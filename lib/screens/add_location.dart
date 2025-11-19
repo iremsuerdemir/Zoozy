@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-// Harita bileşeni için gerekli paket
-import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:zoozy/screens/upload_photo_screen.dart';
+import 'package:zoozy/services/places_service.dart'; // Backend proxy servisini import ettik
 
 class AddLocation extends StatefulWidget {
   const AddLocation({super.key});
@@ -12,7 +12,7 @@ class AddLocation extends StatefulWidget {
 }
 
 class _AddLocationState extends State<AddLocation> {
-  // Metin giriş alanları için kontrolcüler (Controllers)
+  // Metin giriş alanları için kontrolcüler
   final TextEditingController aramaKontrolcusu = TextEditingController();
   final TextEditingController daireKontrolcusu = TextEditingController();
   final TextEditingController caddeKontrolcusu = TextEditingController();
@@ -21,17 +21,17 @@ class _AddLocationState extends State<AddLocation> {
   final TextEditingController postaKoduKontrolcusu = TextEditingController();
   final TextEditingController ulkeKontrolcusu = TextEditingController();
 
-  // Giriş alanları için kenarlık stili
   final OutlineInputBorder _inputBorder = const OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(8.0)),
     borderSide: BorderSide(color: Color(0xFFD3D3D3)),
   );
-  // Google API Anahtarı
-  static const String googleApiKey = "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4";
+
+  // Backend’den gelen yerleri saklayacağız
+  List _places = [];
+  Timer? _debounce;
 
   @override
   void dispose() {
-    // Controller'ları temizle
     aramaKontrolcusu.dispose();
     daireKontrolcusu.dispose();
     caddeKontrolcusu.dispose();
@@ -39,7 +39,25 @@ class _AddLocationState extends State<AddLocation> {
     eyaletKontrolcusu.dispose();
     postaKoduKontrolcusu.dispose();
     ulkeKontrolcusu.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  // Input değişimlerini debounce ile backend çağrısı yap
+  void _onPlaceChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (value.isNotEmpty) {
+        try {
+          final results = await PlacesService.getPlaces(value);
+          setState(() => _places = results);
+        } catch (e) {
+          print(e);
+        }
+      } else {
+        setState(() => _places = []);
+      }
+    });
   }
 
   @override
@@ -48,7 +66,6 @@ class _AddLocationState extends State<AddLocation> {
       body: Stack(
         children: [
           Container(
-            // Gradient arka plan
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFFB39DDB), Color(0xFFF48FB1)],
@@ -146,31 +163,42 @@ class _AddLocationState extends State<AddLocation> {
                                       ),
                                       const SizedBox(height: 25),
 
-                                      // Google Places Otomatik Tamamlama
+                                      // Arama input
                                       _buildInputField(
                                         ipucu: 'Aramak için yazın',
                                         kontrolcu: aramaKontrolcusu,
-                                        saltOkunur:
-                                            true, // Kullanıcının tıklayarak açması için
-                                        onTap: () async {
-                                          final secilenYer =
-                                              await PlacesAutocomplete.show(
-                                                context: context,
-                                                apiKey: googleApiKey,
-                                                mode: Mode.overlay,
-                                                types: const [],
-                                                strictbounds: false,
-                                                onError: (err) => print(err),
-                                              );
-
-                                          if (secilenYer != null) {
-                                            setState(() {
-                                              aramaKontrolcusu.text =
-                                                  secilenYer.description ?? '';
-                                            });
-                                          }
-                                        },
+                                        saltOkunur: false,
+                                        onChanged: _onPlaceChanged,
                                       ),
+
+                                      // Backend’den gelen sonuçları listele
+                                      if (_places.isNotEmpty)
+                                        SizedBox(
+                                          height: 200,
+                                          child: ListView.builder(
+                                            itemCount: _places.length,
+                                            itemBuilder: (context, index) {
+                                              final place = _places[index];
+                                              return ListTile(
+                                                title: Text(place[
+                                                        "structured_formatting"]
+                                                    ["main_text"]),
+                                                subtitle: Text(
+                                                    place["structured_formatting"]
+                                                            [
+                                                            "secondary_text"] ??
+                                                        ""),
+                                                onTap: () {
+                                                  setState(() {
+                                                    aramaKontrolcusu.text =
+                                                        place["description"];
+                                                    _places = [];
+                                                  });
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ),
 
                                       const SizedBox(height: 20),
                                       _buildInputField(
@@ -211,12 +239,22 @@ class _AddLocationState extends State<AddLocation> {
                               // İLERİ Butonu
                               GestureDetector(
                                 onTap: () {
-                                  // Tüm alanlar doluysa sonraki sayfaya veya işleme geç
-                                  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-                                  String petName = args != null ? (args['petName'] ?? '') : '';
-                                  String serviceName = args != null ? (args['serviceName'] ?? '') : '';
-                                  DateTime startDate = args != null ? (args['startDate'] ?? DateTime.now()) : DateTime.now();
-                                  DateTime endDate = args != null ? (args['endDate'] ?? DateTime.now()) : DateTime.now();
+                                  final args = ModalRoute.of(context)
+                                      ?.settings
+                                      .arguments as Map<String, dynamic>?;
+                                  String petName = args != null
+                                      ? (args['petName'] ?? '')
+                                      : '';
+                                  String serviceName = args != null
+                                      ? (args['serviceName'] ?? '')
+                                      : '';
+                                  DateTime startDate = args != null
+                                      ? (args['startDate'] ?? DateTime.now())
+                                      : DateTime.now();
+                                  DateTime endDate = args != null
+                                      ? (args['endDate'] ?? DateTime.now())
+                                      : DateTime.now();
+
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -226,7 +264,6 @@ class _AddLocationState extends State<AddLocation> {
                                         'serviceName': serviceName,
                                         'startDate': startDate,
                                         'endDate': endDate,
-                                        // adres bilgileri de eklenebilir
                                       }),
                                     ),
                                   );
@@ -280,17 +317,18 @@ class _AddLocationState extends State<AddLocation> {
     );
   }
 
-  // Giriş Alanı Yapıcı Fonksiyon
   Widget _buildInputField({
-    required String ipucu, // hint -> ipucu
-    TextEditingController? kontrolcu, // controller -> kontrolcu
-    bool saltOkunur = false, // readOnly -> saltOkunur
+    required String ipucu,
+    TextEditingController? kontrolcu,
+    bool saltOkunur = false,
     VoidCallback? onTap,
+    Function(String)? onChanged,
   }) {
     return TextFormField(
       controller: kontrolcu,
       readOnly: saltOkunur,
       onTap: onTap,
+      onChanged: onChanged,
       decoration: InputDecoration(
         hintText: ipucu,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 16),
