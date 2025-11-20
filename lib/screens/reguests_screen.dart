@@ -43,25 +43,19 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
   Future<ImageProvider?> _loadProfileImageProvider(String userPhoto) async {
     try {
-      // Eğer userPhoto base64 string ise MemoryImage'a çevir
       if (userPhoto.startsWith('data:image') ||
           userPhoto.length > 100 &&
               RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(userPhoto)) {
         final bytes = base64Decode(userPhoto);
         return MemoryImage(bytes);
       }
-
-      // Eğer URL ise NetworkImage kullan
       if (userPhoto.isNotEmpty &&
           (userPhoto.startsWith('http://') ||
               userPhoto.startsWith('https://'))) {
         return NetworkImage(userPhoto);
       }
-
-      // Hiçbiri değilse SharedPreferences'tan profil resmini yükle
       final prefs = await SharedPreferences.getInstance();
       final profileImagePath = prefs.getString('profileImagePath');
-
       if (profileImagePath != null && profileImagePath.isNotEmpty) {
         try {
           final bytes = base64Decode(profileImagePath);
@@ -71,7 +65,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
           return null;
         }
       }
-
       return null;
     } catch (e) {
       print('Profil resmi yüklenirken hata: $e');
@@ -88,22 +81,23 @@ class _RequestsScreenState extends State<RequestsScreen> {
       onTap: () async {
         if (text == "Köpek Gezdir" || text == "Yardım") {
           final allowed = await GuestAccessService.ensureLoggedIn(context);
-          if (!allowed) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PetWalkPage()),
-            );
+          if (allowed) {
+            if (text == "Köpek Gezdir") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PetWalkPage()),
+              );
+            } else if (text == "Yardım") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HelpCenterPage()),
+              );
+            }
           }
-        }
-        setState(() {
-          selectedIndex = _getIndexFromText(text);
-        });
-
-        if (text == "Yardım") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HelpCenterPage()),
-          );
+        } else {
+          setState(() {
+            selectedIndex = _getIndexFromText(text);
+          });
         }
       },
       child: Column(
@@ -167,8 +161,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
       child: GestureDetector(
         onTap: () {
           Navigator.pop(context); // Modalı kapat
-
-          // Her hizmet kartı için yönlendirme
           switch (text) {
             case "Pansiyon":
               Navigator.push(
@@ -392,7 +384,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   color: primaryPurple,
                   size: 24,
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  final allowed =
+                      await GuestAccessService.ensureLoggedIn(context);
+                  if (!allowed) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -549,9 +544,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
-
             const SizedBox(height: 20),
-            // --- TALEP KARTLARI ---
             if (requestList.isNotEmpty)
               ListView.builder(
                 shrinkWrap: true,

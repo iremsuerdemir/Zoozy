@@ -1,10 +1,13 @@
 import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/CaregiverCard.dart';
 import 'package:zoozy/components/SimplePetCard.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/favori_page.dart';
+import 'package:zoozy/screens/login_page.dart';
 import 'package:zoozy/services/guest_access_service.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -16,7 +19,7 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   int selectedCategoryIndex = -1;
-  Set<String> favoriIsimleri = {}; // 🔹 Favorilerdeki kişileri tutar
+  Set<String> favoriIsimleri = {};
   bool _isGuest = false;
 
   final caregivers = [
@@ -47,7 +50,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     _loadGuestFlag();
   }
 
-  // 🔹 Favorileri SharedPreferences'tan yükler
   Future<void> _favorileriYukle() async {
     final prefs = await SharedPreferences.getInstance();
     final favStrings = prefs.getStringList("favoriler") ?? [];
@@ -68,6 +70,116 @@ class _ExploreScreenState extends State<ExploreScreen> {
         _isGuest = isGuest;
       });
     }
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // SharedPreferences temizle
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+    }
+  }
+
+  Future<void> _confirmLogout() async {
+    if (!mounted) return;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 10.0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.logout, color: Color(0xFF9C27B0), size: 50),
+              const SizedBox(height: 12),
+              const Text(
+                'Oturumu kapatmak istediğine emin misin?',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Giriş ekranına yönlendirileceksin.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: GestureDetector(
+                onTap: () async {
+                  Navigator.of(dialogContext).pop();
+
+                  try {
+                    // Firebase ve SharedPreferences temizle
+                    await GuestAccessService.disableGuestMode();
+                    await FirebaseAuth.instance.signOut();
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+
+                    if (!mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Başarıyla çıkış yapıldı."),
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.all(16),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                      (route) => false,
+                    );
+                  } catch (e) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Çıkış hatası: ${e.toString()}"),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.all(16),
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF9C27B0), Color(0xFF7B1FA2)],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Çıkış Yap',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -118,10 +230,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               size: 28,
             ),
             onPressed: () async {
-              if (!await GuestAccessService.ensureLoggedIn(context)) {
-                return;
-              }
-              // 🔹 Favori sayfasına git ve geri dönünce yenile
+              if (!await GuestAccessService.ensureLoggedIn(context)) return;
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -130,11 +239,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     previousScreen: const ExploreScreen(),
                   ),
                 ),
-              ).then((_) {
-                // Geri dönünce favorileri yenile
-                _favorileriYukle();
-              });
+              ).then((_) => _favorileriYukle());
             },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.black87,
+              size: 28,
+            ),
+            onPressed: _confirmLogout,
           ),
           const SizedBox(width: 8),
         ],
@@ -212,9 +326,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         cat["label"] as String,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                           color: isSelected ? Colors.deepPurple : Colors.black,
                         ),
                       ),
@@ -224,7 +337,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               },
             ),
             const SizedBox(height: 20),
-
             // --- CAREGIVER BAŞLIK ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -246,7 +358,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ],
             ),
             const SizedBox(height: 8),
-
             // --- CAREGIVER KARTLARI ---
             SizedBox(
               height: 230,
@@ -256,7 +367,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 itemBuilder: (context, index) {
                   final c = caregivers[index];
                   final isFav = favoriIsimleri.contains(c["name"]);
-
                   return Padding(
                     padding: const EdgeInsets.only(right: 12),
                     child: CaregiverCardAsset(
@@ -274,7 +384,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
             // --- PETS ---
             const Text(
               "Topluluktaki Evcil Hayvanlar",
@@ -305,6 +414,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 0,
+        onTap: (index) async {
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/explore');
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/requests');
+          } else if (index == 2) {
+            Navigator.pushNamed(context, '/moments');
+          } else if (index == 3) {
+            Navigator.pushNamed(context, '/jobs');
+          } else if (index == 4) {
+            await _confirmLogout(); // Logout işlemi
+          }
+        },
         selectedColor: Colors.deepPurple,
         unselectedColor: Colors.grey,
       ),

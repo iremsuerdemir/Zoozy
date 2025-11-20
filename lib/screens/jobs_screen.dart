@@ -31,26 +31,26 @@ class _JobsScreenState extends State<JobsScreen> {
       onTap: () async {
         if (text == "Köpek Gezdir" || text == "Yardım") {
           final allowed = await GuestAccessService.ensureLoggedIn(context);
-          if (!allowed) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PetWalkPage()),
-            );
+          if (allowed) {
+            if (text == "Köpek Gezdir") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PetWalkPage()),
+              );
+            } else if (text == "Yardım") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HelpCenterPage()),
+              );
+            }
           }
-        }
-        if (text == "Takvim") {
+        } else if (text == "Takvim") {
           // Takvim ikonuna basıldığında yönlendirme
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const MinimalCalendarPage(),
             ),
-          );
-        } else if (text == "Yardım") {
-          // Yardım ikonuna basıldığında yönlendirme
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HelpCenterPage()),
           );
         } else {
           setState(() {
@@ -145,13 +145,17 @@ class _JobsScreenState extends State<JobsScreen> {
                   color: primaryPurple,
                   size: 24,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => IndexboxMessageScreen(),
-                    ),
-                  );
+                onPressed: () async {
+                  final allowed =
+                      await GuestAccessService.ensureLoggedIn(context);
+                  if (allowed) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => IndexboxMessageScreen(),
+                      ),
+                    );
+                  }
                 },
               ),
               Positioned(

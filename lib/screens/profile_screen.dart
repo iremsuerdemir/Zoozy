@@ -1,13 +1,11 @@
-// ✅ YUKARI KISIMDA EKLENECEK IMPORTLAR
-import 'package:zoozy/screens/favori_page.dart';
-import 'package:zoozy/screens/help_center_page.dart';
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/edit_profile.dart';
+import 'package:zoozy/screens/favori_page.dart';
+import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
@@ -54,35 +52,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  Widget buildMenuButton(IconData icon, String title) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: const Color(0xFF7A4FAD), size: 28),
-          const SizedBox(height: 6),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
+  // -------------------- MENÜ BUTONU --------------------
+  Widget buildMenuButton(IconData icon, String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: () async {
+        // ✔ Misafir kontrolü
+        final allowed = await GuestAccessService.ensureLoggedIn(context);
+        if (!allowed) return;
+
+        onTap(); // ✔ Yetki varsa işleme devam
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: const Color(0xFF7A4FAD), size: 28),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.black87,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // ✅ GÜNCELLENMİŞ buildStatColumn (ikon ve renk desteği)
+  // -------------------- İSTATİSTİK KOLONU --------------------
   Widget buildStatColumn(
     String label,
     String value, {
@@ -167,7 +174,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Icons.settings,
                               color: Colors.white,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+                              final allowed =
+                                  await GuestAccessService.ensureLoggedIn(
+                                      context);
+                              if (!allowed) return;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -181,7 +192,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Icons.chat_bubble_outline,
                               color: Colors.white,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+                              final allowed =
+                                  await GuestAccessService.ensureLoggedIn(
+                                      context);
+                              if (!allowed) return;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -238,6 +253,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const SizedBox(height: 4),
                               GestureDetector(
                                 onTap: () async {
+                                  final allowed =
+                                      await GuestAccessService.ensureLoggedIn(
+                                          context);
+                                  if (!allowed) return;
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -267,7 +286,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
+                            final allowed =
+                                await GuestAccessService.ensureLoggedIn(
+                                    context);
+                            if (!allowed) return;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -305,7 +328,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           '',
                           icon: Icons.military_tech,
                           color: Colors.purple,
-                          onTap: () {
+                          onTap: () async {
+                            final allowed =
+                                await GuestAccessService.ensureLoggedIn(
+                                    context);
+                            if (!allowed) return;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -336,41 +363,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         buildMenuButton(
                           Icons.card_giftcard,
                           'Promosyonlar\nKuponlar',
+                          () {},
                         ),
                         buildMenuButton(
-                          Icons.monetization_on,
-                          'Referans Programı',
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FavoriPage(
-                                  favoriTipi: "profil",
-                                  previousScreen: widget,
-                                ),
+                            Icons.monetization_on, 'Referans Programı', () {}),
+                        buildMenuButton(Icons.favorite, 'Favorilerim', () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FavoriPage(
+                                favoriTipi: "profil",
+                                previousScreen: widget,
                               ),
-                            );
-                          },
-                          child: buildMenuButton(Icons.favorite, 'Favorilerim'),
-                        ),
-                        buildMenuButton(Icons.account_balance_wallet, 'Bakiye'),
-                        buildMenuButton(Icons.pets, 'Evcil Hayvanlarım'),
-                        buildMenuButton(Icons.military_tech, 'Rozetlerim'),
-                        buildMenuButton(Icons.handshake, 'Sponsor / Üyelik'),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HelpCenterPage(),
-                              ),
-                            );
-                          },
-                          child: buildMenuButton(
-                              Icons.help_center, 'Yardım Merkezi'),
-                        ),
+                            ),
+                          );
+                        }),
+                        buildMenuButton(
+                            Icons.account_balance_wallet, 'Bakiye', () {}),
+                        buildMenuButton(Icons.pets, 'Evcil Hayvanlarım', () {}),
+                        buildMenuButton(
+                            Icons.military_tech, 'Rozetlerim', () {}),
+                        buildMenuButton(
+                            Icons.handshake, 'Sponsor / Üyelik', () {}),
+                        buildMenuButton(Icons.help_center, 'Yardım Merkezi',
+                            () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HelpCenterPage(),
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -393,7 +416,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: Color(0xFF7A4FAD),
                           size: 25,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          final allowed =
+                              await GuestAccessService.ensureLoggedIn(context);
+                          if (!allowed) return;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -408,9 +434,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: () async {
-                      if (!await GuestAccessService.ensureLoggedIn(context)) {
-                        return;
-                      }
+                      final allowed =
+                          await GuestAccessService.ensureLoggedIn(context);
+                      if (!allowed) return;
                       Navigator.push(
                         context,
                         MaterialPageRoute(
