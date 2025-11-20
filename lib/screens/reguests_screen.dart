@@ -1,14 +1,17 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:zoozy/components/bottom_navigation_bar.dart';
-import 'package:zoozy/screens/indexbox_message.dart';
-import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/help_center_page.dart';
-import 'package:zoozy/screens/my_pets_page.dart'; // <- MyPetsPage import
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/request_item.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoozy/components/bottom_navigation_bar.dart';
+import 'package:zoozy/screens/help_center_page.dart';
+import 'package:zoozy/screens/indexbox_message.dart';
+import 'package:zoozy/screens/my_pets_page.dart'; // <- MyPetsPage import
+import 'package:zoozy/screens/pet_walk_page.dart';
+import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/services/guest_access_service.dart';
+
+import '../models/request_item.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -87,7 +90,12 @@ class _RequestsScreenState extends State<RequestsScreen> {
       onTap: () async {
         if (text == "Köpek Gezdir" || text == "Yardım") {
           final allowed = await GuestAccessService.ensureLoggedIn(context);
-          if (!allowed) return;
+          if (!allowed) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PetWalkPage()),
+            );
+          }
         }
         setState(() {
           selectedIndex = _getIndexFromText(text);

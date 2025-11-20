@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
+import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/minimal_calendar_page.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/services/guest_access_service.dart';
 
 class JobsScreen extends StatefulWidget {
@@ -30,7 +30,12 @@ class _JobsScreenState extends State<JobsScreen> {
       onTap: () async {
         if (text == "Köpek Gezdir" || text == "Yardım") {
           final allowed = await GuestAccessService.ensureLoggedIn(context);
-          if (!allowed) return;
+          if (!allowed) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HelpCenterPage()),
+            );
+          }
         }
         if (text == "Takvim") {
           // Takvim ikonuna basıldığında yönlendirme

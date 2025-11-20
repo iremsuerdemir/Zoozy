@@ -105,7 +105,7 @@ class HelpCenterPage extends StatelessWidget {
                 ),
               ),
 
-              // 🔹 Kartların olduğu içerik alanı
+              // 🔹 Kartların olduğu içerik alanı (GÜNCELLENEN KISIM)
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -116,18 +116,16 @@ class HelpCenterPage extends StatelessWidget {
                       topRight: Radius.circular(28),
                     ),
                   ),
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(20),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 20,
-                          crossAxisSpacing: 20,
-                          childAspectRatio: 1,
-                        ),
+                  // GridView yerine ListView kullanılıyor
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16), // Tüm liste için padding
                     itemCount: helpItems.length,
                     itemBuilder: (context, index) {
-                      return HelpCard(item: helpItems[index]);
+                      return Padding(
+                        // Her bir kartın altına boşluk ekleniyor
+                        padding: const EdgeInsets.only(bottom: 16.0), 
+                        child: HelpCard(item: helpItems[index]),
+                      );
                     },
                   ),
                 ),

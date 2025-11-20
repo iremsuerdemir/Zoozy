@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/_inbox_actions_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/chat_conversation_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class IndexboxMessageScreen extends StatefulWidget {
   const IndexboxMessageScreen({super.key});
