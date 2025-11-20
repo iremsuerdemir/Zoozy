@@ -6,6 +6,7 @@ import 'package:zoozy/screens/minimal_calendar_page.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/services/guest_access_service.dart';
+import 'package:zoozy/screens/pet_walk_page.dart';
 
 class JobsScreen extends StatefulWidget {
   const JobsScreen({super.key});
@@ -30,7 +31,12 @@ class _JobsScreenState extends State<JobsScreen> {
       onTap: () async {
         if (text == "Köpek Gezdir" || text == "Yardım") {
           final allowed = await GuestAccessService.ensureLoggedIn(context);
-          if (!allowed) return;
+          if (!allowed) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PetWalkPage()),
+            );
+          }
         }
         if (text == "Takvim") {
           // Takvim ikonuna basıldığında yönlendirme
