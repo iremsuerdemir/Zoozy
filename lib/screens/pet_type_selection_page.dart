@@ -4,13 +4,31 @@ class PetTypeSelectionPage extends StatelessWidget {
   const PetTypeSelectionPage({super.key});
 
   static const List<Map<String, String>> petTypes = [
-    {"name": "Köpek", "image": "assets/images/icons/dog.png"},
-    {"name": "Kedi", "image": "assets/images/icons/cat.png"},
-    {"name": "Tavşan", "image": "assets/images/icons/rabbit.png"},
-    {"name": "Balık", "image": "assets/images/icons/fish.png"},
-    {"name": "Kuş", "image": "assets/images/icons/parrot.png"},
-    {"name": "Diğer", "image": "assets/images/icons/others.png"},
+    {"name": "Köpek", "image": "assets/my_pets_image/dog.png"},
+    {"name": "Kedi", "image": "assets/my_pets_image/cat.png"},
+    {"name": "Tavşan", "image": "assets/my_pets_image/rabbit.png"},
+    {"name": "Balık", "image": "assets/my_pets_image/fish.png"},
+    {"name": "Kuş", "image": "assets/my_pets_image/parrot.png"},
+    {"name": "Diğer", "image": "assets/my_pets_image/others.png"},
   ];
+
+  // Türlere göre fallback asset
+  String getFallbackImage(String type) {
+    switch (type) {
+      case 'Köpek':
+        return 'assets/my_pets_image/dog.png';
+      case 'Kedi':
+        return 'assets/my_pets_image/cat.png';
+      case 'Kuş':
+        return 'assets/my_pets_image/parrot.png';
+      case 'Tavşan':
+        return 'assets/my_pets_image/rabbit.png';
+      case 'Balık':
+        return 'assets/my_pets_image/fish.png';
+      default:
+        return 'assets/my_pets_image/others.png';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,28 +54,14 @@ class PetTypeSelectionPage extends StatelessWidget {
             },
           ),
           centerTitle: true,
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              // sabit bir appbar ikonu göstermek istersen burayı kullan:
-              Image(
-                image: AssetImage("assets/images/icons/dog.png"),
-                width: 28,
-                height: 28,
-                fit: BoxFit.contain,
-              ),
-              SizedBox(width: 8),
-              Text(
-                "Hayvan Türü Seç",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ],
+          title: const Text(
+            "Hayvan Türü Seç",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
           ),
-          actions: const [SizedBox(width: 48)],
         ),
       ),
       body: Padding(
@@ -72,7 +76,7 @@ class PetTypeSelectionPage extends StatelessWidget {
           ),
           itemBuilder: (context, index) {
             final pet = petTypes[index];
-            final imagePath = pet["image"] ?? "";
+            final imagePath = pet["image"] ?? getFallbackImage(pet["name"]!);
 
             return InkWell(
               borderRadius: BorderRadius.circular(18),
@@ -101,15 +105,13 @@ class PetTypeSelectionPage extends StatelessWidget {
                           child: Image.asset(
                             imagePath,
                             fit: BoxFit.contain,
-                            // Eğer asset yüklenemezse proje içindeki fallback görselini göster
                             errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Image.asset(
-                                  'assets/images/icons/others.png', // fallback asset
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.contain,
-                                ),
+                              // Asset yüklenemezse fallback göster
+                              return Image.asset(
+                                'assets/my_pets_image/others.png',
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.contain,
                               );
                             },
                           ),

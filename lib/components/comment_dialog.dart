@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/models/comment.dart';
 
 class CommentDialog extends StatefulWidget {
@@ -20,6 +20,28 @@ class CommentDialog extends StatefulWidget {
 class _CommentDialogState extends State<CommentDialog> {
   final TextEditingController _messageController = TextEditingController();
   int _selectedRating = 5;
+  String? _currentUserAvatar;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUserAvatar();
+  }
+
+  Future<void> _loadCurrentUserAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    final imageString = prefs.getString('profileImagePath');
+    if (!mounted) return;
+    if (imageString != null && imageString.isNotEmpty) {
+      setState(() {
+        _currentUserAvatar = 'base64:$imageString';
+      });
+    } else {
+      setState(() {
+        _currentUserAvatar = 'asset:assets/images/caregiver1.png';
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -41,7 +63,7 @@ class _CommentDialogState extends State<CommentDialog> {
       rating: _selectedRating,
       createdAt: DateTime.now(),
       authorName: widget.currentUserName,
-      authorAvatar: "assets/images/caregiver1.png",
+      authorAvatar: _currentUserAvatar ?? 'asset:assets/images/caregiver1.png',
     );
 
     widget.onCommentAdded(comment);

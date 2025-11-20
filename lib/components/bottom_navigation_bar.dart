@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:zoozy/screens/jobs_screen.dart';
 import 'package:zoozy/screens/moments_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-import '../screens/reguests_screen.dart'; // doğru ekranı import et
+
 import '../screens/explore_screen.dart'; // ExploreScreen importu eklendi
+import '../screens/reguests_screen.dart'; // doğru ekranı import et
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int)? onTap; // opsiyonel yapabiliriz
   final Color selectedColor;
   final Color unselectedColor;
+  final Color backgroundColor;
 
   const CustomBottomNavBar({
     super.key,
@@ -17,6 +19,7 @@ class CustomBottomNavBar extends StatelessWidget {
     this.onTap, // artık opsiyonel
     required this.selectedColor,
     required this.unselectedColor,
+    this.backgroundColor = Colors.white,
   });
 
   @override
@@ -26,6 +29,8 @@ class CustomBottomNavBar extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       selectedItemColor: selectedColor,
       unselectedItemColor: unselectedColor,
+      backgroundColor: backgroundColor,
+      elevation: backgroundColor == Colors.transparent ? 0 : 8,
       showUnselectedLabels: true,
       onTap: (index) {
         if (index == 0) {

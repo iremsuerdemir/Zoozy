@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:zoozy/models/comment.dart';
 
@@ -21,6 +23,21 @@ class CommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider<Object> _resolveAvatar(String avatar) {
+      try {
+        if (avatar.startsWith('base64:')) {
+          final base64Str = avatar.substring(7);
+          final bytes = base64Decode(base64Str);
+          return MemoryImage(bytes);
+        }
+        final assetPath =
+            avatar.startsWith('asset:') ? avatar.substring(6) : avatar;
+        return AssetImage(assetPath);
+      } catch (_) {
+        return const AssetImage('assets/images/caregiver1.png');
+      }
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 2,
@@ -36,7 +53,7 @@ class CommentCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: AssetImage(comment.authorAvatar),
+                  backgroundImage: _resolveAvatar(comment.authorAvatar),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

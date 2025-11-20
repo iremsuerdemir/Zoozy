@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/screens/certification_screen.dart';
 import 'package:zoozy/screens/confirm_email_screen.dart';
@@ -50,6 +50,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
     setState(() {
       _isBusinessLicenseVerified = prefs.getBool('business_license') ?? false;
       _isCriminalRecordVerified = prefs.getBool('criminal_record') ?? false;
+      _isIdVerified =
+          prefs.getBool('id_verification') ?? prefs.getBool('id') ?? false;
+      _isCertificatesVerified = prefs.getBool('certificates_verified') ?? false;
+      _isPhoneVerified = prefs.getBool('phone_verified') ?? _isPhoneVerified;
     });
   }
 
@@ -110,11 +114,11 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                 leading: const Icon(Icons.picture_as_pdf),
                 title: const Text("PDF Seç"),
                 onTap: () async {
-                  FilePickerResult? result = await FilePicker.platform
-                      .pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['pdf'],
-                      );
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['pdf'],
+                  );
                   if (result != null && result.files.isNotEmpty) {
                     await _saveStatus(prefKey, true);
                     Navigator.pop(context, true);
@@ -220,12 +224,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   durumRengi: _isEmailVerified
                                       ? Colors.green
                                       : Colors.black54,
-                                  trailingIcon: _isEmailVerified
-                                      ? Icons.verified
-                                      : null,
-                                  trailingIconColor: _isEmailVerified
-                                      ? Colors.green
-                                      : null,
+                                  trailingIcon:
+                                      _isEmailVerified ? Icons.verified : null,
+                                  trailingIconColor:
+                                      _isEmailVerified ? Colors.green : null,
                                   onTap: _isEmailVerified
                                       ? null
                                       : () {
@@ -234,13 +236,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                             MaterialPageRoute(
                                               builder: (_) =>
                                                   ConfirmEmailScreen(
-                                                    email:
-                                                        FirebaseAuth
-                                                            .instance
-                                                            .currentUser
-                                                            ?.email ??
-                                                        '',
-                                                  ),
+                                                email: FirebaseAuth.instance
+                                                        .currentUser?.email ??
+                                                    '',
+                                              ),
                                             ),
                                           ).then(
                                             (_) => _checkEmailVerification(),
@@ -256,12 +255,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   durumRengi: _isPhoneVerified
                                       ? Colors.green
                                       : Colors.black54,
-                                  trailingIcon: _isPhoneVerified
-                                      ? Icons.verified
-                                      : null,
-                                  trailingIconColor: _isPhoneVerified
-                                      ? Colors.green
-                                      : null,
+                                  trailingIcon:
+                                      _isPhoneVerified ? Icons.verified : null,
+                                  trailingIconColor:
+                                      _isPhoneVerified ? Colors.green : null,
                                   onTap: _isPhoneVerified
                                       ? null
                                       : () {
@@ -276,6 +273,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                               setState(
                                                 () => _isPhoneVerified = true,
                                               );
+                                            if (result == true) {
+                                              _saveStatus(
+                                                  'phone_verified', true);
+                                            }
                                             _checkPhoneVerification();
                                           });
                                         },
@@ -289,12 +290,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                   durumRengi: _isIdVerified
                                       ? Colors.green
                                       : Colors.black54,
-                                  trailingIcon: _isIdVerified
-                                      ? Icons.verified
-                                      : null,
-                                  trailingIconColor: _isIdVerified
-                                      ? Colors.green
-                                      : null,
+                                  trailingIcon:
+                                      _isIdVerified ? Icons.verified : null,
+                                  trailingIconColor:
+                                      _isIdVerified ? Colors.green : null,
                                   onTap: _isIdVerified
                                       ? null
                                       : () async {
@@ -309,6 +308,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                             setState(
                                               () => _isIdVerified = true,
                                             );
+                                          if (result == true) {
+                                            _saveStatus(
+                                                'id_verification', true);
+                                          }
                                           _checkIdVerification();
                                         },
                                 ),
@@ -355,6 +358,10 @@ class _MyBadgetsScreenState extends State<MyBadgetsScreen> {
                                         setState(
                                           () => _isCertificatesVerified = true,
                                         );
+                                      if (result == true) {
+                                        _saveStatus(
+                                            'certificates_verified', true);
+                                      }
                                     });
                                   },
                                 ),

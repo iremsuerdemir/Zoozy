@@ -1,16 +1,17 @@
 // ✅ YUKARI KISIMDA EKLENECEK IMPORTLAR
-import 'package:zoozy/screens/favori_page.dart';
-import 'package:zoozy/screens/help_center_page.dart';
-
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/edit_profile.dart';
+import 'package:zoozy/screens/favori_page.dart';
+import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
+import 'package:zoozy/screens/pet_list_page.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 import 'package:zoozy/screens/settings_screen.dart';
 import 'package:zoozy/services/guest_access_service.dart';
@@ -127,6 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      backgroundColor: Colors.transparent,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -333,14 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        buildMenuButton(
-                          Icons.card_giftcard,
-                          'Promosyonlar\nKuponlar',
-                        ),
-                        buildMenuButton(
-                          Icons.monetization_on,
-                          'Referans Programı',
-                        ),
+                        // FAVORİLER
                         InkWell(
                           onTap: () {
                             Navigator.push(
@@ -355,10 +351,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                           child: buildMenuButton(Icons.favorite, 'Favorilerim'),
                         ),
-                        buildMenuButton(Icons.account_balance_wallet, 'Bakiye'),
-                        buildMenuButton(Icons.pets, 'Evcil Hayvanlarım'),
-                        buildMenuButton(Icons.military_tech, 'Rozetlerim'),
-                        buildMenuButton(Icons.handshake, 'Sponsor / Üyelik'),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PetListPage(),
+                              ),
+                            );
+                          },
+                          child:
+                              buildMenuButton(Icons.pets, 'Evcil Hayvanlarım'),
+                        ),
+                        // MY PETS
+
+                        // ROZETLERİM
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const MyBadgetsScreen(phoneVerified: true),
+                              ),
+                            );
+                          },
+                          child: buildMenuButton(
+                              Icons.military_tech, 'Rozetlerim'),
+                        ),
+
+                        // YARDIM MERKEZİ
                         InkWell(
                           onTap: () {
                             Navigator.push(
@@ -374,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+
                   // -------------------- İLANLAR --------------------
                   Row(
                     children: [
@@ -491,6 +513,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
         selectedColor: const Color(0xFF7A4FAD),
         unselectedColor: Colors.grey,
+        backgroundColor: Colors.transparent,
       ),
     );
   }

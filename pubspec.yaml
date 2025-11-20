@@ -61,3 +61,5 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/my_pets_image/
+
