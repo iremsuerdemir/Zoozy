@@ -76,9 +76,10 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        /*
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('${widget.name} seçildi')));
+        ).showSnackBar(SnackBar(content: Text('${widget.name} seçildi')));*/
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.40,
@@ -115,7 +116,6 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
                 ),
               ),
             ),
-
             Positioned(
               top: 8,
               right: 8,
@@ -144,7 +144,6 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
                 ),
               ),
             ),
-
             Positioned(
               left: 12,
               bottom: 12,

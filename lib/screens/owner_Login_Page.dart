@@ -23,17 +23,25 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  /// E-posta ve şifre ile giriş işlemini gerçekleştirir.
+  // 🔥 Eklenen loading state
+  bool _isLoading = false;
+
+  /// -------------------------------
+  /// E-posta ve şifre ile giriş işlemi
+  /// -------------------------------
   void _login() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true); // LOGIN TIKLANDIĞINDA KİLİTLE
+
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
 
       try {
+        ScaffoldMessenger.of(context).clearSnackBars(); // SNACKBAR SPAM ÖNLENDİ
+
         UserCredential userCredential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
 
-        // SharedPreferences'a kullanıcı adını ve e-postayı kaydet
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(
           'username',
@@ -42,17 +50,18 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
         await prefs.setString('email', email.toLowerCase());
         await GuestAccessService.disableGuestMode();
 
-        // Başarılı giriş bildirimi ve 4 saniye bekletme
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              "Giriş başarılı!  ${userCredential.user?.displayName ?? ""}. Sayfaya yönlendiriliyorsunuz...",
-            ),
             backgroundColor: Colors.green,
+            content: Text(
+              "Giriş başarılı! ${userCredential.user?.displayName ?? ""}. Yönlendiriliyorsunuz...",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         );
 
-        await Future.delayed(const Duration(seconds: 4));
+        await Future.delayed(const Duration(seconds: 3));
 
         if (mounted) {
           Navigator.pushReplacement(
@@ -61,40 +70,58 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
           );
         }
       } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+
         String errorMessage;
         if (e.code == 'user-not-found') {
           errorMessage = 'Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.';
         } else if (e.code == 'wrong-password') {
           errorMessage = 'Yanlış şifre. Lütfen tekrar deneyin.';
         } else {
-          errorMessage = 'Giriş başarısız !';
+          errorMessage = 'Giriş başarısız!';
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
         );
       } catch (e) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Bilinmeyen bir hata oluştu: $e'),
+            content: Text("Bilinmeyen bir hata oluştu: $e"),
             backgroundColor: Colors.red,
           ),
         );
+      } finally {
+        if (mounted)
+          setState(() => _isLoading = false); // LOGIN BİTTİ, BUTON AÇILDI
       }
     }
   }
 
-  ///  Web ve mobil uyumlu Google ile giriş işlemi
+  /// -------------------------------
+  /// Google ile giriş işlemi
+  /// -------------------------------
   Future<void> _signInWithGoogle() async {
     try {
+      setState(() => _isLoading = true);
+      ScaffoldMessenger.of(context).clearSnackBars();
+
       final FirebaseAuth auth = FirebaseAuth.instance;
       final GoogleSignIn googleSignIn = GoogleSignIn();
 
       if (Theme.of(context).platform == TargetPlatform.android ||
           Theme.of(context).platform == TargetPlatform.iOS) {
-        // 🔹 Mobil platformlar için klasik signIn
         final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-        if (googleUser == null) return;
+        if (googleUser == null) {
+          setState(() => _isLoading = false);
+          return;
+        }
 
         final GoogleSignInAuthentication googleAuth =
             await googleUser.authentication;
@@ -106,7 +133,6 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
 
         await auth.signInWithCredential(credential);
       } else {
-        // 🔹 Web platformu için yeni GIS (Google Identity Services) yöntemi
         GoogleAuthProvider googleProvider = GoogleAuthProvider();
         googleProvider
           ..addScope('email')
@@ -116,18 +142,21 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
       }
 
       final user = auth.currentUser;
+
       if (user != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', user.displayName ?? 'Kullanıcı');
-        await prefs.setString('email', (user.email ?? '').toLowerCase());
+        await prefs.setString('email', (user.email ?? "").toLowerCase());
         await GuestAccessService.disableGuestMode();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            backgroundColor: Colors.green,
             content: Text(
               "Google ile giriş başarılı! Hoş geldiniz ${user.displayName ?? ""}",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            backgroundColor: Colors.green,
           ),
         );
 
@@ -139,16 +168,22 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
         }
       }
     } catch (e) {
-      debugPrint("Google ile giriş hatası: $e");
+      ScaffoldMessenger.of(context).clearSnackBars();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Google ile giriş başarısız: $e"),
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  /// -------------------------------
+  /// UI
+  /// -------------------------------
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -255,8 +290,8 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: const Color(0xFF7A4FAD),
                       ),
                       onPressed: () {
@@ -277,28 +312,36 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+
+                /// -------------------------
+                /// LOGIN BUTTON (GÜNCELLENDİ)
+                /// -------------------------
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF7A4FAD),
+                      backgroundColor:
+                          _isLoading ? Colors.grey : const Color(0xFF7A4FAD),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       elevation: 4,
                     ),
-                    onPressed: _login,
-                    child: const Text(
-                      "E-posta ile Giriş Yap",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    onPressed: _isLoading ? null : _login,
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "E-posta ile Giriş Yap",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
+
                 const SizedBox(height: 15),
                 Align(
                   alignment: Alignment.centerRight,
@@ -322,6 +365,7 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
                 const Center(
                   child: Text(
@@ -329,12 +373,14 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
                 ),
+
                 const SizedBox(height: 15),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: _signInWithGoogle,
+                      onTap: _isLoading ? null : _signInWithGoogle,
                       child: Container(
                         width: 50,
                         height: 50,
@@ -354,14 +400,15 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                             "https://cdn-icons-png.flaticon.com/512/300/300221.png",
                             width: 30,
                             height: 30,
-                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 20),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -391,20 +438,15 @@ class _OwnerLoginPageState extends State<OwnerLoginPage> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 25),
+
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
                   child: Text.rich(
                     TextSpan(
