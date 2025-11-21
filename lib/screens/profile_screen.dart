@@ -360,13 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        buildMenuButton(
-                          Icons.card_giftcard,
-                          'Promosyonlar\nKuponlar',
-                          () {},
-                        ),
-                        buildMenuButton(
-                            Icons.monetization_on, 'Referans Programı', () {}),
                         buildMenuButton(Icons.favorite, 'Favorilerim', () {
                           Navigator.push(
                             context,
@@ -378,13 +371,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           );
                         }),
-                        buildMenuButton(
-                            Icons.account_balance_wallet, 'Bakiye', () {}),
                         buildMenuButton(Icons.pets, 'Evcil Hayvanlarım', () {}),
                         buildMenuButton(
                             Icons.military_tech, 'Rozetlerim', () {}),
-                        buildMenuButton(
-                            Icons.handshake, 'Sponsor / Üyelik', () {}),
                         buildMenuButton(Icons.help_center, 'Yardım Merkezi',
                             () {
                           Navigator.push(
