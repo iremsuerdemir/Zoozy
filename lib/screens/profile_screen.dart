@@ -320,8 +320,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        buildStatColumn('Bakiye', '0.00'),
-                        buildStatColumn('Kredi', '0'),
                         buildStatColumn('Yorum', '0'),
                         buildStatColumn(
                           'Rozetlerim',
@@ -372,8 +370,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         }),
                         buildMenuButton(Icons.pets, 'Evcil Hayvanlarım', () {}),
-                        buildMenuButton(
-                            Icons.military_tech, 'Rozetlerim', () {}),
+                        buildMenuButton(Icons.military_tech, 'Rozetlerim', () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MyBadgetsScreen(
+                                phoneVerified: true,
+                              ),
+                            ),
+                          );
+                        }),
                         buildMenuButton(Icons.help_center, 'Yardım Merkezi',
                             () {
                           Navigator.push(

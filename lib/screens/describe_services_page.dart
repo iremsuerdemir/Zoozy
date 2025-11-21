@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart';
-import 'package:zoozy/screens/services_rate.dart'; // Bu import'un ServiceRatesPage'i içerdiğini varsayıyoruz
+import 'package:zoozy/screens/services_rates.dart'; // Bu import'un ServiceRatesPage'i içerdiğini varsayıyoruz
 
 class DescribeServicesPage extends StatefulWidget {
   const DescribeServicesPage({super.key});
@@ -82,8 +82,7 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
 
   void _kontrolButonDurumu() {
     setState(() {
-      butonAktifMi =
-          secilenEvcilHayvanSayisi != null &&
+      butonAktifMi = secilenEvcilHayvanSayisi != null &&
           secilenCins != null &&
           secilenBoyut != null &&
           secilenDenetim != null &&
@@ -444,9 +443,8 @@ class _DescribeServicesPageState extends State<DescribeServicesPage> {
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: butonAktifMi
-                          ? const Color(0xFF8e44ad)
-                          : Colors.grey,
+                      backgroundColor:
+                          butonAktifMi ? const Color(0xFF8e44ad) : Colors.grey,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(

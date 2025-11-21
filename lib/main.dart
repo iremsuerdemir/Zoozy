@@ -28,7 +28,7 @@ import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
 import 'package:zoozy/screens/service_name_page.dart';
 import 'package:zoozy/screens/services.dart';
-import 'package:zoozy/screens/services_rate.dart';
+import 'package:zoozy/screens/services_rates.dart';
 import 'package:zoozy/screens/session_count_page.dart';
 import 'package:zoozy/screens/settings_screen.dart';
 import 'package:zoozy/screens/upload_photo_screen.dart';

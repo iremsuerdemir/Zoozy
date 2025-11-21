@@ -49,7 +49,6 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
     const Color buttonColor1 = Color(0xFFB39DDB);
     const Color buttonColor2 = Color(0xFFF48FB1);
 
-    // HATA DÜZELTİLDİ: serviceTitle, artık doğru kaynaktan (widget.initialServiceName) alınıyor.
     final String serviceTitle = widget.initialServiceName.isEmpty
         ? 'Seçilen Hizmet'
         : widget.initialServiceName;
@@ -133,7 +132,6 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
                           child: Column(
                             children: [
                               Expanded(
-                                // Scrollbar ve Controller kullanıldı
                                 child: Scrollbar(
                                   controller: _scrollController,
                                   child: SingleChildScrollView(
@@ -143,7 +141,7 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        // Dinamik olarak mevcut ve eklenen kartlar
+                                        // Kullanıcı tarafından eklenen kartlar (tıklama yok)
                                         for (var card in _rateCards)
                                           Padding(
                                             padding: const EdgeInsets.only(
@@ -153,18 +151,11 @@ class _ServiceRatesPageState extends State<ServiceRatesPage> {
                                               title: card['title']!,
                                               subtitle: card['subtitle']!,
                                               fontSize: fontSize,
-                                              onTap: () async {
-                                                final serviceName =
-                                                    card['title'] ??
-                                                    widget.initialServiceName;
-                                                _navigateToAddServiceRate(
-                                                  serviceName,
-                                                );
-                                              },
+                                              onTap: null, // tıklama kapalı
                                             ),
                                           ),
 
-                                        // Yeni Fiyat Ekle Kartı
+                                        // Yeni Fiyat Ekle Kartı (tıklama aktif)
                                         _rateCard(
                                           title:
                                               '${serviceTitle} İçin Fiyat Ekle',

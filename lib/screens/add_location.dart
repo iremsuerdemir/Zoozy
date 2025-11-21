@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/upload_photo_screen.dart';
-import 'package:zoozy/services/places_service.dart'; // Backend proxy servisini import ettik
+import 'package:zoozy/services/places_service.dart';
 
 class AddLocation extends StatefulWidget {
   const AddLocation({super.key});
@@ -12,7 +12,6 @@ class AddLocation extends StatefulWidget {
 }
 
 class _AddLocationState extends State<AddLocation> {
-  // Metin giriş alanları için kontrolcüler
   final TextEditingController aramaKontrolcusu = TextEditingController();
   final TextEditingController daireKontrolcusu = TextEditingController();
   final TextEditingController caddeKontrolcusu = TextEditingController();
@@ -26,7 +25,6 @@ class _AddLocationState extends State<AddLocation> {
     borderSide: BorderSide(color: Color(0xFFD3D3D3)),
   );
 
-  // Backend’den gelen yerleri saklayacağız
   List _places = [];
   Timer? _debounce;
 
@@ -43,7 +41,6 @@ class _AddLocationState extends State<AddLocation> {
     super.dispose();
   }
 
-  // Input değişimlerini debounce ile backend çağrısı yap
   void _onPlaceChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
@@ -77,14 +74,12 @@ class _AddLocationState extends State<AddLocation> {
           SafeArea(
             child: Column(
               children: [
-                // Üst Çubuk
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 8,
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         icon: const Icon(
@@ -94,12 +89,15 @@ class _AddLocationState extends State<AddLocation> {
                         ),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      const Text(
-                        'Konum Ekle',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: const Text(
+                          'Konum Ekle',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 48),
@@ -107,15 +105,11 @@ class _AddLocationState extends State<AddLocation> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // İçerik Alanı
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final double maxWidth = math.min(
-                        constraints.maxWidth * 0.9,
-                        900,
-                      );
+                      final double maxWidth =
+                          math.min(constraints.maxWidth * 0.9, 900);
                       final double fontSize = constraints.maxWidth > 1000
                           ? 18
                           : (constraints.maxWidth < 360 ? 14 : 16);
@@ -162,16 +156,11 @@ class _AddLocationState extends State<AddLocation> {
                                         ),
                                       ),
                                       const SizedBox(height: 25),
-
-                                      // Arama input
                                       _buildInputField(
                                         ipucu: 'Aramak için yazın',
                                         kontrolcu: aramaKontrolcusu,
-                                        saltOkunur: false,
                                         onChanged: _onPlaceChanged,
                                       ),
-
-                                      // Backend’den gelen sonuçları listele
                                       if (_places.isNotEmpty)
                                         SizedBox(
                                           height: 200,
@@ -184,14 +173,99 @@ class _AddLocationState extends State<AddLocation> {
                                                         "structured_formatting"]
                                                     ["main_text"]),
                                                 subtitle: Text(
-                                                    place["structured_formatting"]
-                                                            [
-                                                            "secondary_text"] ??
-                                                        ""),
-                                                onTap: () {
+                                                  place["structured_formatting"]
+                                                          ["secondary_text"] ??
+                                                      "",
+                                                ),
+                                                onTap: () async {
+                                                  final placeId =
+                                                      place['place_id'];
+                                                  final details =
+                                                      await PlacesService
+                                                          .getPlaceDetails(
+                                                              placeId);
+
+                                                  final components = details[
+                                                              'result']
+                                                          ['address_components']
+                                                      as List;
+
+                                                  String sokakNumarasi = '';
+                                                  String cadde = '';
+
+                                                  // Türkiye için doğru adres ayrıştırma
+                                                  String il = '';
+                                                  String ilce = '';
+                                                  String postaKodu = '';
+                                                  String ulke = '';
+
+                                                  for (var c in components) {
+                                                    final types =
+                                                        c['types'] as List;
+
+                                                    if (types.contains(
+                                                        'street_number')) {
+                                                      sokakNumarasi =
+                                                          c['long_name'];
+                                                    }
+
+                                                    if (types
+                                                        .contains('route')) {
+                                                      cadde = c['long_name'];
+                                                    }
+
+                                                    // 📌 İL (Kesin)
+                                                    if (types.contains(
+                                                        'administrative_area_level_1')) {
+                                                      il = c['long_name'];
+                                                    }
+
+                                                    // 📌 İLÇE (Kesin)
+                                                    if (types.contains(
+                                                        'administrative_area_level_2')) {
+                                                      ilce = c['long_name'];
+                                                    }
+
+                                                    // 📌 Eğer il boşsa locality → İl olarak alınabilir (yedek)
+                                                    if (types.contains(
+                                                            'locality') &&
+                                                        il.isEmpty) {
+                                                      il = c['long_name'];
+                                                    }
+
+                                                    if (types.contains(
+                                                        'postal_code')) {
+                                                      postaKodu =
+                                                          c['long_name'];
+                                                    }
+
+                                                    if (types
+                                                        .contains('country')) {
+                                                      ulke = c['long_name'];
+                                                    }
+                                                  }
+
+                                                  String tamCadde = [
+                                                    sokakNumarasi,
+                                                    cadde
+                                                  ]
+                                                      .where(
+                                                          (s) => s.isNotEmpty)
+                                                      .join(' ');
+
                                                   setState(() {
                                                     aramaKontrolcusu.text =
-                                                        place["description"];
+                                                        place['description'];
+                                                    daireKontrolcusu.text = '';
+                                                    caddeKontrolcusu.text =
+                                                        tamCadde;
+                                                    sehirKontrolcusu.text =
+                                                        il; // İL
+                                                    eyaletKontrolcusu.text =
+                                                        ilce; // İLÇE
+                                                    postaKoduKontrolcusu.text =
+                                                        postaKodu;
+                                                    ulkeKontrolcusu.text = ulke;
                                                     _places = [];
                                                   });
                                                 },
@@ -199,7 +273,6 @@ class _AddLocationState extends State<AddLocation> {
                                             },
                                           ),
                                         ),
-
                                       const SizedBox(height: 20),
                                       _buildInputField(
                                         ipucu: 'Daire, kat, vs.',
@@ -217,7 +290,7 @@ class _AddLocationState extends State<AddLocation> {
                                       ),
                                       const SizedBox(height: 15),
                                       _buildInputField(
-                                        ipucu: 'Eyalet / İlçe',
+                                        ipucu: 'İlçe',
                                         kontrolcu: eyaletKontrolcusu,
                                       ),
                                       const SizedBox(height: 15),
@@ -235,8 +308,6 @@ class _AddLocationState extends State<AddLocation> {
                                   ),
                                 ),
                               ),
-
-                              // İLERİ Butonu
                               GestureDetector(
                                 onTap: () {
                                   final args = ModalRoute.of(context)
@@ -270,9 +341,8 @@ class _AddLocationState extends State<AddLocation> {
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [

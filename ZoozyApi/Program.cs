@@ -18,14 +18,15 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "http://localhost:5000", // Flutter Web development port
-                "https://zoozy-proje.web.app" // Prod Web app
+                "http://localhost:5000", 
+                "https://zoozy-proje.web.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
     });
 });
+
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

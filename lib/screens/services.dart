@@ -4,7 +4,7 @@ import 'package:zoozy/screens/about_me_page.dart'; // İlk durak
 import 'package:zoozy/screens/add_service_rate_page.dart';
 import 'package:zoozy/screens/agreement_screen.dart';
 // import 'package:zoozy/screens/service_name_page.dart'; // Bu dosyayı akışta kullanabilirsiniz.
-import 'package:zoozy/screens/services_rate.dart'; // ServiceRatesPage'i import etmeyi unutmayın
+import 'package:zoozy/screens/services_rates.dart'; // ServiceRatesPage'i import etmeyi unutmayın
 
 // Services ekranı
 class Services extends StatefulWidget {
