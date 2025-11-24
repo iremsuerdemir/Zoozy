@@ -47,18 +47,22 @@ final GoogleSignIn googleSignIn = GoogleSignIn(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //   Firebase Başlatma
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4",
-      authDomain: "zoozy-proje.firebaseapp.com",
-      projectId: "zoozy-proje",
-      storageBucket: "zoozy-proje.appspot.com",
-      messagingSenderId: "301880499217",
-      appId: "1:301880499217:web:ab6f352ce3c0e0df43a5b0",
-      measurementId: "G-KKZ5HXFDFD",
-    ),
-  );
+  // Firebase başlatma
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4",
+        authDomain: "zoozy-proje.firebaseapp.com",
+        projectId: "zoozy-proje",
+        storageBucket: "zoozy-proje.appspot.com",
+        messagingSenderId: "301880499217",
+        appId: "1:301880499217:web:ab6f352ce3c0e0df43a5b0",
+        measurementId: "G-KKZ5HXFDFD",
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
 
   //   Tarih formatları & Türkçe ayarlar
   await initializeDateFormatting('tr_TR', null);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'active_pet_walk_page.dart';
 import 'pet_breed_selection_page.dart';
 import 'pet_type_selection_page.dart';
 import 'pet_weight_selection_page.dart';
@@ -349,14 +350,16 @@ class _PetWalkPageState extends State<PetWalkPage> {
                           // Yürüyüşü başlat butonu
                           GestureDetector(
                             onTap: selectedIndexes.isNotEmpty
-                                ? () {
-                                    final selectedPetsText = selectedIndexes
-                                        .map((i) => pets[i]['type'])
-                                        .join(', ');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            "Seçilen evcil hayvanlar: $selectedPetsText"),
+                                ? () async {
+                                    final selectedPets = selectedIndexes
+                                        .map((i) => pets[i])
+                                        .toList();
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ActivePetWalkPage(
+                                          selectedPets: selectedPets,
+                                        ),
                                       ),
                                     );
                                   }

@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Yürüyüş rotanızı gösterebilmek için konumunuza ihtiyaç duyuyoruz.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Arka planda yürürken rotanızı kaydedebilmek için konum erişimi gerekir.</string>
+	<key>GMSApiKey</key>
+	<string>PASTE_YOUR_IOS_MAPS_API_KEY_HERE</string>
 </dict>
 </plist>

@@ -181,10 +181,8 @@ class _JobsScreenState extends State<JobsScreen> {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                // Üst arka plan gradient
                 Container(
-                  height: 200,
-                  width: double.infinity,
+                  height: screenHeight * 0.35,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [primaryPurple, softPink],
@@ -193,25 +191,19 @@ class _JobsScreenState extends State<JobsScreen> {
                     ),
                   ),
                 ),
-
-                // Orta görsel
                 Positioned(
                   left: screenWidth / 2 - 80,
                   top: 20,
-                  child: Center(
-                    child: Transform.scale(
-                      scale: 1.3,
-                      child: Image.asset(
-                        'assets/images/jobs.png',
-                        height: 160,
-                        width: 160,
-                        fit: BoxFit.contain,
-                      ),
+                  child: Transform.scale(
+                    scale: 1.3,
+                    child: Image.asset(
+                      'assets/images/jobs.png',
+                      height: 160,
+                      width: 160,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
-
-                // Alt kısım: ikonlu kutular
                 Positioned(
                   top: screenHeight * 0.25,
                   left: screenWidth * 0.06,

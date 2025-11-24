@@ -1,18 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.zoozy">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
     <application
         android:label="zoozy"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-
-        <!-- Facebook App ID burada olmalı -->
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
-            <meta-data
-    android:name="com.facebook.sdk.ClientToken"
-    android:value="@string/facebook_client_token"/>
 
         <activity
             android:name=".MainActivity"
@@ -34,6 +30,10 @@
             </intent-filter>
 
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_api_key" />
 
         <!-- Flutter embedding -->
         <meta-data

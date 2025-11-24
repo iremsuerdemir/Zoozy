@@ -1,11 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zoozy/models/favori_item.dart';
-import 'package:zoozy/models/comment.dart';
-import 'package:zoozy/services/comment_service.dart';
 import 'package:zoozy/components/comment_card.dart';
 import 'package:zoozy/components/comment_dialog.dart';
+import 'package:zoozy/models/comment.dart';
+import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/services/comment_service.dart';
 import 'package:zoozy/services/guest_access_service.dart';
 
 class MomentsPostCard extends StatefulWidget {
@@ -51,19 +52,16 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
     _loadComments();
   }
 
+  String get _cardId => "moment_${widget.userName}_${widget.postImage}";
+
   void _loadComments() {
-    // Moment kartı için unique cardId kullanıyoruz
-    final cardId =
-        "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}";
     setState(() {
-      _comments = _commentService.getCommentsForCard(cardId);
+      _comments = _commentService.getCommentsForCard(_cardId);
     });
   }
 
   void _onCommentAdded(Comment comment) {
-    final cardId =
-        "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}";
-    _commentService.addComment(cardId, comment);
+    _commentService.addComment(_cardId, comment);
     _loadComments();
   }
 
@@ -202,8 +200,7 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                       context: context,
                       builder: (context) => CommentDialog(
                         currentUserName: widget.currentUserName,
-                        cardId:
-                            "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}",
+                        cardId: _cardId,
                         onCommentAdded: _onCommentAdded,
                       ),
                     );

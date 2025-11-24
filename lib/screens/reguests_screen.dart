@@ -416,14 +416,15 @@ class _RequestsScreenState extends State<RequestsScreen> {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [primaryPurple, softPink],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                SizedBox(
+                  height: screenHeight * 0.35,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [primaryPurple, softPink],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
                   ),
                 ),
