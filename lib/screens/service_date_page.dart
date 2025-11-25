@@ -62,8 +62,11 @@ class _ServiceDatePageState extends State<ServiceDatePage> {
     final DateTime? picked = await showDatePicker(
       context: context,
       locale: const Locale('tr', 'TR'),
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate:
+          _isStartSelected ? DateTime.now() : (_startDate ?? DateTime.now()),
+      firstDate: _isStartSelected
+          ? DateTime.now()
+          : _startDate!, // ❗ Bitiş tarihi en erken başlangıç tarihi olmalı
       lastDate: DateTime(2100),
       builder: (context, child) {
         return Theme(
@@ -106,15 +109,38 @@ class _ServiceDatePageState extends State<ServiceDatePage> {
       },
     );
 
-    if (picked != null) {
-      setState(() {
-        if (_isStartSelected) {
-          _startTime = picked;
-        } else {
-          _endTime = picked;
-        }
-      });
+    if (picked == null) return;
+
+    // ❗ Aynı gün kontrolü
+    if (!_isStartSelected &&
+        _startDate != null &&
+        _endDate != null &&
+        _startDate!.year == _endDate!.year &&
+        _startDate!.month == _endDate!.month &&
+        _startDate!.day == _endDate!.day) {
+      final startMinutes = _startTime!.hour * 60 + _startTime!.minute;
+      final endMinutes = picked.hour * 60 + picked.minute;
+
+      // ❗ En az 1 saat sonrası olmalı
+      if (endMinutes < startMinutes + 60) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                "Aynı gün için bitiş saati, başlangıç saatinden en az 1 saat sonra olmalıdır."),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
     }
+
+    setState(() {
+      if (_isStartSelected) {
+        _startTime = picked;
+      } else {
+        _endTime = picked;
+      }
+    });
   }
 
   @override

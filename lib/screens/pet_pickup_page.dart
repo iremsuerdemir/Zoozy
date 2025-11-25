@@ -104,37 +104,41 @@ class _PetPickupPageState extends State<PetPickupPage> {
           ),
 
           SafeArea(
-            child: Column(
-              children: [
-                // Üst başlık
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 28),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        "Evcil Hayvan Alma Hizmeti",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Üst başlık
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back,
+                              color: Colors.white, size: 28),
+                          onPressed: () => Navigator.pop(context),
                         ),
-                      ),
-                      const SizedBox(width: 48),
-                    ],
+                        Expanded(
+                          child: Text(
+                            "Evcil Hayvan Alma Hizmeti",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 48),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
 
-                // Beyaz kart
-                Expanded(
-                  child: LayoutBuilder(
+                  const SizedBox(height: 16),
+
+                  // Beyaz kart
+                  LayoutBuilder(
                     builder: (context, constraints) {
                       final double maxWidth =
                           math.min(constraints.maxWidth * 0.9, 600);
@@ -181,7 +185,7 @@ class _PetPickupPageState extends State<PetPickupPage> {
                               const SizedBox(height: 12),
                               _buildOptionCard("Hayır"),
 
-                              const Spacer(),
+                              const SizedBox(height: 20),
 
                               // Mor degrade ileri butonu
                               GestureDetector(
@@ -236,9 +240,10 @@ class _PetPickupPageState extends State<PetPickupPage> {
                       );
                     },
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ],

@@ -94,6 +94,13 @@ class _RequestsScreenState extends State<RequestsScreen> {
               );
             }
           }
+        }
+
+        // ⭐⭐⭐ HİZMET AL BURADA YAKALANIYOR ⭐⭐⭐
+        else if (text == "Hizmet Al") {
+          final allowed = await GuestAccessService.ensureLoggedIn(context);
+          if (!allowed) return;
+          _showBroadcastRequestModal(context);
         } else {
           setState(() {
             selectedIndex = _getIndexFromText(text);
@@ -509,7 +516,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
-                "Birisi iş ilanı verdiğinde burada bilgilendirileceksiniz. İşler hakkında bildirim almak için destekçi olarak kaydolun.",
+                "Yakınınızdaki hayvan bakıcılarından teklif almak için talepte bulunun.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -540,7 +547,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 _showBroadcastRequestModal(context);
               },
               child: Text(
-                selectedIndex == 1 ? "ŞİMDİ HİZMET ALIN" : "ŞİMDİ HİZMET SUNUN",
+                "TALEP OLUŞTURUN",
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),

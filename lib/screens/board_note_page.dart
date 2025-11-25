@@ -22,6 +22,7 @@ class _BoardNotePageState extends State<BoardNotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           // Arka plan
@@ -38,44 +39,50 @@ class _BoardNotePageState extends State<BoardNotePage> {
             ),
           ),
           SafeArea(
-            child: Column(
-              children: [
-                // Üst bar
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 28),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 30), // Başlığı biraz aşağı itti
-                          child: const Text(
-                            "Ek olarak bakıcının bilmesi gerekenler (isteğe bağlı)",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              // ← EKLEDİM
+              padding: EdgeInsets.only(
+                // ← EKLEDİM
+                bottom:
+                    MediaQuery.of(context).viewInsets.bottom + 20, // ← EKLEDİM
+              ),
+              child: Column(
+                children: [
+                  // Üst bar
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back,
+                              color: Colors.white, size: 28),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 30), // Başlığı biraz aşağı itti
+                            child: const Text(
+                              "Ek olarak bakıcının bilmesi gerekenler (isteğe bağlı)",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 48),
-                    ],
+                        const SizedBox(width: 48),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // İçerik kutusu
-                Expanded(
-                  child: LayoutBuilder(
+                  // İçerik kutusu
+                  LayoutBuilder(
                     builder: (context, constraints) {
                       final double maxContentWidth =
                           math.min(constraints.maxWidth * 0.9, 600);
@@ -136,7 +143,7 @@ class _BoardNotePageState extends State<BoardNotePage> {
                                 ),
                               ),
 
-                              const Spacer(),
+                              SizedBox(height: 20),
 
                               // İleri butonu
                               GestureDetector(
@@ -192,9 +199,10 @@ class _BoardNotePageState extends State<BoardNotePage> {
                       );
                     },
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ],
