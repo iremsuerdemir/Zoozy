@@ -205,7 +205,7 @@ class _UploadPhotoScreenState extends State<UploadPhotoScreen> {
             _mevcutAdim == 0 ? "Evcil Hayvan Fotoğrafları" : "Ev Fotoğrafları",
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),

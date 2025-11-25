@@ -1,13 +1,26 @@
+import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class PlacesService {
-  static const String _baseUrl = "http://localhost:5001";
+  // Platforma göre değişen baseUrl
+  static String get baseUrl {
+    if (kIsWeb) {
+      return "http://localhost:5001"; // Web
+    } else if (Platform.isAndroid) {
+      return "http://192.168.75.149:5001"; // Android cihaz / emulator
+    } else if (Platform.isIOS) {
+      return "http://192.168.75.149:5001"; // iOS cihaz
+    } else {
+      return "http://localhost:5001"; // Windows / MacOS / Linux
+    }
+  }
 
   static Future<List<dynamic>> getPlaces(String input) async {
     if (input.isEmpty) return [];
 
-    final url = Uri.parse("$_baseUrl/places/autocomplete?input=$input");
+    final url = Uri.parse("$baseUrl/places/autocomplete?input=$input");
 
     final response = await http.get(url);
 
@@ -20,7 +33,8 @@ class PlacesService {
   }
 
   static Future<Map<String, dynamic>> getPlaceDetails(String placeId) async {
-    final url = Uri.parse("$_baseUrl/places/details?place_id=$placeId");
+    final url = Uri.parse("$baseUrl/places/details?place_id=$placeId");
+
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

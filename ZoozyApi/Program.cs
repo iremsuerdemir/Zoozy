@@ -4,35 +4,32 @@ using ZoozyApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ortam değişkenlerini yükle
+
+
+// Ortam değişkenleri
 builder.Configuration.AddEnvironmentVariables(prefix: "ZOOZY_");
 
 // Servisler
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 
-// CORS ayarları
+// CORS — Flutter Web + Android + iOS + Desktop için OPEN
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .WithOrigins(
-                "http://localhost:5000", 
-                "https://zoozy-proje.web.app"
-            )
+            .AllowAnyOrigin()   // Her IP'ye izin ver
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
-
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Database bağlantısı
+// Database
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection") ??
     builder.Configuration["ConnectionStrings__DefaultConnection"] ??
@@ -42,7 +39,7 @@ var connectionString =
 if (string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(
-        "Veritabanı bağlantı bilgisi bulunamadı. Lütfen ConnectionStrings:DefaultConnection değerini User Secrets veya ortam değişkeni ile tanımlayın."
+        "Veritabanı bağlantı bilgisi bulunamadı. ConnectionStrings:DefaultConnection tanımlayın."
     );
 }
 
@@ -54,16 +51,19 @@ builder.Services.AddScoped<IFirebaseSyncService, FirebaseSyncService>();
 
 var app = builder.Build();
 
-// Swagger UI (development)
+// Swagger UI
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middleware sırası önemli: Cors -> HTTPS -> Auth -> Controllers
-app.UseCors();
+// Middleware sırası
+app.UseCors("AllowAll");
+
+// Lokal geliştirme HTTPS kullanmıyorsan sorun olmaz
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
 app.MapControllers();
