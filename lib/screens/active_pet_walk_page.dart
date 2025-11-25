@@ -220,7 +220,7 @@ class _ActivePetWalkPageState extends State<ActivePetWalkPage> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Text(
-                        'Dog Walk',
+                        'Yürüyüş',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -319,8 +319,9 @@ class _EndWalkButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: const Text(
-        'End Walk',
+        'Yürüyüşü Bitir',
         style: TextStyle(
+          color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.bold,
         ),

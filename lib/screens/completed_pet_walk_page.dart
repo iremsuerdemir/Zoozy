@@ -33,7 +33,7 @@ class CompletedPetWalkPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pet Walks'),
+        title: const Text(' Evcil Hayvan Yürüyüşleri'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -46,7 +46,7 @@ class CompletedPetWalkPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
             color: Colors.green.shade600,
             child: const Text(
-              'Dog Walk Info Successfully Saved.',
+              'Yürüyüş Bilgileri Başarıyla Kaydedildi.',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -61,7 +61,7 @@ class CompletedPetWalkPage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 12),
                   const Text(
-                    'Completed Walks',
+                    'Tamamlanan Yürüyüşler',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -189,22 +189,22 @@ class CompletedPetWalkPage extends StatelessWidget {
         .map((pet) => pet['type'] as String? ?? '')
         .toList()
       ..removeWhere((element) => element.isEmpty);
-    if (names.isEmpty) return 'Pets';
+    if (names.isEmpty) return 'Evcil Hayvanlar';
     return names.join(', ');
   }
 }
 
 const List<String> _months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
+  'Ocak',
+  'Şubat',
+  'Mart',
+  'Nisan',
+  'Mayıs',
+  'Haziran',
+  'Temmuz',
+  'Ağustos',
+  'Eylül',
+  'Ekim',
+  'Kasım',
+  'Aralık',
 ];
