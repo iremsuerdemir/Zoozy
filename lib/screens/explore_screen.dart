@@ -21,6 +21,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
   int selectedCategoryIndex = -1;
   Set<String> favoriIsimleri = {};
   bool _isGuest = false;
+  double arrowOffset = 0.0;
+
+  // ⭐ ScrollController EKLEDİK
+  final ScrollController caregiverScrollController = ScrollController();
 
   final caregivers = [
     {
@@ -295,7 +299,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   crossAxisCount: 4,
                   mainAxisSpacing: 20,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 0.8,
+                  childAspectRatio: 0.68,
                 ),
                 itemBuilder: (context, index) {
                   final cat = categories[index];
@@ -326,6 +330,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         const SizedBox(height: 6),
                         Text(
                           cat["label"] as String,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: isSelected
@@ -351,14 +357,40 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     "Yakınınızdaki Bakıcılar",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
+
+                  // ⭐ DÜZELTİLMİŞ DAHA FAZLA BUTONU — SCROLL YAPAR
                   TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Daha Fazla >",
-                      style: TextStyle(
-                        color: Colors.purple,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    onPressed: () {
+                      caregiverScrollController.animateTo(
+                        caregiverScrollController.offset + 260,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                      setState(() {
+                        arrowOffset = 8;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Daha Fazla",
+                          style: TextStyle(
+                            color: Colors.purple,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        AnimatedPadding(
+                          duration: const Duration(milliseconds: 250),
+                          padding: EdgeInsets.only(left: 2 + arrowOffset),
+                          child: const Text(
+                            ">",
+                            style: TextStyle(
+                              color: Colors.purple,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -366,10 +398,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
               const SizedBox(height: 8),
 
-              // --- CAREGIVER KARTLARI DÜZELTİLMİŞ ---
+              // --- SCROLL CONTROLLER EKLENMİŞ CAREGIVER LİSTESİ ---
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.32, // ARTTIRILDI
+                height: 250,
                 child: ListView.builder(
+                  controller: caregiverScrollController,
                   scrollDirection: Axis.horizontal,
                   itemCount: caregivers.length,
                   itemBuilder: (context, index) {
@@ -395,7 +428,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
               const SizedBox(height: 24),
 
-              // --- PETLER DÜZELTİLMİŞ ---
               const Text(
                 "Topluluktaki Evcil Hayvanlar",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -404,7 +436,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               const SizedBox(height: 8),
 
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.25, // ARTTIRILDI
+                height: 180,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: pets.length,

@@ -82,7 +82,7 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
         ).showSnackBar(SnackBar(content: Text('${widget.name} seçildi')));*/
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.40,
+        width: MediaQuery.of(context).size.width * 0.60,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           image: DecorationImage(
