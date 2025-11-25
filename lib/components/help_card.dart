@@ -11,10 +11,6 @@ class HelpCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(
-        minHeight: 200, // Kart minimum yüksekliği
-        maxHeight: 240, // Kart çok büyümesin
-      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
@@ -29,33 +25,36 @@ class HelpCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              children: [
-                Icon(item.icon, size: 42, color: const Color(0xFF7A4FAD)),
-                const SizedBox(height: 12),
-                Text(
-                  item.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item.description,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey,
-                    height: 1.3,
-                  ),
-                ),
-              ],
+            Icon(item.icon, size: 42, color: const Color(0xFF7A4FAD)),
+            const SizedBox(height: 12),
+            Text(
+              item.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
             ),
+            const SizedBox(height: 8),
+            Flexible(
+              child: Text(
+                item.description,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             Buton(
               text: "Aç",
               buttonColor: const Color(0xFF7A4FAD),

@@ -24,7 +24,6 @@ class HelpCenterPage extends StatelessWidget {
           );
         },
       ),
-
       HelpItem(
         icon: Icons.mail_outline,
         title: 'Destek Talebi',
@@ -78,10 +77,8 @@ class HelpCenterPage extends StatelessWidget {
             children: [
               // 🔹 Geri Dön Butonu ve Başlık
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 16,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                 child: Row(
                   children: [
                     IconButton(
@@ -120,11 +117,11 @@ class HelpCenterPage extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 20,
-                          crossAxisSpacing: 20,
-                          childAspectRatio: 1,
-                        ),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 20,
+                      crossAxisSpacing: 20,
+                      childAspectRatio: 0.68, // ← DÜZELTİLDİ
+                    ),
                     itemCount: helpItems.length,
                     itemBuilder: (context, index) {
                       return HelpCard(item: helpItems[index]);

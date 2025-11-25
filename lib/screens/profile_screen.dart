@@ -56,11 +56,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget buildMenuButton(IconData icon, String title, VoidCallback onTap) {
     return GestureDetector(
       onTap: () async {
-        // ✔ Misafir kontrolü
         final allowed = await GuestAccessService.ensureLoggedIn(context);
         if (!allowed) return;
 
-        onTap(); // ✔ Yetki varsa işleme devam
+        onTap();
       },
       child: Container(
         decoration: BoxDecoration(

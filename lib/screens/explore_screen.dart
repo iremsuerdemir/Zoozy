@@ -74,7 +74,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // SharedPreferences temizle
+    await prefs.clear();
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -121,7 +121,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   Navigator.of(dialogContext).pop();
 
                   try {
-                    // Firebase ve SharedPreferences temizle
                     await GuestAccessService.disableGuestMode();
                     await FirebaseAuth.instance.signOut();
                     final prefs = await SharedPreferences.getInstance();
@@ -201,234 +200,250 @@ class _ExploreScreenState extends State<ExploreScreen> {
       {"image": "assets/images/pet3.jpg", "name": "Max", "owner": "Carol"},
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 2,
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 16.0),
-          child: Icon(Icons.pets, color: Colors.deepPurple, size: 28),
-        ),
-        title: const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            "ZOOZY",
-            style: TextStyle(
-              color: Colors.deepPurple,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-              letterSpacing: 1.5,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 2,
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 16.0),
+            child: Icon(Icons.pets, color: Colors.deepPurple, size: 28),
+          ),
+          title: const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "ZOOZY",
+              style: TextStyle(
+                color: Colors.deepPurple,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                letterSpacing: 1.5,
+              ),
             ),
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.favorite_border,
-              color: Colors.red,
-              size: 28,
-            ),
-            onPressed: () async {
-              if (!await GuestAccessService.ensureLoggedIn(context)) return;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FavoriPage(
-                    favoriTipi: "explore",
-                    previousScreen: const ExploreScreen(),
-                  ),
-                ),
-              ).then((_) => _favorileriYukle());
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.black87,
-              size: 28,
-            ),
-            onPressed: _confirmLogout,
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_isGuest)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 16),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.deepPurple.shade100),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.info_outline, color: Colors.deepPurple),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Misafir modundasınız. İşlem yapabilmek için lütfen giriş yapınız.',
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.favorite_border,
+                color: Colors.red,
+                size: 28,
+              ),
+              onPressed: () async {
+                if (!await GuestAccessService.ensureLoggedIn(context)) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoriPage(
+                      favoriTipi: "explore",
+                      previousScreen: const ExploreScreen(),
                     ),
-                  ],
-                ),
+                  ),
+                ).then((_) => _favorileriYukle());
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.black87,
+                size: 28,
               ),
-            // --- KATEGORİLER ---
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: categories.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.9,
-              ),
-              itemBuilder: (context, index) {
-                final cat = categories[index];
-                final isSelected = index == selectedCategoryIndex;
-                return InkWell(
-                  borderRadius: BorderRadius.circular(40),
-                  onTap: () {
-                    setState(() {
-                      selectedCategoryIndex = isSelected ? -1 : index;
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: isSelected
-                            ? Colors.deepPurple
-                            : Colors.purple.shade50,
-                        child: Icon(
-                          cat["icon"] as IconData,
-                          color: isSelected
-                              ? Colors.white
-                              : Colors.purple.shade700,
-                          size: 26,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        cat["label"] as String,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Colors.deepPurple : Colors.black,
+              onPressed: _confirmLogout,
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_isGuest)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.deepPurple.shade100),
+                  ),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.info_outline, color: Colors.deepPurple),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Misafir modundasınız. İşlem yapabilmek için lütfen giriş yapınız.',
+                          style: TextStyle(
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            // --- CAREGIVER BAŞLIK ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Yakınınızdaki Bakıcılar",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    "Daha Fazla >",
-                    style: TextStyle(
-                      color: Colors.purple,
-                      fontWeight: FontWeight.w600,
+
+              // --- KATEGORİLER ---
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: categories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 20,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.8,
+                ),
+                itemBuilder: (context, index) {
+                  final cat = categories[index];
+                  final isSelected = index == selectedCategoryIndex;
+
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(40),
+                    onTap: () {
+                      setState(() {
+                        selectedCategoryIndex = isSelected ? -1 : index;
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: isSelected
+                              ? Colors.deepPurple
+                              : Colors.purple.shade50,
+                          child: Icon(
+                            cat["icon"] as IconData,
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.purple.shade700,
+                            size: 26,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          cat["label"] as String,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color:
+                                isSelected ? Colors.deepPurple : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // --- CAREGIVER BAŞLIK ---
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Yakınınızdaki Bakıcılar",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      "Daha Fazla >",
+                      style: TextStyle(
+                        color: Colors.purple,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              // --- CAREGIVER KARTLARI DÜZELTİLMİŞ ---
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.32, // ARTTIRILDI
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: caregivers.length,
+                  itemBuilder: (context, index) {
+                    final c = caregivers[index];
+                    final isFav = favoriIsimleri.contains(c["name"]);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: CaregiverCardAsset(
+                        name: c["name"] as String,
+                        imagePath: c["image"] as String,
+                        suitability: c["suitability"] as String,
+                        price: c["price"] as double,
+                        isFavorite: isFav,
+                        onFavoriteChanged: () {
+                          _favorileriYukle();
+                        },
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // --- CAREGIVER KARTLARI ---
-            SizedBox(
-              height: 230,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: caregivers.length,
-                itemBuilder: (context, index) {
-                  final c = caregivers[index];
-                  final isFav = favoriIsimleri.contains(c["name"]);
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: CaregiverCardAsset(
-                      name: c["name"] as String,
-                      imagePath: c["image"] as String,
-                      suitability: c["suitability"] as String,
-                      price: c["price"] as double,
-                      isFavorite: isFav,
-                      onFavoriteChanged: () {
-                        _favorileriYukle();
-                      },
-                    ),
-                  );
-                },
               ),
-            ),
-            const SizedBox(height: 24),
-            // --- PETS ---
-            const Text(
-              "Topluluktaki Evcil Hayvanlar",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 180,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: pets.length,
-                itemBuilder: (context, index) {
-                  final pet = pets[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: SimplePetCard(
-                      imagePath: pet["image"] as String,
-                      name: pet["name"] as String,
-                      ownerName: pet["owner"] as String,
-                    ),
-                  );
-                },
+
+              const SizedBox(height: 24),
+
+              // --- PETLER DÜZELTİLMİŞ ---
+              const Text(
+                "Topluluktaki Evcil Hayvanlar",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+
+              const SizedBox(height: 8),
+
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.25, // ARTTIRILDI
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: pets.length,
+                  itemBuilder: (context, index) {
+                    final pet = pets[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: SimplePetCard(
+                        imagePath: pet["image"] as String,
+                        name: pet["name"] as String,
+                        ownerName: pet["owner"] as String,
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0,
-        onTap: (index) async {
-          if (index == 0) {
-            Navigator.pushReplacementNamed(context, '/explore');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/requests');
-          } else if (index == 2) {
-            Navigator.pushNamed(context, '/moments');
-          } else if (index == 3) {
-            Navigator.pushNamed(context, '/jobs');
-          } else if (index == 4) {
-            await _confirmLogout(); // Logout işlemi
-          }
-        },
-        selectedColor: Colors.deepPurple,
-        unselectedColor: Colors.grey,
+        bottomNavigationBar: CustomBottomNavBar(
+          currentIndex: 0,
+          onTap: (index) async {
+            if (index == 0) {
+              Navigator.pushReplacementNamed(context, '/explore');
+            } else if (index == 1) {
+              Navigator.pushNamed(context, '/requests');
+            } else if (index == 2) {
+              Navigator.pushNamed(context, '/moments');
+            } else if (index == 3) {
+              Navigator.pushNamed(context, '/jobs');
+            } else if (index == 4) {
+              await _confirmLogout();
+            }
+          },
+          selectedColor: Colors.deepPurple,
+          unselectedColor: Colors.grey,
+        ),
       ),
     );
   }

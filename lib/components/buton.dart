@@ -7,7 +7,7 @@ class Buton extends StatelessWidget {
   final Color textColor;
   final double fontSize;
   final double height;
-  final VoidCallback onPressed;
+  final Future<void> Function() onPressed; // async destekli
 
   const Buton({
     super.key,
@@ -22,43 +22,40 @@ class Buton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: height,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          decoration: BoxDecoration(
-            color: buttonColor,
+    return SizedBox(
+      height: height,
+      child: ElevatedButton(
+        onPressed: () async => await onPressed(),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: buttonColor,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: Colors.grey.shade300),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              if (icon != null)
-                Icon(
-                  icon,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Icon(
+                icon,
+                color: textColor,
+                size: fontSize * 1.5,
+              ),
+            if (icon != null) const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: textColor,
-                  size: fontSize * 1.5,
-                ),
-              if (icon != null) const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

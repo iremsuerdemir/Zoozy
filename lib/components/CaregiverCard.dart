@@ -83,7 +83,6 @@ class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.40,
-        height: 180,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           image: DecorationImage(
