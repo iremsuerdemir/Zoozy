@@ -352,6 +352,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: GridView.count(
                       crossAxisCount: 4,
+                      childAspectRatio: 0.68,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 10,
                       shrinkWrap: true,
