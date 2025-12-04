@@ -211,25 +211,57 @@ class _AddLocationState extends State<AddLocation> {
                               // İLERİ Butonu
                               GestureDetector(
                                 onTap: () {
-                                  // Tüm alanlar doluysa sonraki sayfaya veya işleme geç
-                                  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-                                  String petName = args != null ? (args['petName'] ?? '') : '';
-                                  String serviceName = args != null ? (args['serviceName'] ?? '') : '';
-                                  DateTime startDate = args != null ? (args['startDate'] ?? DateTime.now()) : DateTime.now();
-                                  DateTime endDate = args != null ? (args['endDate'] ?? DateTime.now()) : DateTime.now();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UploadPhotoScreen(),
-                                      settings: RouteSettings(arguments: {
-                                        'petName': petName,
-                                        'serviceName': serviceName,
-                                        'startDate': startDate,
-                                        'endDate': endDate,
-                                        // adres bilgileri de eklenebilir
-                                      }),
-                                    ),
-                                  );
+                                  // Kontrol et: Tüm alanlar boş mu?
+                                  if (aramaKontrolcusu.text.isEmpty ||
+                                      daireKontrolcusu.text.isEmpty ||
+                                      caddeKontrolcusu.text.isEmpty ||
+                                      sehirKontrolcusu.text.isEmpty ||
+                                      eyaletKontrolcusu.text.isEmpty ||
+                                      postaKoduKontrolcusu.text.isEmpty ||
+                                      ulkeKontrolcusu.text.isEmpty) {
+                                    // Hata Mesajı Göster
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+                                        title: const Icon(
+                                          Icons.error,
+                                          color: Colors.red,
+                                          size: 50,
+                                        ),
+                                        content: const Text(
+                                          'Devam etmek için lütfen hizmetinizin daha doğru bir adresini girin.',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: const Color(
+                                                0xFF9370DB,
+                                              ),
+                                              foregroundColor: Colors.white,
+                                            ),
+                                            child: const Text('Tamam'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    // Tüm alanlar doluysa sonraki sayfaya veya işleme geç
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            UploadPhotoScreen(),
+                                      ),
+                                    );
+                                  }
                                 },
                                 child: Container(
                                   width: double.infinity,

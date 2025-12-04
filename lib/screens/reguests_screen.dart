@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
+import 'package:zoozy/screens/agreement_screen.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/screens/my_pets_page.dart'; // <- MyPetsPage import
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/request_item.dart';
-import 'package:intl/intl.dart';
-import 'package:zoozy/services/guest_access_service.dart';
+import 'package:zoozy/components/selectedService.dart' as globals;
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -24,71 +21,13 @@ class _RequestsScreenState extends State<RequestsScreen> {
   static const Color softPink = Color(0xFFF48FB1);
   static const Color cardIconBgColor = Color(0xFFF3E5F5);
 
-  List<RequestItem> requestList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadRequests();
-  }
-
-  Future<void> _loadRequests() async {
-    final prefs = await SharedPreferences.getInstance();
-    final rawList = prefs.getString('requests');
-    setState(() {
-      requestList = rawList != null ? RequestItem.decode(rawList) : [];
-    });
-  }
-
-  Future<ImageProvider?> _loadProfileImageProvider(String userPhoto) async {
-    try {
-      // Eğer userPhoto base64 string ise MemoryImage'a çevir
-      if (userPhoto.startsWith('data:image') ||
-          userPhoto.length > 100 &&
-              RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(userPhoto)) {
-        final bytes = base64Decode(userPhoto);
-        return MemoryImage(bytes);
-      }
-
-      // Eğer URL ise NetworkImage kullan
-      if (userPhoto.isNotEmpty &&
-          (userPhoto.startsWith('http://') ||
-              userPhoto.startsWith('https://'))) {
-        return NetworkImage(userPhoto);
-      }
-
-      // Hiçbiri değilse SharedPreferences'tan profil resmini yükle
-      final prefs = await SharedPreferences.getInstance();
-      final profileImagePath = prefs.getString('profileImagePath');
-
-      if (profileImagePath != null && profileImagePath.isNotEmpty) {
-        try {
-          final bytes = base64Decode(profileImagePath);
-          return MemoryImage(bytes);
-        } catch (e) {
-          print('Profil resmi decode edilemedi: $e');
-          return null;
-        }
-      }
-
-      return null;
-    } catch (e) {
-      print('Profil resmi yüklenirken hata: $e');
-      return null;
-    }
-  }
-
   Widget _buildIconTextCard(
     IconData icon,
     String text, {
     bool isSelected = false,
   }) {
     return GestureDetector(
-      onTap: () async {
-        if (text == "Köpek Gezdir" || text == "Yardım") {
-          final allowed = await GuestAccessService.ensureLoggedIn(context);
-          if (!allowed) return;
-        }
+      onTap: () {
         setState(() {
           selectedIndex = _getIndexFromText(text);
         });
@@ -162,83 +101,49 @@ class _RequestsScreenState extends State<RequestsScreen> {
         onTap: () {
           Navigator.pop(context); // Modalı kapat
 
+          globals.selectedService = text;
           // Her hizmet kartı için yönlendirme
           switch (text) {
             case "Pansiyon":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Pansiyon'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             case "Gündüz Bakımı":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Gündüz Bakımı'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             case "Evde Bakım":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Evde Bakım'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             case "Gezdirme":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Gezdirme'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             case "Taksi":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Taksi'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             case "Bakım":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Bakım'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             case "Eğitim":
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
-                  settings: RouteSettings(
-                    arguments: {'serviceName': 'Eğitim'},
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => MyPetsPage()),
               );
               break;
             default:
@@ -531,80 +436,13 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 ),
                 elevation: 0,
               ),
-              onPressed: () async {
-                if (!await GuestAccessService.ensureLoggedIn(context)) {
-                  return;
-                }
-                _showBroadcastRequestModal(context);
-              },
-              child: Text(
-                selectedIndex == 1 ? "ŞİMDİ HİZMET ALIN" : "ŞİMDİ HİZMET SUNUN",
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              onPressed: () => _showBroadcastRequestModal(context),
+              child: const Text(
+                "ŞİMDİ HİZMET SUNUN",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
-
             const SizedBox(height: 20),
-            // --- TALEP KARTLARI ---
-            if (requestList.isNotEmpty)
-              ListView.builder(
-                shrinkWrap: true,
-                padding: const EdgeInsets.only(top: 30),
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: requestList.length,
-                itemBuilder: (context, i) {
-                  final x = requestList[i];
-                  return FutureBuilder<ImageProvider?>(
-                    future: _loadProfileImageProvider(x.userPhoto),
-                    builder: (context, snapshot) {
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: snapshot.data,
-                            child: snapshot.data == null
-                                ? const Icon(Icons.person)
-                                : null,
-                          ),
-                          title: Text("${x.petName} - ${x.serviceName}"),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "Tarih: " +
-                                      DateFormat('d MMMM yyyy', 'tr_TR')
-                                          .format(x.startDate) +
-                                      " - " +
-                                      DateFormat('d MMMM yyyy', 'tr_TR')
-                                          .format(x.endDate),
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.black87)),
-                              Text("Süre: ${x.dayDiff - 1} gün",
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.black87)),
-                              if (x.note.isNotEmpty)
-                                Text("Not: ${x.note}",
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black87)),
-                            ],
-                          ),
-                          onTap: () {},
-                        ),
-                      );
-                    },
-                  );
-                },
-              )
-            else ...[
-              const SizedBox(height: 30),
-              const Text(
-                'Henüz kayıtlı talep yok.',
-                style: TextStyle(fontSize: 17, color: Colors.black),
-              ),
-            ],
           ],
         ),
       ),

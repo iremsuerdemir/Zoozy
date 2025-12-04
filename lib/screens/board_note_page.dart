@@ -141,21 +141,11 @@ class _BoardNotePageState extends State<BoardNotePage> {
                               // İleri butonu
                               GestureDetector(
                                 onTap: () {
-                                  final args = ModalRoute.of(context)
-                                      ?.settings
-                                      .arguments as Map;
-
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => PetPickupPage(),
-                                      settings: RouteSettings(
-                                        arguments: {
-                                          ...args,
-                                          'note': _noteController
-                                              .text, // not ekleniyor
-                                        },
-                                      ),
+                                      builder: (context) =>
+                                          const PetPickupPage(),
                                     ),
                                   );
                                 },

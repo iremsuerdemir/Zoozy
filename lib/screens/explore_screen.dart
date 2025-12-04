@@ -5,7 +5,6 @@ import 'package:zoozy/components/CaregiverCard.dart';
 import 'package:zoozy/components/SimplePetCard.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/favori_page.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -17,7 +16,6 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   int selectedCategoryIndex = -1;
   Set<String> favoriIsimleri = {}; // 🔹 Favorilerdeki kişileri tutar
-  bool _isGuest = false;
 
   final caregivers = [
     {
@@ -44,7 +42,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
   void initState() {
     super.initState();
     _favorileriYukle();
-    _loadGuestFlag();
   }
 
   // 🔹 Favorileri SharedPreferences'tan yükler
@@ -59,15 +56,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     setState(() {
       favoriIsimleri = mevcutIsimler;
     });
-  }
-
-  Future<void> _loadGuestFlag() async {
-    final isGuest = await GuestAccessService.isGuest();
-    if (mounted) {
-      setState(() {
-        _isGuest = isGuest;
-      });
-    }
   }
 
   @override
@@ -118,9 +106,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               size: 28,
             ),
             onPressed: () async {
-              if (!await GuestAccessService.ensureLoggedIn(context)) {
-                return;
-              }
               // 🔹 Favori sayfasına git ve geri dönünce yenile
               Navigator.push(
                 context,
@@ -144,33 +129,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (_isGuest)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 16),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.deepPurple.shade100),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.info_outline, color: Colors.deepPurple),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Misafir modundasınız. İşlem yapabilmek için lütfen giriş yapınız.',
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             // --- KATEGORİLER ---
             GridView.builder(
               shrinkWrap: true,

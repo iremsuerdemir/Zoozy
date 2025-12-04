@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 void main() {
   runApp(const LoginPage());
@@ -260,14 +259,10 @@ class _LoginPageState extends State<LoginPage> {
                 metin: 'Keşfet',
                 renk: const Color(0xFFB2A4FF), // açık mor
                 metinRengi: Colors.white,
-                tiklamaFonksiyonu: () async {
-                  await GuestAccessService.enableGuestMode();
-                  if (!mounted) return;
+                tiklamaFonksiyonu: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const ExploreScreen(),
-                    ),
+                    MaterialPageRoute(builder: (context) => ExploreScreen()),
                   );
                 },
                 cizgili: true,

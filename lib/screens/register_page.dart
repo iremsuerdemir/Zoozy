@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/owner_login_page.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -46,7 +46,6 @@ class _RegisterPageState extends State<RegisterPage> {
         'email',
         (userCredential.user?.email ?? '').toLowerCase(),
       );
-      await GuestAccessService.disableGuestMode();
 
       if (!mounted) return;
 
@@ -262,7 +261,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               'password',
                               passwordController.text.trim(),
                             );
-                            await GuestAccessService.disableGuestMode();
 
                             if (!mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(

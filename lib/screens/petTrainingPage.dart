@@ -1,21 +1,28 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
-import 'package:zoozy/screens/service_date_page.dart';
 
-class WalkCountPage extends StatefulWidget {
-  const WalkCountPage({super.key});
+import 'package:flutter/material.dart';
+import 'package:zoozy/screens/training_type_page.dart';
+
+class PetTrainingPage extends StatefulWidget {
+  const PetTrainingPage({super.key});
+
   @override
-  State<WalkCountPage> createState() => _WalkCountPageState();
+  State<PetTrainingPage> createState() => _PetTrainingPageState();
 }
 
-class _WalkCountPageState extends State<WalkCountPage> {
-  final List<String> walkOptions = [
-    "Günde 1 yürüyüş",
-    "Günde 2 yürüyüş",
-    "Günde 3 yürüyüş",
+class _PetTrainingPageState extends State<PetTrainingPage> {
+  final List<String> trainingServices = [
+    "Tuvalet Eğitimi",
+    "İtaat Eğitimi",
+    "Davranış Eğitimi",
+    "Çeviklik Eğitimi",
+    "Numara Öğretme",
+    "Terapötik Eğitim",
   ];
-  String? selectedOption;
-  // Gradient (kutular + butonlar)
+
+  final Set<String> selectedServices = {};
+
+  // Ortak gradient tanımı (kutular + buton)
   final LinearGradient appGradient = const LinearGradient(
     colors: [
       Colors.purple,
@@ -24,12 +31,18 @@ class _WalkCountPageState extends State<WalkCountPage> {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  Widget _buildWalkButton(String option, double fontSize) {
-    final isSelected = selectedOption == option;
+
+  Widget _buildServiceButton(String service, double fontSize) {
+    final isSelected = selectedServices.contains(service);
+
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedOption = isSelected ? null : option;
+          if (isSelected) {
+            selectedServices.remove(service);
+          } else {
+            selectedServices.add(service);
+          }
         });
       },
       child: AnimatedContainer(
@@ -58,7 +71,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              option,
+              service,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: fontSize,
@@ -77,7 +90,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Arka plan gradient
+          // Gradient arka plan
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -106,7 +119,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Text(
-                        "Günlük Yürüyüşler",
+                        "Evcil Hayvan Eğitimi",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -118,7 +131,8 @@ class _WalkCountPageState extends State<WalkCountPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // İçerik kısmı
+
+                // Ana içerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -127,6 +141,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                       final double fontSize = constraints.maxWidth > 1000
                           ? 18
                           : (constraints.maxWidth < 360 ? 14 : 16);
+
                       return Center(
                         child: Container(
                           width: maxContentWidth,
@@ -147,7 +162,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Evcil hayvanınız için günlük yürüyüş sıklığını seçin",
+                                "Evcil hayvanınız için hangi eğitim hizmetlerini almak istiyorsunuz?",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -160,22 +175,37 @@ class _WalkCountPageState extends State<WalkCountPage> {
                                   mainAxisSpacing: 16,
                                   crossAxisSpacing: 16,
                                   childAspectRatio: 2.5,
-                                  children: walkOptions
-                                      .map((option) =>
-                                          _buildWalkButton(option, fontSize))
+                                  children: trainingServices
+                                      .map((service) => _buildServiceButton(
+                                          service, fontSize))
                                       .toList(),
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              // İleri butonu
+
+                              // İleri Butonu
                               GestureDetector(
-                                onTap: selectedOption != null
+                                onTap: selectedServices.isNotEmpty
                                     ? () {
+                                        // SnackBar göstermek istersen bunu bırakabilirsin
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            backgroundColor: Colors.green,
+                                            content: Text(
+                                              "Seçilen eğitimler: ${selectedServices.join(', ')}",
+                                            ),
+                                          ),
+                                        );
+
+                                        // Seçilen eğitimler varsa TrainingTypePage'e yönlendir
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const ServiceDatePage(),
+                                                TrainingTypePage(
+                                                    // opsiyonel parametre
+                                                    ),
                                           ),
                                         );
                                       }
@@ -185,7 +215,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
-                                    gradient: selectedOption != null
+                                    gradient: selectedServices.isNotEmpty
                                         ? appGradient
                                         : LinearGradient(
                                             colors: [
@@ -195,7 +225,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                                           ),
                                     borderRadius: BorderRadius.circular(14),
                                     boxShadow: [
-                                      if (selectedOption != null)
+                                      if (selectedServices.isNotEmpty)
                                         const BoxShadow(
                                           color: Colors.purpleAccent,
                                           blurRadius: 8,
@@ -207,7 +237,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                                     child: Text(
                                       "İleri",
                                       style: TextStyle(
-                                        color: selectedOption != null
+                                        color: selectedServices.isNotEmpty
                                             ? Colors.white
                                             : Colors.black54,
                                         fontSize: 18,
@@ -216,7 +246,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                                     ),
                                   ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),

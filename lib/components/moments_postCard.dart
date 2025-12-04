@@ -6,7 +6,6 @@ import 'package:zoozy/models/comment.dart';
 import 'package:zoozy/services/comment_service.dart';
 import 'package:zoozy/components/comment_card.dart';
 import 'package:zoozy/components/comment_dialog.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 class MomentsPostCard extends StatefulWidget {
   final String userName;
@@ -17,7 +16,6 @@ class MomentsPostCard extends StatefulWidget {
   final int likes;
   final int comments;
   final DateTime timePosted;
-  final currentUserName;
 
   const MomentsPostCard({
     Key? key,
@@ -29,7 +27,6 @@ class MomentsPostCard extends StatefulWidget {
     required this.likes,
     required this.comments,
     required this.timePosted,
-    required this.currentUserName,
   }) : super(key: key);
 
   @override
@@ -89,9 +86,6 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
   }
 
   void toggleFavorite() async {
-    if (!await GuestAccessService.ensureLoggedIn(context)) {
-      return;
-    }
     setState(() {
       isFavorite = !isFavorite;
       likeCount += isFavorite ? 1 : -1;
@@ -194,14 +188,10 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                   iconSize: 26,
                   icon: const Icon(Icons.mode_comment_outlined,
                       color: Colors.grey),
-                  onPressed: () async {
-                    if (!await GuestAccessService.ensureLoggedIn(context)) {
-                      return;
-                    }
+                  onPressed: () {
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(
-                        currentUserName: widget.currentUserName,
                         cardId:
                             "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}",
                         onCommentAdded: _onCommentAdded,

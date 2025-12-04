@@ -11,7 +11,6 @@ import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/models/favori_item.dart';
 import 'package:zoozy/models/comment.dart';
 import 'package:zoozy/services/comment_service.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 const Color primaryPurple = Colors.deepPurple;
 
@@ -50,13 +49,11 @@ class CaregiverProfilpage extends StatefulWidget {
 class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
   final CommentService _commentService = CommentService();
   List<Comment> _comments = [];
-  String? _currentUserName;
 
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser(); // Kullanıcı adını yükle
-    _loadComments(); // Yorumları yükle
+    _loadComments();
   }
 
   void _loadComments() {
@@ -70,18 +67,7 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
     _loadComments();
   }
 
-  // SharedPreferences'tan giriş yapan kullanıcının adını al
-  Future<void> _loadCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _currentUserName = prefs.getString('username') ?? 'Bilinmeyen Kullanıcı';
-    });
-  }
-
   Future<void> _favoriyeEkle(BuildContext context) async {
-    if (!await GuestAccessService.ensureLoggedIn(context)) {
-      return;
-    }
     final prefs = await SharedPreferences.getInstance();
     List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
 
@@ -153,10 +139,7 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () async {
-              if (!await GuestAccessService.ensureLoggedIn(context)) {
-                return;
-              }
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -236,8 +219,8 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _favoriyeEkle(context),
+                          ElevatedButton(
+                            onPressed: () => _favoriyeEkle(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               shape: RoundedRectangleBorder(
@@ -347,8 +330,6 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                         likes: moment['likes'],
                         comments: moment['comments'],
                         timePosted: moment['timePosted'],
-                        currentUserName: _currentUserName ??
-                            'Bilinmeyen Kullanıcı', // ✅ Güncellendi
                       ),
                     )
                     .toList(),
@@ -378,17 +359,12 @@ class _CaregiverProfilpageState extends State<CaregiverProfilpage> {
                 ..._comments.map((comment) => CommentCard(comment: comment)),
                 const SizedBox(height: 8),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    if (!await GuestAccessService.ensureLoggedIn(context)) {
-                      return;
-                    }
+                  onPressed: () {
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(
                         cardId: widget.userName,
                         onCommentAdded: _onCommentAdded,
-                        currentUserName: _currentUserName ??
-                            'Bilinmeyen Kullanıcı', // ✅ Güncellendi
                       ),
                     );
                   },

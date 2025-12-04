@@ -3,6 +3,7 @@ import 'package:zoozy/screens/favori_page.dart';
 import 'package:zoozy/screens/help_center_page.dart';
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/components/bottom_navigation_bar.dart';
@@ -13,7 +14,6 @@ import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 import 'package:zoozy/screens/settings_screen.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -82,42 +82,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // ✅ GÜNCELLENMİŞ buildStatColumn (ikon ve renk desteği)
   Widget buildStatColumn(
     String label,
     String value, {
     String? subLabel,
-    IconData? icon,
-    Color? color,
     VoidCallback? onTap,
   }) {
     final content = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (icon != null)
-          Icon(
-            icon,
-            size: 28,
-            color: color ?? const Color(0xFF7A4FAD),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF7A4FAD),
           ),
-        if (value.isNotEmpty)
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF7A4FAD),
-            ),
-          ),
+        ),
         if (subLabel != null)
           Text(
             subLabel,
             style: const TextStyle(fontSize: 12, color: Colors.black54),
           ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
       ],
     );
 
@@ -142,7 +133,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // -------------------- ÜST BAR --------------------
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -195,7 +185,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // -------------------- PROFİL KART --------------------
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -287,7 +276,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // -------------------- İSTATİSTİKLER --------------------
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
@@ -301,10 +289,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         buildStatColumn('Kredi', '0'),
                         buildStatColumn('Yorum', '0'),
                         buildStatColumn(
-                          'Rozetlerim',
-                          '',
-                          icon: Icons.military_tech,
-                          color: Colors.purple,
+                          'Görev',
+                          '1/7',
                           onTap: () {
                             Navigator.push(
                               context,
@@ -319,7 +305,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // -------------------- MENÜ GRID --------------------
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -348,7 +333,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               MaterialPageRoute(
                                 builder: (context) => FavoriPage(
                                   favoriTipi: "profil",
-                                  previousScreen: widget,
+                                  previousScreen:
+                                      widget, // Mevcut ProfileScreen widget'ını gönder
                                 ),
                               ),
                             );
@@ -369,13 +355,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                           },
                           child: buildMenuButton(
-                              Icons.help_center, 'Yardım Merkezi'),
+                            Icons.help_center,
+                            'Yardım Merkezi',
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // -------------------- İLANLAR --------------------
                   Row(
                     children: [
                       const Text(
@@ -407,10 +394,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   InkWell(
-                    onTap: () async {
-                      if (!await GuestAccessService.ensureLoggedIn(context)) {
-                        return;
-                      }
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(

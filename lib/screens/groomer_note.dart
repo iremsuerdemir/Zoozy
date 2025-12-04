@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import '../screens/pet_pickup_page.dart';
 
 class GroomerNotePage extends StatefulWidget {
   const GroomerNotePage({super.key});
@@ -147,26 +146,11 @@ class _GroomerNotePageState extends State<GroomerNotePage> {
                               GestureDetector(
                                 onTap: () {
                                   FocusScope.of(context).unfocus();
-                                  // Notu, önceki tüm bilgileri ve notu ilet
-                                  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-                                  String petName = args != null ? (args['petName'] ?? '') : '';
-                                  String serviceName = args != null ? (args['serviceName'] ?? '') : '';
-                                  DateTime startDate = args != null ? (args['startDate'] ?? DateTime.now()) : DateTime.now();
-                                  DateTime endDate = args != null ? (args['endDate'] ?? DateTime.now()) : DateTime.now();
-                                  // eğer foto yolu varsa onu da ekle (ör: userPhoto)
-                                  String note = _noteController.text;
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PetPickupPage(),
-                                      settings: RouteSettings(arguments: {
-                                        'petName': petName,
-                                        'serviceName': serviceName,
-                                        'startDate': startDate,
-                                        'endDate': endDate,
-                                        'note': note,
-                                        // userPhoto da eklenebilir
-                                      }),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.green.shade600,
+                                      content: const Text(
+                                          "Form başarıyla gönderildi!"),
                                     ),
                                   );
                                 },

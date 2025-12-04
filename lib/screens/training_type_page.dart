@@ -1,21 +1,24 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:zoozy/screens/service_date_page.dart';
 
-class WalkCountPage extends StatefulWidget {
-  const WalkCountPage({super.key});
+class TrainingTypePage extends StatefulWidget {
+  const TrainingTypePage({super.key});
+
   @override
-  State<WalkCountPage> createState() => _WalkCountPageState();
+  State<TrainingTypePage> createState() => _TrainingTypePageState();
 }
 
-class _WalkCountPageState extends State<WalkCountPage> {
-  final List<String> walkOptions = [
-    "Günde 1 yürüyüş",
-    "Günde 2 yürüyüş",
-    "Günde 3 yürüyüş",
+class _TrainingTypePageState extends State<TrainingTypePage> {
+  final List<String> trainingOptions = [
+    "Özel eğitim dersleri",
+    "Grup eğitim dersleri",
+    "Yatılı eğitim programları",
   ];
+
   String? selectedOption;
-  // Gradient (kutular + butonlar)
+
   final LinearGradient appGradient = const LinearGradient(
     colors: [
       Colors.purple,
@@ -24,12 +27,14 @@ class _WalkCountPageState extends State<WalkCountPage> {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  Widget _buildWalkButton(String option, double fontSize) {
-    final isSelected = selectedOption == option;
+
+  Widget _buildOptionButton(String option, double fontSize) {
+    final bool isSelected = selectedOption == option;
+
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedOption = isSelected ? null : option;
+          selectedOption = option;
         });
       },
       child: AnimatedContainer(
@@ -81,22 +86,23 @@ class _WalkCountPageState extends State<WalkCountPage> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
                 colors: [
                   Color(0xFFB39DDB), // Açık mor
                   Color(0xFFF48FB1), // Açık pembe
                 ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
+
           SafeArea(
             child: Column(
               children: [
-                // Üst başlık bar
+                // Üst AppBar benzeri başlık
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -106,31 +112,33 @@ class _WalkCountPageState extends State<WalkCountPage> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Text(
-                        "Günlük Yürüyüşler",
+                        "Eğitim Türü",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 48),
+                      const SizedBox(width: 48), // boşluk dengelemek için
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 16),
-                // İçerik kısmı
+
+                // İçerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final double maxContentWidth =
                           math.min(constraints.maxWidth * 0.9, 900);
-                      final double fontSize = constraints.maxWidth > 1000
-                          ? 18
-                          : (constraints.maxWidth < 360 ? 14 : 16);
+                      final double fontSize =
+                          constraints.maxWidth < 360 ? 14 : 16;
+
                       return Center(
                         child: Container(
                           width: maxContentWidth,
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -147,35 +155,50 @@ class _WalkCountPageState extends State<WalkCountPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Evcil hayvanınız için günlük yürüyüş sıklığını seçin",
+                                "Özel ders, grup eğitimi veya yatılı eğitim programlarından hangisini tercih ediyorsunuz?",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 20),
+
                               Expanded(
                                 child: GridView.count(
                                   crossAxisCount: 2,
                                   mainAxisSpacing: 16,
                                   crossAxisSpacing: 16,
                                   childAspectRatio: 2.5,
-                                  children: walkOptions
+                                  children: trainingOptions
                                       .map((option) =>
-                                          _buildWalkButton(option, fontSize))
+                                          _buildOptionButton(option, fontSize))
                                       .toList(),
                                 ),
                               ),
+
                               const SizedBox(height: 16),
-                              // İleri butonu
+
+                              // İleri Butonu
                               GestureDetector(
                                 onTap: selectedOption != null
                                     ? () {
+                                        // SnackBar göstermek istersen bırakabilirsin
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            backgroundColor: Colors.green,
+                                            content: Text(
+                                                "Seçilen: $selectedOption"),
+                                          ),
+                                        );
+
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ServiceDatePage(),
+                                            builder: (context) => ServiceDatePage(
+                                                // selectedServiceOption:
+                                                //selectedOption, // opsiyonel parametre
+                                                ),
                                           ),
                                         );
                                       }
@@ -216,7 +239,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                                     ),
                                   ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
@@ -224,6 +247,7 @@ class _WalkCountPageState extends State<WalkCountPage> {
                     },
                   ),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),

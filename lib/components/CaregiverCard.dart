@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/models/favori_item.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 class CaregiverCardAsset extends StatefulWidget {
   final String name;
@@ -28,9 +27,6 @@ class CaregiverCardAsset extends StatefulWidget {
 
 class _CaregiverCardAssetState extends State<CaregiverCardAsset> {
   Future<void> _toggleFavorite() async {
-    if (!await GuestAccessService.ensureLoggedIn(context)) {
-      return;
-    }
     final prefs = await SharedPreferences.getInstance();
     List<String> mevcutFavoriler = prefs.getStringList("favoriler") ?? [];
 

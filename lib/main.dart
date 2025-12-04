@@ -24,6 +24,7 @@ import 'package:zoozy/screens/login_page.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
 import 'package:zoozy/screens/owner_Login_Page.dart';
 import 'package:zoozy/screens/password_forgot_screen.dart';
+import 'package:zoozy/screens/petTrainingPage.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
 import 'package:zoozy/screens/service_name_page.dart';
@@ -39,8 +40,7 @@ import 'package:zoozy/screens/confirm_phone_screen.dart';
 
 //   GoogleSignIn
 final GoogleSignIn googleSignIn = GoogleSignIn(
-  clientId:
-      "301880499217-ke43kqtvdpue274f5d4lmjnbbt0enorg.apps.googleusercontent.com",
+  clientId: "301880499217-webab6f352ce3c0e0df43a5b0.apps.googleusercontent.com",
   scopes: ['email'],
 );
 
@@ -90,7 +90,9 @@ class MyApp extends StatelessWidget {
 
       //   Uygulama dili zorunlu Türkçe
       locale: const Locale('tr', 'TR'),
-      supportedLocales: const [Locale('tr', 'TR')],
+      supportedLocales: const [
+        Locale('tr', 'TR'),
+      ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -98,15 +100,8 @@ class MyApp extends StatelessWidget {
       ],
 
       //   İlk açılan sayfa
-      home: LoginPage(),
-      /*CaregiverProfilpage(
-        displayName: "İrem Su Erdemir",
-        userName: "iremsuerdemir",
-        location: "Edirne, Türkiye",
-        bio: "Hayvanları çok seven, profesyonel bakım sağlayıcı.",
-        userPhoto: "https://cdn-icons-png.flaticon.com/512/194/194938.png",
-      ),
-*/
+      home: ExploreScreen(),
+
       routes: {
         '/addServiceRate': (context) => const AddServiceRatePageFromPrefs(),
         '/confirmPhone': (context) => const ConfirmPhoneScreen(),

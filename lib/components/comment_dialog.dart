@@ -1,16 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:zoozy/models/comment.dart';
 
 class CommentDialog extends StatefulWidget {
   final String cardId;
   final Function(Comment) onCommentAdded;
-  final String currentUserName;
+
   const CommentDialog({
     Key? key,
     required this.cardId,
     required this.onCommentAdded,
-    required this.currentUserName,
   }) : super(key: key);
 
   @override
@@ -20,6 +18,8 @@ class CommentDialog extends StatefulWidget {
 class _CommentDialogState extends State<CommentDialog> {
   final TextEditingController _messageController = TextEditingController();
   int _selectedRating = 5;
+  final String _authorName = "Kullanıcı";
+  final String _authorAvatar = "assets/images/caregiver1.png";
 
   @override
   void dispose() {
@@ -40,8 +40,8 @@ class _CommentDialogState extends State<CommentDialog> {
       message: _messageController.text.trim(),
       rating: _selectedRating,
       createdAt: DateTime.now(),
-      authorName: widget.currentUserName,
-      authorAvatar: "assets/images/caregiver1.png",
+      authorName: _authorName,
+      authorAvatar: _authorAvatar,
     );
 
     widget.onCommentAdded(comment);

@@ -88,8 +88,8 @@ class _UploadPhotoScreenState extends State<UploadPhotoScreen> {
     if (secilenFoto == null) return;
 
     final yol = secilenFoto.path;
-    Uint8List bytes =
-        await secilenFoto.readAsBytes(); // Her zaman byte verisini oku
+    Uint8List bytes = await secilenFoto
+        .readAsBytes(); // Her zaman byte verisini oku
     String kayitVerisi;
 
     if (kIsWeb) {
@@ -216,8 +216,9 @@ class _UploadPhotoScreenState extends State<UploadPhotoScreen> {
   }
 
   Widget _buildContentCard() {
-    List<_PhotoData> mevcutFotoListesi =
-        _mevcutAdim == 0 ? _hayvanFotograflari : _evFotograflari;
+    List<_PhotoData> mevcutFotoListesi = _mevcutAdim == 0
+        ? _hayvanFotograflari
+        : _evFotograflari;
 
     String aciklama = _mevcutAdim == 0
         ? "Evcil hayvanınızla birkaç tatlı fotoğraf yükleyin 💜"
@@ -289,10 +290,10 @@ class _UploadPhotoScreenState extends State<UploadPhotoScreen> {
                             itemCount: mevcutFotoListesi.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                ),
                             itemBuilder: (context, index) {
                               Widget imageWidget;
                               final fotoData = mevcutFotoListesi[index];

@@ -1,42 +1,47 @@
 import 'package:flutter/material.dart';
+
+import 'package:zoozy/components/selectedService.dart' as globals;
+import 'package:zoozy/screens/grooming_service_page.dart';
+import 'package:zoozy/screens/my_cities_page.dart';
+import 'package:zoozy/screens/petTrainingPage.dart';
 import 'package:zoozy/screens/reguests_screen.dart';
-import 'package:zoozy/services/guest_access_service.dart';
-import 'service_date_page.dart'; // MyCitiesPage dosyanızın doğru yolunu yazın
+import 'package:zoozy/screens/service_date_page.dart';
+import 'package:zoozy/screens/visit_type_page.dart';
+import 'package:zoozy/screens/walk_count_page.dart';
 
 class MyPetsPage extends StatelessWidget {
   final List<Map<String, dynamic>> pets = [
     {
       "name": "Dog",
       "color": Colors.orange,
-      "icon": "🐶",
+      "icon": ":dog:",
     },
     {
       "name": "Cat",
       "color": Colors.purple,
-      "icon": "🐱",
+      "icon": ":cat:",
     },
     {
       "name": "Rabbit",
       "color": Colors.lightBlue,
-      "icon": "🐇",
+      "icon": ":rabbit2:",
     },
     {
       "name": "Guinea Pig",
       "color": Colors.greenAccent,
-      "icon": "🐹",
+      "icon": ":hamster:",
     },
     {
       "name": "Ferret",
       "color": Colors.deepOrangeAccent,
-      "icon": "🦦",
+      "icon": ":otter:",
     },
     {
       "name": "Bird",
       "color": Colors.redAccent,
-      "icon": "🕊",
+      "icon": ":dove_of_peace:",
     },
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,17 +64,10 @@ class MyPetsPage extends StatelessWidget {
           ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () async {
-              if (!await GuestAccessService.ensureLoggedIn(context)) {
-                return;
-              }
+            onPressed: () {
               if (Navigator.canPop(context)) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RequestsScreen(),
-                  ),
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => RequestsScreen()));
               }
             },
           ),
@@ -108,28 +106,65 @@ class MyPetsPage extends StatelessWidget {
           itemBuilder: (context, index) {
             return InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () async {
-                if (!await GuestAccessService.ensureLoggedIn(context)) {
-                  return;
+              onTap: () {
+                Navigator.pop(context); // Modalı kapat
+
+                // Global değişkene göre yönlendirme
+                switch (globals.selectedService) {
+                  case "Pansiyon":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ServiceDatePage()),
+                    );
+                    break;
+                  case "Gündüz Bakımı":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ServiceDatePage()),
+                    );
+                    break;
+                  case "Evde Bakım":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => VisitTypePage()),
+                    );
+                    break;
+                  case "Gezdirme":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => WalkCountPage()),
+                    );
+                    break;
+                  case "Taksi":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ServiceDatePage()),
+                    );
+                    break;
+                  case "Bakım":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GroomingServicePage()),
+                    );
+                    break;
+                  case "Eğitim":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PetTrainingPage()),
+                    );
+                    break;
+                  default:
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyPetsPage()),
+                    );
+                    break;
                 }
-                // ModalRoute'dan gelen serviceName'i al
-                final args = ModalRoute.of(context)?.settings.arguments
-                    as Map<String, dynamic>?;
-                String? serviceName =
-                    args != null ? args['serviceName'] as String? : null;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ServiceDatePage(petName: pets[index]["name"]),
-                    settings: RouteSettings(
-                      arguments: {
-                        'petName': pets[index]["name"],
-                        'serviceName': serviceName ?? '',
-                      },
-                    ),
-                  ),
-                );
               },
               child: Card(
                 shape: RoundedRectangleBorder(

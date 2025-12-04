@@ -2,11 +2,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:zoozy/components/selectedService.dart' as globals;
 import 'package:zoozy/screens/my_cities_page.dart';
+import 'add_location.dart';
 
 class ServiceDatePage extends StatefulWidget {
-  final String petName;
-  const ServiceDatePage({super.key, required this.petName});
+  const ServiceDatePage({super.key});
 
   @override
   State<ServiceDatePage> createState() => _ServiceDatePageState();
@@ -27,33 +28,30 @@ class _ServiceDatePageState extends State<ServiceDatePage> {
   }
 
   void _onNext() {
-    if (_isStartSelected) {
+    // Eğer hizmet 'Taksi' ise sadece başlangıç tarihi/saatini seç ve hemen yönlendir
+    if (globals.selectedService == "Taksi") {
       if (_startDate != null && _startTime != null) {
-        setState(() {
-          _isStartSelected = false; // Bitiş seçimine geç
-        });
-      }
-    } else {
-      if (_endDate != null && _endTime != null) {
-        // Hem başlangıç hem bitiş alındı → MyCitiesPage sayfasına git
-        final args =
-            ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => MyCitiesPage(),
-            settings: RouteSettings(
-              arguments: {
-                'petName': widget.petName,
-                'serviceName': args?['serviceName'] ?? '',
-                'startDate': _startDate,
-                'startTime': _startTime,
-                'endDate': _endDate,
-                'endTime': _endTime,
-              },
-            ),
-          ),
+          MaterialPageRoute(builder: (context) => const MyCitiesPage()),
         );
+      }
+    } else {
+      // Diğer hizmetlerde normal akış
+      if (_isStartSelected) {
+        if (_startDate != null && _startTime != null) {
+          setState(() {
+            _isStartSelected = false; // Bitiş seçimine geç
+          });
+        }
+      } else {
+        if (_endDate != null && _endTime != null) {
+          // Hem başlangıç hem bitiş alındı → AddLocation sayfasına git
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MyCitiesPage()),
+          );
+        }
       }
     }
   }
