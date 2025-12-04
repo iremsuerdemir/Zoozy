@@ -1,0 +1,6 @@
+@ZoozyApi_HostAddress = http://localhost:5182
+
+GET {{ZoozyApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

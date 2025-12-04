@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Uygulama Adı -->
+    <string name="app_name">zoozy</string>
+
+    <!-- Facebook App ID -->
+    <string name="facebook_app_id">1199373132023022</string>
+
+    <!-- Temalar -->
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- Uygulama başlatılırken gösterilecek splash ekran -->
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- Flutter UI yüklenene kadar pencere arka planı -->
+        <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+</resources>

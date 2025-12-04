@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <meta name="google-signin-client_id"
+    content="301880499217-ke43kqtvdpue274f5d4lmjnbbt0enorg.apps.googleusercontent.com">
+
+  <meta property="fb:app_id" content="1199373132023022" />
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="zoozy">
+
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <title>zoozy</title>
+  <link rel="manifest" href="manifest.json">
+
+  <script async defer
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4&libraries=places"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics-compat.js"></script>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxCjJKz8p4hDgYuzpSs27mCRGAmc8BFI4",
+      authDomain: "zoozy-proje.firebaseapp.com",
+      projectId: "zoozy-proje",
+      storageBucket: "zoozy-proje.appspot.com",
+      messagingSenderId: "301880499217",
+      appId: "1:301880499217:web:ab6f352ce3c0e0df43a5b0",
+      measurementId: "G-KKZ5HXFDFD"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    const clientId = "301880499217-ke43kqtvdpue274f5d4lmjnbbt0enorg.apps.googleusercontent.com";
+  </script>
+</head>
+
+<body>
+  <div id="flutter_container">
+
+  </div>
+  <!-- reCAPTCHA container -->
+  <div id="recaptcha-container"></div>
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '1199373132023022', // Senin Facebook App ID
+        cookie: true,
+        xfbml: true,
+        version: 'v21.0'
+      });
+    };
+
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) { return; }
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+
+  <script src="main.dart.js" type="application/javascript"></script>
+</body>
+
+</html>
