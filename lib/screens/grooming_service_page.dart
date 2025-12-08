@@ -1,9 +1,16 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/my_cities_page.dart';
 
 class GroomingServicePage extends StatefulWidget {
-  const GroomingServicePage({super.key});
+  final String petName;
+  final String serviceName;
+
+  const GroomingServicePage({
+    super.key,
+    required this.petName,
+    required this.serviceName,
+  });
 
   @override
   State<GroomingServicePage> createState() => _GroomingServicePageState();
@@ -20,6 +27,8 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
 
   final Set<String> selectedServices = {};
 
+  Map<String, dynamic>? incomingArgs;
+
   // Ortak gradient tanımı (kutular + buton)
   final LinearGradient appGradient = const LinearGradient(
     colors: [
@@ -29,6 +38,15 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    incomingArgs =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
+    print("GroomingServicePage gelen ARGUMENTS: $incomingArgs");
+  }
 
   Widget _buildServiceButton(String service, double fontSize) {
     final isSelected = selectedServices.contains(service);
@@ -95,8 +113,8 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFFB39DDB), // Açık mor
-                  Color(0xFFF48FB1), // Açık pembe
+                  Color(0xFFB39DDB),
+                  Color(0xFFF48FB1),
                 ],
               ),
             ),
@@ -130,7 +148,6 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Ana içerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -167,6 +184,7 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                                 ),
                               ),
                               const SizedBox(height: 20),
+
                               Expanded(
                                 child: GridView.count(
                                   crossAxisCount: 2,
@@ -174,23 +192,38 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                                   crossAxisSpacing: 16,
                                   childAspectRatio: 2.5,
                                   children: groomingServices
-                                      .map((service) => _buildServiceButton(
-                                          service, fontSize))
+                                      .map((service) =>
+                                          _buildServiceButton(service, fontSize))
                                       .toList(),
                                 ),
                               ),
                               const SizedBox(height: 16),
 
-                              // İleri Butonu
+                              // İleri Butonu (TÜM VERİLER GÖNDERİLİYOR)
                               GestureDetector(
                                 onTap: selectedServices.isNotEmpty
                                     ? () {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.green,
-                                            content: Text(
-                                              "Seçilen hizmetler: ${selectedServices.join(', ')}",
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MyCitiesPage(),
+                                            settings: RouteSettings(
+                                              arguments: {
+                                                "petName": widget.petName,
+                                                "serviceName":
+                                                    widget.serviceName,
+                                                "startDate":
+                                                    incomingArgs?["startDate"],
+                                                "startTime":
+                                                    incomingArgs?["startTime"],
+                                                "endDate":
+                                                    incomingArgs?["endDate"],
+                                                "endTime":
+                                                    incomingArgs?["endTime"],
+                                                "groomingServices":
+                                                    selectedServices.toList(),
+                                              },
                                             ),
                                           ),
                                         );
@@ -240,6 +273,7 @@ class _GroomingServicePageState extends State<GroomingServicePage> {
                     },
                   ),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),

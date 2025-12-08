@@ -13,6 +13,7 @@ import 'package:zoozy/screens/about_me_page.dart';
 import 'package:zoozy/screens/add_location.dart';
 import 'package:zoozy/screens/add_service_rate_page.dart'
     show AddServiceRatePageFromPrefs;
+import 'package:zoozy/screens/backers_list_screen.dart';
 import 'package:zoozy/screens/board_note_page.dart';
 import 'package:zoozy/screens/caregiverProfilPage.dart';
 import 'package:zoozy/screens/describe_services_page.dart';
@@ -27,7 +28,7 @@ import 'package:zoozy/screens/my_cities_page.dart';
 import 'package:zoozy/screens/owner_Login_Page.dart';
 import 'package:zoozy/screens/password_forgot_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/screens/requests_screen.dart';
 import 'package:zoozy/screens/service_name_page.dart';
 import 'package:zoozy/screens/services.dart';
 import 'package:zoozy/screens/services_rates.dart';
@@ -112,7 +113,7 @@ class MyApp extends StatelessWidget {
       ],
 
       //   İlk açılan sayfa
-      home: OwnerLoginPage(),
+      home: BackersListScreen(),
       /*CaregiverProfilpage(
         displayName: "İrem Su Erdemir",
         userName: "iremsuerdemir",

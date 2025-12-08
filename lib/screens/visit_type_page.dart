@@ -1,15 +1,23 @@
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
+import 'package:zoozy/screens/my_cities_page.dart';
 
 class VisitTypePage extends StatefulWidget {
-  const VisitTypePage({super.key});
+  final String petName;
+  final String serviceName;
+
+  const VisitTypePage({
+    super.key,
+    required this.petName,
+    required this.serviceName,
+  });
 
   @override
   State<VisitTypePage> createState() => _VisitTypePageState();
 }
 
 class _VisitTypePageState extends State<VisitTypePage> {
+  // Ziyaret tipleri
   final List<String> visitTypes = [
     "Gece konaklama",
     "Günde 1 ziyaret",
@@ -19,6 +27,20 @@ class _VisitTypePageState extends State<VisitTypePage> {
 
   String? selectedType;
 
+  // ServiceDatePage'den gelecek veriler
+  Map<String, dynamic>? incomingArgs;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    incomingArgs =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
+    print("VisitTypePage gelen ARGUMENTS: $incomingArgs");
+  }
+
+  // Ana gradient
   final LinearGradient appGradient = const LinearGradient(
     colors: [
       Colors.purple,
@@ -28,6 +50,7 @@ class _VisitTypePageState extends State<VisitTypePage> {
     end: Alignment.bottomRight,
   );
 
+  // Ziyaret butonu widget
   Widget _buildVisitButton(String type, double fontSize) {
     final isSelected = selectedType == type;
 
@@ -86,15 +109,13 @@ class _VisitTypePageState extends State<VisitTypePage> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
+                colors: [Color(0xFFB39DDB), Color(0xFFF48FB1)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFB39DDB),
-                  Color(0xFFF48FB1),
-                ],
               ),
             ),
           ),
+
           SafeArea(
             child: Column(
               children: [
@@ -122,9 +143,10 @@ class _VisitTypePageState extends State<VisitTypePage> {
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
-                // Ana içerik
+                // İçerik
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -145,8 +167,8 @@ class _VisitTypePageState extends State<VisitTypePage> {
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
                                 blurRadius: 10,
-                                spreadRadius: 2,
                                 offset: const Offset(0, 4),
+                                spreadRadius: 2,
                               ),
                             ],
                           ),
@@ -160,31 +182,48 @@ class _VisitTypePageState extends State<VisitTypePage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+
                               const SizedBox(height: 20),
+
                               Expanded(
                                 child: GridView.count(
                                   crossAxisCount: 2,
+                                  childAspectRatio: 2.5,
                                   mainAxisSpacing: 16,
                                   crossAxisSpacing: 16,
-                                  childAspectRatio: 2.5,
                                   children: visitTypes
-                                      .map((type) =>
-                                          _buildVisitButton(type, fontSize))
+                                      .map((t) =>
+                                          _buildVisitButton(t, fontSize))
                                       .toList(),
                                 ),
                               ),
+
                               const SizedBox(height: 16),
 
-                              // İleri Butonu
+                              // === İLERİ BUTONU: ARGUMENTS GÖNDERİLDİ ===
                               GestureDetector(
                                 onTap: selectedType != null
                                     ? () {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.green,
-                                            content: Text(
-                                              "Seçilen ziyaret türü: $selectedType",
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const MyCitiesPage(),
+                                            settings: RouteSettings(
+                                              arguments: {
+                                                "petName": widget.petName,
+                                                "serviceName":
+                                                    widget.serviceName,
+                                                "startDate":
+                                                    incomingArgs?["startDate"],
+                                                "startTime":
+                                                    incomingArgs?["startTime"],
+                                                "endDate":
+                                                    incomingArgs?["endDate"],
+                                                "endTime":
+                                                    incomingArgs?["endTime"],
+                                                "visitType": selectedType,
+                                              },
                                             ),
                                           ),
                                         );
@@ -200,16 +239,17 @@ class _VisitTypePageState extends State<VisitTypePage> {
                                         : LinearGradient(
                                             colors: [
                                               Colors.grey.shade400,
-                                              Colors.grey.shade300
+                                              Colors.grey.shade300,
                                             ],
                                           ),
                                     borderRadius: BorderRadius.circular(14),
                                     boxShadow: [
                                       if (selectedType != null)
-                                        const BoxShadow(
-                                          color: Colors.purpleAccent,
+                                        BoxShadow(
+                                          color: Colors.purpleAccent
+                                              .withOpacity(0.6),
                                           blurRadius: 8,
-                                          offset: Offset(0, 4),
+                                          offset: const Offset(0, 4),
                                         ),
                                     ],
                                   ),
@@ -217,11 +257,11 @@ class _VisitTypePageState extends State<VisitTypePage> {
                                     child: Text(
                                       "İleri",
                                       style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
                                         color: selectedType != null
                                             ? Colors.white
                                             : Colors.black54,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -234,6 +274,7 @@ class _VisitTypePageState extends State<VisitTypePage> {
                     },
                   ),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),

@@ -5,11 +5,13 @@ import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/components/moments_postCard.dart';
 import 'package:zoozy/screens/explore_screen.dart';
 import 'package:zoozy/screens/profile_screen.dart';
-import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/screens/requests_screen.dart';
 import 'package:zoozy/screens/favori_page.dart';
-import 'package:zoozy/services/guest_access_service.dart';
+import 'package:zoozy/screens/caregiverProfilPage.dart';
+// Gerekli BackersNearbyScreen import'unun burada olduğunu varsayıyoruz
 
 const Color primaryPurple = Colors.deepPurple;
+const Color _lightLilacBackground = Color(0xFFF3E5F5);
 
 class MomentsScreen extends StatefulWidget {
   const MomentsScreen({super.key});
@@ -19,6 +21,7 @@ class MomentsScreen extends StatefulWidget {
 }
 
 class _MomentsScreenState extends State<MomentsScreen> {
+  // Post verileri (Gösterim amaçlı)
   List<Map<String, dynamic>> posts = [
     {
       "userName": "berkshn",
@@ -53,7 +56,7 @@ class _MomentsScreenState extends State<MomentsScreen> {
   ];
 
   Set<String> favoriIsimleri = {};
-  String? _currentUserName; // <-- Burada değişkeni tanımladık
+  String? _currentUserName;
 
   @override
   void initState() {
@@ -82,20 +85,78 @@ class _MomentsScreenState extends State<MomentsScreen> {
     });
   }
 
+  // Bakıcı profil sayfasının ihtiyaç duyduğu eksik verileri simüle eden fonksiyon
+  Map<String, dynamic> _fetchCaregiverData(String userName) {
+    final post = posts.firstWhere(
+      (p) => p["userName"] == userName,
+      orElse: () => {
+        "displayName": "Bilinmeyen Bakıcı",
+        "userPhoto": "assets/images/default.png"
+      },
+    );
+
+    // MomentsScreen'de gösterilen post'u (moment) simülasyon olarak kullan
+    final List<Map<String, dynamic>> simuleMoments =
+        posts.where((p) => p["userName"] == userName).map((item) {
+      return item;
+    }).toList();
+
+    // CaregiverProfilpage'in beklediği verileri hazırlıyoruz
+    return {
+      "displayName": post["displayName"],
+      "userName": userName,
+      "location": "Bilinmeyen Konum",
+      "bio": "${post["displayName"]}, hayvanları çok seven bir bakıcıdır.",
+      "userPhoto": post["userPhoto"],
+      "userSkills": "Köpek Gezdirme, Kedi Bakımı",
+      "otherSkills": "İlk Yardım Bilgisi",
+      "moments": simuleMoments,
+      "reviews": [].cast<Map<String, dynamic>>().toList(),
+      "followers": 75,
+      "following": 30,
+    };
+  }
+
+  // Yönlendirme fonksiyonu
+  void _navigateToCaregiverProfile(String userName) {
+    final data = _fetchCaregiverData(userName);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CaregiverProfilpage(
+          displayName: data["displayName"],
+          userName: data["userName"],
+          location: data["location"],
+          bio: data["bio"],
+          userPhoto: data["userPhoto"],
+          userSkills: data["userSkills"],
+          otherSkills: data["otherSkills"],
+          moments: data["moments"],
+          reviews: data["reviews"],
+          followers: data["followers"],
+          following: data["following"],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: _lightLilacBackground,
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.deepPurple,
+            color: primaryPurple,
             size: 28,
           ),
           onPressed: () {
+            // Geri tuşu ile ExploreScreen'e geri dönüş (replace kullanarak)
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const ExploreScreen()),
@@ -105,12 +166,13 @@ class _MomentsScreenState extends State<MomentsScreen> {
         title: const Text(
           "MOMENTS",
           style: TextStyle(
-            color: Colors.deepPurple,
+            color: primaryPurple,
             fontWeight: FontWeight.bold,
             fontSize: 22,
             letterSpacing: 1.2,
           ),
         ),
+        // 🎉 DÜZELTME: Başlık ortalandı
         centerTitle: true,
         actions: [
           IconButton(
@@ -119,10 +181,8 @@ class _MomentsScreenState extends State<MomentsScreen> {
               color: Colors.red,
               size: 28,
             ),
-            onPressed: () async {
-              if (!await GuestAccessService.ensureLoggedIn(context)) {
-                return;
-              }
+            onPressed: () {
+              // Favori sayfasına git ve geri döndüğünde favorileri yenile
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -139,7 +199,9 @@ class _MomentsScreenState extends State<MomentsScreen> {
           const SizedBox(width: 8),
         ],
       ),
+      // --- Gönderi Listesi (ListView.builder zaten responsive'dir) ---
       body: ListView.builder(
+        // Yatay boşluklar ekrandan bağımsız sabit kaldı
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         itemCount: posts.length,
         itemBuilder: (context, index) {
@@ -155,12 +217,16 @@ class _MomentsScreenState extends State<MomentsScreen> {
               description: post["description"],
               likes: post["likes"],
               comments: post["comments"],
+              // DateTime.now() formatında gelen veriyi gönderiyoruz
               timePosted: post["timePosted"],
               currentUserName: _currentUserName ?? 'Bilinmeyen Kullanıcı',
+              // Profil resmine tıklama olayı
+              onProfileTap: () => _navigateToCaregiverProfile(post["userName"]),
             ),
           );
         },
       ),
+      // --- Alt Navigasyon Çubuğu ---
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 2,
         selectedColor: primaryPurple,

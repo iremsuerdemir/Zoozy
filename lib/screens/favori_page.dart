@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/screens/backers_list_screen.dart';
 import 'explore_screen.dart';
 import 'moments_screen.dart';
 import '../components/bottom_navigation_bar.dart'; // CustomBottomNavBar importu
@@ -289,14 +290,16 @@ class _FavoriPageState extends State<FavoriPage> {
                       builder: (context) => const MomentsScreen(),
                     ),
                   );
-                } else if (widget.favoriTipi == 'caregiver') {
+                } else if (widget.favoriTipi == 'caregivers') {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ExploreScreen(),
+                      builder: (context) => const BackersListScreen(),
                     ),
                   );
                 }
+                
+
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(

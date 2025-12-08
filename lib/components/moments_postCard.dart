@@ -1,13 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zoozy/models/favori_item.dart';
+import 'package:zoozy/models/comment.dart';
+import 'package:zoozy/services/comment_service.dart';
 import 'package:zoozy/components/comment_card.dart';
 import 'package:zoozy/components/comment_dialog.dart';
-import 'package:zoozy/models/comment.dart';
-import 'package:zoozy/models/favori_item.dart';
-import 'package:zoozy/services/comment_service.dart';
-import 'package:zoozy/services/guest_access_service.dart';
 
 class MomentsPostCard extends StatefulWidget {
   final String userName;
@@ -19,6 +17,8 @@ class MomentsPostCard extends StatefulWidget {
   final int comments;
   final DateTime timePosted;
   final currentUserName;
+  // 👇 YENİ: Profil fotoğrafına tıklama olayını yakalamak için geri çağırım
+  final VoidCallback? onProfileTap;
 
   const MomentsPostCard({
     Key? key,
@@ -31,6 +31,7 @@ class MomentsPostCard extends StatefulWidget {
     required this.comments,
     required this.timePosted,
     required this.currentUserName,
+    this.onProfileTap, // Parametreyi ekledik
   }) : super(key: key);
 
   @override
@@ -52,16 +53,19 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
     _loadComments();
   }
 
-  String get _cardId => "moment_${widget.userName}_${widget.postImage}";
-
   void _loadComments() {
+    // Moment kartı için unique cardId kullanıyoruz
+    final cardId =
+        "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}";
     setState(() {
-      _comments = _commentService.getCommentsForCard(_cardId);
+      _comments = _commentService.getCommentsForCard(cardId);
     });
   }
 
   void _onCommentAdded(Comment comment) {
-    _commentService.addComment(_cardId, comment);
+    final cardId =
+        "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}";
+    _commentService.addComment(cardId, comment);
     _loadComments();
   }
 
@@ -82,14 +86,14 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
 
     setState(() {
       isFavorite = exists;
-      likeCount = widget.likes + (exists ? 1 : 0);
+      // Favoriye ekliyse like'ı zaten artırdık, burada sadece kontrol ediyoruz.
+      // Basitlik adına, mevcut likeCount'u koruyoruz veya yeniden hesaplıyoruz.
+      // Sadece isFavorite durumunu doğru yansıtmak yeterli.
+      // Like sayısını sadece favori butonuna basıldığında değiştirmek daha doğru olur.
     });
   }
 
   void toggleFavorite() async {
-    if (!await GuestAccessService.ensureLoggedIn(context)) {
-      return;
-    }
     setState(() {
       isFavorite = !isFavorite;
       likeCount += isFavorite ? 1 : -1;
@@ -150,13 +154,21 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            leading: CircleAvatar(
-              backgroundImage: AssetImage(widget.userPhoto),
-              radius: 24,
+            // 👇 Profil resmine tıklama ekleme
+            leading: GestureDetector(
+              onTap: widget.onProfileTap,
+              child: CircleAvatar(
+                backgroundImage: AssetImage(widget.userPhoto),
+                radius: 24,
+              ),
             ),
-            title: Text(widget.displayName,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            // 👇 DisplayName'e tıklama ekleme (isteğe bağlı, ListTile'ın onTap'i yerine)
+            title: GestureDetector(
+              onTap: widget.onProfileTap,
+              child: Text(widget.displayName,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
             subtitle: Text('@${widget.userName}',
                 style: const TextStyle(color: Colors.blueAccent)),
             trailing: Text(
@@ -192,15 +204,13 @@ class _MomentsPostCardState extends State<MomentsPostCard> {
                   iconSize: 26,
                   icon: const Icon(Icons.mode_comment_outlined,
                       color: Colors.grey),
-                  onPressed: () async {
-                    if (!await GuestAccessService.ensureLoggedIn(context)) {
-                      return;
-                    }
+                  onPressed: () {
                     showDialog(
                       context: context,
                       builder: (context) => CommentDialog(
                         currentUserName: widget.currentUserName,
-                        cardId: _cardId,
+                        cardId:
+                            "moment_${widget.userName}_${widget.timePosted.millisecondsSinceEpoch}",
                         onCommentAdded: _onCommentAdded,
                       ),
                     );

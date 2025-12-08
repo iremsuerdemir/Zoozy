@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/request_item.dart';
-import 'package:zoozy/screens/reguests_screen.dart';
+import 'package:zoozy/screens/requests_screen.dart';
 import 'package:zoozy/services/guest_access_service.dart';
 
 class PetPickupPage extends StatefulWidget {

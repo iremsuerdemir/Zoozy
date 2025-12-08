@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:zoozy/models/user_model.dart';
 
 class UserService {
-  static const String baseUrl = "http://192.168.193.149:5001/api/users";
+  static const String baseUrl = "http:// 192.168.86.149:5001/api/users";
 
   // -------------------------------------------------------------
   // 🔥 Kullanıcı var mı?

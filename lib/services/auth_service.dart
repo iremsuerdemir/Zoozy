@@ -5,7 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   /// Backend API base URL
-  static const String baseUrl = 'http://192.168.193.149:5001/api/auth';
+ static const String baseUrl = 'http://192.168.86.149:5001/api/auth';
+
 
   /// Http client
   final http.Client httpClient;

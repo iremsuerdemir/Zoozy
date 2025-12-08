@@ -25,8 +25,8 @@ class RequestItem {
         'petName': petName,
         'serviceName': serviceName,
         'userPhoto': userPhoto,
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
+        'startDate': startDate.toIso8601String(), // ✔ Kaydetme doğru
+        'endDate': endDate.toIso8601String(),     // ✔ Kaydetme doğru
         'dayDiff': dayDiff,
         'note': note,
         'location': location,
@@ -36,8 +36,8 @@ class RequestItem {
         petName: json['petName'],
         serviceName: json['serviceName'],
         userPhoto: json['userPhoto'],
-        startDate: DateTime.parse(json['startDate']),
-        endDate: DateTime.parse(json['endDate']),
+        startDate: DateTime.parse(json['startDate']), // ✔ Geri alma doğru
+        endDate: DateTime.parse(json['endDate']),     // ✔ Geri alma doğru
         dayDiff: json['dayDiff'],
         note: json['note'] ?? '',
         location: json['location'] ?? '',

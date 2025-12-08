@@ -9,6 +9,7 @@ import 'package:zoozy/screens/help_center_page.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/listing_process_screen.dart';
 import 'package:zoozy/screens/my_badgets_screen.dart';
+import 'package:zoozy/screens/pet_profile_page.dart';
 import 'package:zoozy/screens/qr_code_screen.dart';
 import 'package:zoozy/screens/settings_screen.dart';
 import 'package:zoozy/services/guest_access_service.dart';
@@ -367,7 +368,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           );
                         }),
-                        buildMenuButton(Icons.pets, 'Evcil Hayvanlarım', () {}),
+                        buildMenuButton(Icons.pets, 'Evcil Hayvanlarım', () {
+                            Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PetProfilePage(
+                               fromRequestPage:true,
+                               serviceName:'',
+                              ),
+                            ),
+                          );
+                        }),
                         buildMenuButton(Icons.military_tech, 'Rozetlerim', () {
                           Navigator.push(
                             context,

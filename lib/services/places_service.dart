@@ -10,11 +10,11 @@ class PlacesService {
       return "http://localhost:5001";
     }
     if (Platform.isAndroid) {
-      return "http://192.168.135.35:5001"; // ← gerçek PC IP (USB tethering)
+      return "http://192.168.86.149:5001"; // ← gerçek PC IP (USB tethering)
     }
 
     if (Platform.isIOS) {
-      return "http://192.168.135.35:5001";
+      return "http://192.168.86.149:5001";
     }
 
     return "http://localhost:5001";

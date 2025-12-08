@@ -4,7 +4,7 @@ import 'package:zoozy/components/bottom_navigation_bar.dart';
 import 'package:zoozy/screens/indexbox_message.dart';
 import 'package:zoozy/screens/profile_screen.dart';
 import 'package:zoozy/screens/help_center_page.dart';
-import 'package:zoozy/screens/my_pets_page.dart';
+import 'package:zoozy/screens/pet_profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/request_item.dart';
 import 'package:intl/intl.dart';
@@ -204,7 +204,11 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                     fromRequestPage: true,
+                    serviceName: "Pansiyon",
+
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Pansiyon'},
                   ),
@@ -215,7 +219,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                       fromRequestPage: true,
+                    serviceName: "Gündüz Bakımı",
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Gündüz Bakımı'},
                   ),
@@ -226,7 +233,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                      fromRequestPage: true,
+                    serviceName: "Evde Bakım",
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Evde Bakım'},
                   ),
@@ -237,7 +247,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                      fromRequestPage: true,
+                    serviceName: "Gezdirme",
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Gezdirme'},
                   ),
@@ -248,7 +261,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                      fromRequestPage: true,
+                    serviceName: "Taksi",
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Taksi'},
                   ),
@@ -259,7 +275,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                      fromRequestPage: true,
+                    serviceName: "Bakım",
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Bakım'},
                   ),
@@ -270,7 +289,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyPetsPage(),
+                  builder: (context) => PetProfilePage(
+                      fromRequestPage: true,
+                    serviceName: "Eğitim",
+                  ),
                   settings: RouteSettings(
                     arguments: {'serviceName': 'Eğitim'},
                   ),
