@@ -636,10 +636,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                     Text(
                                       "Tarih: " +
                                           DateFormat('d MMMM yyyy', 'tr_TR')
-                                              .format(x.startDate) +
+                                              .format(x.endDate) +
                                           " - " +
                                           DateFormat('d MMMM yyyy', 'tr_TR')
-                                              .format(x.endDate),
+                                              .format(x.startDate),
                                       style: const TextStyle(
                                           fontSize: 15, color: Colors.black87),
                                     ),
