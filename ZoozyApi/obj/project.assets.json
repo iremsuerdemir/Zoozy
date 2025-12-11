@@ -4628,11 +4628,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\erdem\\Desktop\\Zoozy-4\\ZoozyApi\\ZoozyApi.csproj",
+      "projectUniqueName": "C:\\Users\\erdem\\Desktop\\Zoozy\\ZoozyApi\\ZoozyApi.csproj",
       "projectName": "ZoozyApi",
-      "projectPath": "C:\\Users\\erdem\\Desktop\\Zoozy-4\\ZoozyApi\\ZoozyApi.csproj",
+      "projectPath": "C:\\Users\\erdem\\Desktop\\Zoozy\\ZoozyApi\\ZoozyApi.csproj",
       "packagesPath": "C:\\Users\\erdem\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\erdem\\Desktop\\Zoozy-4\\ZoozyApi\\obj\\",
+      "outputPath": "C:\\Users\\erdem\\Desktop\\Zoozy\\ZoozyApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\erdem\\AppData\\Roaming\\NuGet\\NuGet.Config",

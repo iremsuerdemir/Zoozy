@@ -65,7 +65,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAll");
 
 // Lokal geliştirme HTTPS kullanmıyorsan sorun olmaz
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

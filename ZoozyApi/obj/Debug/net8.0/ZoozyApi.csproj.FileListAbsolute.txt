@@ -275,3 +275,4 @@ C:\Users\erdem\Desktop\Zoozy-4\ZoozyApi\obj\Debug\net8.0\refint\ZoozyApi.dll
 C:\Users\erdem\Desktop\Zoozy-4\ZoozyApi\obj\Debug\net8.0\ZoozyApi.pdb
 C:\Users\erdem\Desktop\Zoozy-4\ZoozyApi\obj\Debug\net8.0\ZoozyApi.genruntimeconfig.cache
 C:\Users\erdem\Desktop\Zoozy-4\ZoozyApi\obj\Debug\net8.0\ref\ZoozyApi.dll
+C:\Users\erdem\Desktop\Zoozy\ZoozyApi\obj\Debug\net8.0\ZoozyApi.sourcelink.json
